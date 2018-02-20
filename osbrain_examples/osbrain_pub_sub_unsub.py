@@ -1,5 +1,4 @@
 import time
-import random
 from osbrain import run_agent
 from osbrain import run_nameserver
 
@@ -12,26 +11,28 @@ def log_b(agent, message):
     agent.log_info('Log b: %s' % message)
 
 
+def send_messages(agent):
+    agent.send('main', 'Apple', topic='a')
+    agent.send('main', 'Banana', topic='b')
+
+
 if __name__ == '__main__':
 
     # System deployment
     ns = run_nameserver()
     alice = run_agent('Alice')
     bob = run_agent('Bob')
-    eve = run_agent('Eve')
-    dave = run_agent('Dave')
 
     # System configuration
     addr = alice.bind('PUB', alias='main')
-    bob.connect(addr, handler={'a': log_a, 'b': log_b})
-    eve.connect(addr, handler={'a': log_a})
-    dave.connect(addr, handler={'b': log_b})
+    alice.each(0.5, send_messages)
+    bob.connect(addr, alias='listener', handler={'a': log_a})
 
-    # Send messages
-    for i in range(6):
-        time.sleep(1)
-        topic = random.choice(['a', 'b'])
-        message = 'Hello, %s!' % topic
-        alice.send('main', message, topic=topic)
+    time.sleep(2)
+
+    bob.unsubscribe('listener', 'a')
+    bob.subscribe('listener', handlers={'b': log_b})
+
+    time.sleep(2)
 
     ns.shutdown()

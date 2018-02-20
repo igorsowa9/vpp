@@ -12,4 +12,5 @@ if __name__ == '__main__':
     # Show agents registered in the name server
     agent = ns.proxy('Agent1')
     agent.log_info('Hello world!')
-    print(agent.name)
+
+    ns.shutdown()
