@@ -1,0 +1,3 @@
+calling of the remote objects:
+https://pythonhosted.org/Pyro4/clientcode.html
+@expose decorator!
