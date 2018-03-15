@@ -4,121 +4,182 @@ import numpy as np
 import sys
 from osbrain import run_agent
 from osbrain import run_nameserver
+from pprint import pprint as pp
 from osbrain import Agent
+import Pyro4
 
-import matplotlib.pyplot as plt
-
-data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
-data_paths = ["data/vpp1.json", "data/vpp2.json", "data/vpp3.json", "data/vpp4.json"]
-vpp_n = len(data_names)
-ts_n = 10
-# connections for negotiations defined (squere)
-adj_matrix = np.array([[True, True, True, False],
-                       [True, True, False, True],
-                       [True, False, True, True],
-                       [False, True, True, True]], dtype=bool)
+from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix, print_data
+from ext_agents import VPP_ext_agent
 
 
-class VPP_ext_agent(Agent):
-    def on_init(self):
-        #self.bind('PUSH', alias='main')
-        pass
-
-    def load_data(self, path):
-        with open(path, 'r') as f:
-            arr = json.load(f)
-        return arr
-
-    def status_report(self, name):
-        self.send('main', 'Hello, %s!' % name)
-
-def print_data():
-    gen_sum = np.zeros(ts_n)
-    load_sum = np.zeros(ts_n)
-
-    plt.figure(1)
-    for vi in range(vpp_n):
-        with open("data/" + data_names[vi] + ".json", 'r') as f:
-            ar = json.load(f)
-
-        plt.subplot(vi + 221)
-        gen = plt.plot(ar["generation"])
-        load = plt.plot(ar["load"])
-
-        plt.setp(gen, 'color', 'b', 'linewidth', 2.0)
-        plt.setp(load, 'color', 'r', 'linewidth', 2.0)
-
-        plt.ylabel('gen/load aggr. power ' + data_names[vi])
-
-        gen_sum = np.sum([gen_sum, np.array([ar["generation"]])], axis=0)
-        load_sum = np.sum([load_sum, np.array([ar["load"]])], axis=0)
-
-    plt.figure(2)  # sum of all laods generations etc.
-    gen = plt.plot(gen_sum[0])
-    load = plt.plot(load_sum[0])
-    plt.setp(gen, 'color', 'b', 'linewidth', 2.0)
-    plt.setp(load, 'color', 'r', 'linewidth', 2.0)
-    plt.ylabel('total gen/load power of the system')
-
-def request_log(self, message):
-    self.log_info('Request log: %s' % message)
+global_time = 0
 
 
-if __name__ == '__main__':
+def global_time_set(new_time):
+    global global_time
+    global_time = new_time
 
-    print_data()
+    for alias in ns.agents():
+        a = ns.proxy(alias)
+        a.set_attr(agent_time=global_time)
+    print("--- all time variables set to: " + str(new_time) + " ---")
 
-    # initialization of the agents
-    ns = run_nameserver()
-    for vpp_idx in range(vpp_n):
-        agent = run_agent(data_names[vpp_idx], base=VPP_ext_agent)
-        agent.set_attr(myname=str(data_names[vpp_idx]))
-        print(agent.myname)
 
-    # Show agents registered in the name server
-    # for alias in ns.agents():
-    #    print(alias)
-    # print("----------------------")
+def request_handler(self, message):  # Excess' reaction for a request from deficit agent
+    self.log_info('Request received from: ' + str(message[0]) +
+                  ' Value: ' + str(message[1]) +
+                  ' Other content: ' + str(message[2]))
+    self.set_attr(n_requests=self.get_attr('n_requests')+1)
 
-    # subscriptions to neighbours only
-    for vpp_idx in range(vpp_n):
+    # now, reply of the price curve should be triggered
+    myaddr = self.bind('PUSH', alias='price_curve_reply')
+    ns.proxy(message[0]).connect(myaddr, handler=price_curve_handler)
+    power_balance = self.current_balance(self.get_attr('agent_time'))
 
-        agent = ns.proxy(data_names[vpp_idx])
-        addr = agent.bind('PUB', alias='main') # this agent will publish to neighbours
+    # check if is an excess now
+    if power_balance > 0:
+        self.log_info("I have " + str(power_balance) + " to sell. Sending price curve...")
+        val = float(message[1]) if power_balance >= float(message[1]) else power_balance
+        price = self.current_price(self.get_attr('agent_time'))
+        price_curve_array = np.array([self.name, val, price, "I send the price curve"])
+        self.send('price_curve_reply', price_curve_array)
+    else:
+        self.log_info("I cannot sell (D of B). Sending rejection...")
+        price_curve_array = np.array([self.name, False, False, "Rejection. No price curve"])
+        self.send('price_curve_reply', price_curve_array)
 
-        for n in range(vpp_n):
-            if n == vpp_idx:
-                continue
-            if adj_matrix[vpp_idx][n] == True:
-                neighbour = ns.proxy(data_names[n])
-                neighbour.connect(addr, handler={'request_topic': request_log}) # only neighbours connect to the agent
 
-    # system time loop (10 timesteps for now)
-    for t in range(ts_n):
+def price_curve_handler(self, message): # Deficit reaction for the received price curve from Excess
+    self.log_info('Price curve received from: ' + str(message[0]) +
+                  ' Possible quantity: ' + str(message[1]) +
+                  ' Price: ' + str(message[2]) +
+                  ' Other content: ' + str(message[3]))
+    # save all the curves
+    self.get_attr('iteration_memory_pc').append(message)
+    #pp(self.get_attr('iteration_memory_pc'))
+
+    # after receiving all the curves&rejections, need to run my own opf now, implement to own system, create the bids...
+    if len(self.get_attr('iteration_memory_pc')) == sum(self.get_attr('adj'))-1:
+        self.log_info('All price curves received (' + str(len(self.get_attr('iteration_memory_pc'))) +
+                      '), need to run new opf, derive bids etc...')
+        bids = self.new_opf()
+
+        # send bids back to the price-curve senders
+        for b in bids:
+            to_whom = b[0]
+            price = b[1]
+            bid_value = b[2]
+            bid_offer_array = np.array([self.name, price, bid_value, "That's a bid."])
+            myaddr = self.bind('PUSH', alias='bid_offer')
+            ns.proxy(to_whom).connect(myaddr, handler=bid_offer_handler)
+            self.send('bid_offer', bid_offer_array)
+
+
+def bid_offer_handler(self, message):
+    self.log_info(message)
+    self.get_attr('iteration_memory_bid').append(message)
+
+    # gather all the bids
+    if len(self.get_attr('iteration_memory_bid')) == self.get_attr('n_requests'):
+        # make the calcualtion for final accept of or other offers
+        #################################3
+        ##################################3
+        ##################################
+        self.log_info(self.get_attr('iteration_memory_bid'))
+
+
+def runOneTimestep():
+    """
+    Should include all iterations of negotiations.
+    :return:
+    """
+    multi_consensus = False
+
+    while not multi_consensus:
+
+        # 1 iteration loop includes separate steps (loops):
+        #   - D request loop
+        #       when all are distributed then each E that receive a request evaluates own opf
+        #   - E response with price curves to all interested
+        #   - D evaluates all received curves (OPF) and send bids to E according to its OPF
+        #   - E accept bid or refuses and if so then send a new curve ---> new iteration
+
+        erase_iteration_memory()
 
         for vpp_idx in range(vpp_n):
             agent = ns.proxy(data_names[vpp_idx])
 
             # each agent checks the internal resources (from data or from internal agent (OPF))
-            json_data = agent.load_data(data_paths[vpp_idx])
+            power_balance = agent.current_balance(global_time)
 
             # each deficit agent publishes deficit to the neighbours only
-            if json_data["generation"][t] - json_data["load"][t] > 0:
+            if power_balance > 0:
                 agent.log_info("I am excess")
-            elif json_data["generation"][t] - json_data["load"][t] < 0:
-                agent.log_info("I am deficit. I'll publish requests to neighbours.")
+                agent.set_attr(current_status=['E', power_balance])
 
-                message_request = 'I am '+ ns.agents()[vpp_idx] +'. I need support!'
+            elif power_balance < 0:
+                agent.log_info("I am deficit. I'll publish requests to neighbours.")
+                agent.set_attr(current_status=['D', power_balance])
+
+                # request in the following form: name, quantity, some content
+                message_request = np.array([ns.agents()[vpp_idx], -1*power_balance, "I need help"])
                 agent.send('main', message_request, topic='request_topic')
 
             else:
                 agent.log_info("I am balanced")
+                agent.set_attr(current_status=['B', power_balance])
+                agent.set_attr(consensus=True)
 
-            # each asked and interested excess agent publishes the price curve, based on prices from data
-            # each
+        multi_consensus = True
 
+
+def erase_iteration_memory():
+    for vpp_idx in range(vpp_n):
+        a = ns.proxy(data_names[vpp_idx])
+        a.set_attr(iteration_memory_pc=[])
+        a.set_attr(iteration_memory_bid=[])
+        a.set_attr(n_requests=0)
+
+
+if __name__ == '__main__':
+
+    #print_data()
+
+    ##### Initial Settings #####
+
+    #  initialization of the agents
+    ns = run_nameserver()
+    for vpp_idx in range(vpp_n):
+        agent = run_agent(data_names[vpp_idx], base=VPP_ext_agent)
+        agent.set_attr(myname=str(data_names[vpp_idx]))
+        agent.set_attr(adj=adj_matrix[vpp_idx])
+
+
+    # for alias in ns.agents(): print(alias)
+
+    # subscriptions to neighbours only
+    for vpp_idx in range(vpp_n):
+        agent = ns.proxy(data_names[vpp_idx])
+        addr = agent.bind('PUB', alias='main') # this agent will publish to neighbours
+        for n in range(vpp_n): # loop for requesting only the neighbours
+            if n == vpp_idx:
+                continue
+            if adj_matrix[vpp_idx][n]:
+                neighbour = ns.proxy(data_names[n])
+                neighbour.connect(addr, handler={'request_topic': request_handler
+                                                 }) # only neighbours connect to the agent
+
+    # ##### RUN the simulation
+
+    global_time_set(1)
+    runOneTimestep()
+    ns.shutdown()
+    sys.exit()
+
+    for t in range(ts_n):
+        runOneTimestep()
         time.sleep(1)
+        global_time_set(t)
 
     ns.shutdown()
 
-    plt.show()

@@ -1,0 +1,4 @@
+[console_scripts]
+opf = pypower.main:opf
+pf = pypower.main:pf
+

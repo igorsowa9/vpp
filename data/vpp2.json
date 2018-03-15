@@ -1,5 +1,5 @@
 {
-	"name":"name of vpp1",
+	"name":"name of vpp2",
 	"desc":"test aggregated values obtained by controller of VPP for generation and load, i.e. after optimization etc.",    
 	"generation": [6,7,7,9,13,12,11,9,6,2],
 	"load": [5,4,3,11,12,10,7,10,6,7],
