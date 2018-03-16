@@ -2,382 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/vpp.iml" afterPath="$PROJECT_DIR$/.idea/vpp.iml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/EMSParties.py" afterPath="$PROJECT_DIR$/EMSParties.py" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/.ipynb_checkpoints/PythonFirst-checkpoint.ipynb" afterPath="$PROJECT_DIR$/Notebooks/.ipynb_checkpoints/PythonFirst-checkpoint.ipynb" />
-      <change beforePath="$PROJECT_DIR$/Notebooks/PythonFirst.ipynb" afterPath="$PROJECT_DIR$/Notebooks/PythonFirst.ipynb" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/COPYING" afterPath="$PROJECT_DIR$/SPADE-2.3/COPYING" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/MANIFEST.in" afterPath="$PROJECT_DIR$/SPADE-2.3/MANIFEST.in" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/PKG-INFO" afterPath="$PROJECT_DIR$/SPADE-2.3/PKG-INFO" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/README" afterPath="$PROJECT_DIR$/SPADE-2.3/README" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/SPADE.egg-info/PKG-INFO" afterPath="$PROJECT_DIR$/SPADE-2.3/SPADE.egg-info/PKG-INFO" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/SPADE.egg-info/SOURCES.txt" afterPath="$PROJECT_DIR$/SPADE-2.3/SPADE.egg-info/SOURCES.txt" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/SPADE.egg-info/dependency_links.txt" afterPath="$PROJECT_DIR$/SPADE-2.3/SPADE.egg-info/dependency_links.txt" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/SPADE.egg-info/requires.txt" afterPath="$PROJECT_DIR$/SPADE-2.3/SPADE.egg-info/requires.txt" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/SPADE.egg-info/top_level.txt" afterPath="$PROJECT_DIR$/SPADE-2.3/SPADE.egg-info/top_level.txt" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/ACLMessage.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/ACLMessage.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/ACLParser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/ACLParser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/AID.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/AID.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/AMS.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/AMS.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Agent.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Agent.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/BasicFipaDateTime.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/BasicFipaDateTime.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Behaviour.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Behaviour.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/DF.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/DF.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/ECLiPSeKB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/ECLiPSeKB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Envelope.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Envelope.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/FIPAMessage.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/FIPAMessage.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/FlexQueue.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/FlexQueue.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Flora2KB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Flora2KB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/MTP.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/MTP.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/MessageReceiver.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/MessageReceiver.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Organization.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Organization.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Organization_new.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Organization_new.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Platform.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Platform.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/RDF0Parser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/RDF0Parser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/RPC.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/RPC.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/ReceivedObject.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/ReceivedObject.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/SIMBA.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/SIMBA.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/SL0Parser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/SL0Parser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/SPARQLKB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/SPARQLKB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/SWIKB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/SWIKB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/SpadeConfigParser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/SpadeConfigParser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Unit.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Unit.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Unit_new.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/Unit_new.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/XMLCodec.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/XMLCodec.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/XSBKB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/XSBKB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/bdi.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/bdi.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/colors.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/colors.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/content.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/content.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/dblite.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/dblite.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/fipa.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/fipa.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/kb.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/kb.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/logic.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/logic.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/msgtypes.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/msgtypes.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/mtps/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/mtps/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/mtps/http.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/mtps/http.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/mtps/simba.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/mtps/simba.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/odict.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/odict.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/peer2peer.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/peer2peer.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/pubsub.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/pubsub.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/pygooglechart.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/pygooglechart.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/pyparsing.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/pyparsing.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/pyratemp.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/pyratemp.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/pyxf.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/pyxf.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/socialnetwork.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/socialnetwork.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/spade_backend.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/spade_backend.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/tbcbp.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/tbcbp.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/favicon.ico" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/favicon.ico" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/header.pyra" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/header.pyra" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/images/templatemo_background_section_top_bg.png" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/images/templatemo_background_section_top_bg.png" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/images/templatemo_middle_section_box_bg.png" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/images/templatemo_middle_section_box_bg.png" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/login.pyra" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/login.pyra" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/magwood.css" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/magwood.css" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/message.pyra" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/message.pyra" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/quirksmode.css" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/quirksmode.css" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/raphael-min.js" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/raphael-min.js" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/sentmsg.pyra" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/sentmsg.pyra" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/sequence-diagram-min.js" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/sequence-diagram-min.js" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/statusGreen.png" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/statusGreen.png" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/statusRed.png" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/statusRed.png" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/statusYellow.png" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/statusYellow.png" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/table.css" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/table.css" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/table_blue.css" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/table_blue.css" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/underscore-min.js" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/templates/underscore-min.js" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/wui.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/spade/wui.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/BaseDB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/BaseDB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/Checker.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/Checker.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/FileObject.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/FileObject.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/HandshakeSettings.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/HandshakeSettings.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/Session.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/Session.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/SessionCache.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/SessionCache.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/SharedKeyDB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/SharedKeyDB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/TLSConnection.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/TLSConnection.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/TLSRecordLayer.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/TLSRecordLayer.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/VerifierDB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/VerifierDB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/X509.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/X509.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/X509CertChain.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/X509CertChain.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/api.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/api.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/constants.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/constants.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/errors.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/errors.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/AsyncStateMachine.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/AsyncStateMachine.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/ClientHelper.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/ClientHelper.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/HTTPTLSConnection.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/HTTPTLSConnection.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/IMAP4_TLS.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/IMAP4_TLS.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/IntegrationHelper.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/IntegrationHelper.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/POP3_TLS.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/POP3_TLS.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/SMTP_TLS.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/SMTP_TLS.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/TLSAsyncDispatcherMixIn.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/TLSAsyncDispatcherMixIn.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/TLSSocketServerMixIn.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/TLSSocketServerMixIn.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/TLSTwistedProtocolWrapper.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/TLSTwistedProtocolWrapper.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/XMLRPCTransport.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/XMLRPCTransport.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/integration/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/mathtls.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/mathtls.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/messages.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/messages.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/AES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/AES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/ASN1Parser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/ASN1Parser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Cryptlib_AES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Cryptlib_AES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Cryptlib_RC4.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Cryptlib_RC4.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Cryptlib_TripleDES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Cryptlib_TripleDES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/OpenSSL_AES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/OpenSSL_AES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/OpenSSL_RC4.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/OpenSSL_RC4.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/OpenSSL_RSAKey.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/OpenSSL_RSAKey.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/OpenSSL_TripleDES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/OpenSSL_TripleDES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/PyCrypto_AES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/PyCrypto_AES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/PyCrypto_RC4.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/PyCrypto_RC4.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/PyCrypto_RSAKey.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/PyCrypto_RSAKey.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/PyCrypto_TripleDES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/PyCrypto_TripleDES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Python_AES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Python_AES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Python_RC4.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Python_RC4.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Python_RSAKey.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/Python_RSAKey.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/RC4.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/RC4.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/RSAKey.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/RSAKey.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/TripleDES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/TripleDES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/cipherfactory.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/cipherfactory.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/codec.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/codec.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/compat.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/compat.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/cryptomath.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/cryptomath.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/dateFuncs.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/dateFuncs.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/hmac.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/hmac.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/jython_compat.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/jython_compat.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/keyfactory.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/keyfactory.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/rijndael.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/rijndael.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/xmltools.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/tlslite/utils/xmltools.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/auth.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/auth.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/browser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/browser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/client.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/client.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/commands.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/commands.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/debug.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/debug.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/dispatcher.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/dispatcher.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/features.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/features.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/filetransfer.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/filetransfer.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/protocol.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/protocol.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/roster.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/roster.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/session.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/session.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/simplexml.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/simplexml.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/transports.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmpp/transports.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/generate-cert.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/generate-cert.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/locales.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/locales.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/config.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/config.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/db_fake.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/db_fake.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/dialback.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/dialback.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/jep0077.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/jep0077.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/jep0078.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/jep0078.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/message.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/message.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/muc.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/muc.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/oob.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/oob.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/pubsub.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/pubsub.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/roster.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/roster.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/router.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/router.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/stream.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/stream.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/webadmin.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/webadmin.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/wq.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/modules/wq.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/socker/router.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/socker/router.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/socker/socker.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/socker/socker.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/xmppd.py" afterPath="$PROJECT_DIR$/SPADE-2.3/build/lib.linux-x86_64-2.7/xmppd/xmppd.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/configure.py" afterPath="$PROJECT_DIR$/SPADE-2.3/configure.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/dist/SPADE-2.3-py2.7.egg" afterPath="$PROJECT_DIR$/SPADE-2.3/dist/SPADE-2.3-py2.7.egg" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/my_examples/myagent.py" afterPath="$PROJECT_DIR$/SPADE-2.3/my_examples/myagent.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/my_examples/myagent_OneShotBehaviour.py" afterPath="$PROJECT_DIR$/SPADE-2.3/my_examples/myagent_OneShotBehaviour.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/my_examples/myagent_PeriodicBehaviour.py" afterPath="$PROJECT_DIR$/SPADE-2.3/my_examples/myagent_PeriodicBehaviour.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/my_examples/myagent_TimeOutBehaviour.py" afterPath="$PROJECT_DIR$/SPADE-2.3/my_examples/myagent_TimeOutBehaviour.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/my_examples/myagent_messageTemplates.py" afterPath="$PROJECT_DIR$/SPADE-2.3/my_examples/myagent_messageTemplates.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/roomdb.xml" afterPath="$PROJECT_DIR$/SPADE-2.3/roomdb.xml" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/setup.cfg" afterPath="$PROJECT_DIR$/SPADE-2.3/setup.cfg" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade.xml" afterPath="$PROJECT_DIR$/SPADE-2.3/spade.xml" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/ACLMessage.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/ACLMessage.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/ACLParser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/ACLParser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/AID.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/AID.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/AMS.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/AMS.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/Agent.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/Agent.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/BasicFipaDateTime.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/BasicFipaDateTime.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/Behaviour.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/Behaviour.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/DF.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/DF.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/ECLiPSeKB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/ECLiPSeKB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/Envelope.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/Envelope.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/FIPAMessage.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/FIPAMessage.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/FlexQueue.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/FlexQueue.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/Flora2KB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/Flora2KB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/MTP.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/MTP.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/MessageReceiver.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/MessageReceiver.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/Organization.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/Organization.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/Organization_new.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/Organization_new.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/Platform.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/Platform.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/RDF0Parser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/RDF0Parser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/RPC.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/RPC.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/ReceivedObject.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/ReceivedObject.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/SIMBA.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/SIMBA.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/SL0Parser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/SL0Parser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/SPARQLKB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/SPARQLKB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/SWIKB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/SWIKB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/SpadeConfigParser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/SpadeConfigParser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/Unit.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/Unit.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/Unit_new.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/Unit_new.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/XMLCodec.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/XMLCodec.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/XSBKB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/XSBKB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/bdi.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/bdi.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/colors.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/colors.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/content.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/content.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/dblite.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/dblite.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/fipa.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/fipa.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/kb.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/kb.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/logic.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/logic.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/msgtypes.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/msgtypes.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/mtps/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/mtps/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/mtps/http.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/mtps/http.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/mtps/simba.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/mtps/simba.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/odict.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/odict.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/peer2peer.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/peer2peer.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/pubsub.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/pubsub.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/pygooglechart.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/pygooglechart.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/pyparsing.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/pyparsing.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/pyratemp.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/pyratemp.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/pyxf.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/pyxf.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/socialnetwork.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/socialnetwork.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/spade_backend.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/spade_backend.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/tbcbp.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/tbcbp.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/favicon.ico" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/favicon.ico" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/header.pyra" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/header.pyra" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/images/templatemo_background_section_top_bg.png" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/images/templatemo_background_section_top_bg.png" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/images/templatemo_middle_section_box_bg.png" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/images/templatemo_middle_section_box_bg.png" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/login.pyra" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/login.pyra" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/magwood.css" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/magwood.css" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/message.pyra" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/message.pyra" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/quirksmode.css" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/quirksmode.css" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/raphael-min.js" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/raphael-min.js" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/sentmsg.pyra" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/sentmsg.pyra" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/sequence-diagram-min.js" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/sequence-diagram-min.js" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/statusGreen.png" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/statusGreen.png" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/statusRed.png" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/statusRed.png" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/statusYellow.png" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/statusYellow.png" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/table.css" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/table.css" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/table_blue.css" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/table_blue.css" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/templates/underscore-min.js" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/templates/underscore-min.js" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/spade/wui.py" afterPath="$PROJECT_DIR$/SPADE-2.3/spade/wui.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/BaseDB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/BaseDB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/Checker.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/Checker.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/FileObject.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/FileObject.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/HandshakeSettings.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/HandshakeSettings.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/Session.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/Session.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/SessionCache.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/SessionCache.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/SharedKeyDB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/SharedKeyDB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/TLSConnection.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/TLSConnection.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/TLSRecordLayer.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/TLSRecordLayer.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/VerifierDB.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/VerifierDB.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/X509.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/X509.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/X509CertChain.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/X509CertChain.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/api.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/api.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/constants.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/constants.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/errors.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/errors.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/AsyncStateMachine.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/AsyncStateMachine.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/HTTPTLSConnection.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/HTTPTLSConnection.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/TLSAsyncDispatcherMixIn.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/TLSAsyncDispatcherMixIn.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/TLSSocketServerMixIn.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/TLSSocketServerMixIn.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/TLSTwistedProtocolWrapper.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/TLSTwistedProtocolWrapper.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/XMLRPCTransport.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/XMLRPCTransport.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/integration/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/mathtls.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/mathtls.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/messages.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/messages.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/AES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/AES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/ASN1Parser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/ASN1Parser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Cryptlib_AES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Cryptlib_AES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Cryptlib_RC4.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Cryptlib_RC4.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Cryptlib_TripleDES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Cryptlib_TripleDES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/OpenSSL_AES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/OpenSSL_AES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/OpenSSL_RC4.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/OpenSSL_RC4.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/OpenSSL_RSAKey.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/OpenSSL_RSAKey.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/OpenSSL_TripleDES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/OpenSSL_TripleDES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/PyCrypto_AES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/PyCrypto_AES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/PyCrypto_RC4.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/PyCrypto_RC4.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/PyCrypto_RSAKey.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/PyCrypto_RSAKey.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/PyCrypto_TripleDES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/PyCrypto_TripleDES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Python_AES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Python_AES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Python_RC4.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Python_RC4.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Python_RSAKey.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/Python_RSAKey.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/RC4.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/RC4.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/RSAKey.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/RSAKey.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/TripleDES.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/TripleDES.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/cipherfactory.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/cipherfactory.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/codec.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/codec.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/cryptomath.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/cryptomath.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/dateFuncs.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/dateFuncs.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/hmac.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/hmac.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/jython_compat.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/jython_compat.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/keyfactory.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/keyfactory.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/rijndael.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/rijndael.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/xmltools.py" afterPath="$PROJECT_DIR$/SPADE-2.3/tlslite/utils/xmltools.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/user_db.xml" afterPath="$PROJECT_DIR$/SPADE-2.3/user_db.xml" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/auth.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/auth.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/browser.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/browser.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/commands.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/commands.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/debug.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/debug.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/dispatcher.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/dispatcher.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/features.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/features.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/filetransfer.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/filetransfer.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/protocol.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/protocol.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/roster.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/roster.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/session.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/session.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/simplexml.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/simplexml.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmpp/transports.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmpp/transports.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd.xml" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd.xml" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/locales.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/locales.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/__init__.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/config.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/config.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/db_fake.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/db_fake.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/dialback.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/dialback.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/jep0077.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/jep0077.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/jep0078.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/jep0078.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/message.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/message.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/muc.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/muc.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/oob.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/oob.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/pubsub.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/pubsub.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/roster.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/roster.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/router.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/router.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/stream.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/stream.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/wq.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/modules/wq.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/socker/router.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/socker/router.py" />
-      <change beforePath="$PROJECT_DIR$/SPADE-2.3/xmppd/socker/socker.py" afterPath="$PROJECT_DIR$/SPADE-2.3/xmppd/socker/socker.py" />
-      <change beforePath="$PROJECT_DIR$/basictest.py" afterPath="$PROJECT_DIR$/basictest.py" />
-      <change beforePath="$PROJECT_DIR$/basictest2.py" afterPath="$PROJECT_DIR$/basictest2.py" />
-      <change beforePath="$PROJECT_DIR$/data/vpp1.json" afterPath="$PROJECT_DIR$/data/vpp1.json" />
-      <change beforePath="$PROJECT_DIR$/data/vpp2.json" afterPath="$PROJECT_DIR$/data/vpp2.json" />
-      <change beforePath="$PROJECT_DIR$/data/vpp3.json" afterPath="$PROJECT_DIR$/data/vpp3.json" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4.json" afterPath="$PROJECT_DIR$/data/vpp4.json" />
-      <change beforePath="$PROJECT_DIR$/ext_agents.py" afterPath="$PROJECT_DIR$/ext_agents.py" />
-      <change beforePath="$PROJECT_DIR$/issues.txt" afterPath="$PROJECT_DIR$/issues.txt" />
-      <change beforePath="$PROJECT_DIR$/ml_test.py" afterPath="$PROJECT_DIR$/ml_test.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_async_rep.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_async_rep.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_basics.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_basics.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_double_request_reply.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_double_request_reply.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_lambdas.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_lambdas.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_oop.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_oop.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_pub_sub.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_pub_sub.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_pub_sub_filtered.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_pub_sub_filtered.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_pub_sub_unsub.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_pub_sub_unsub.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_pull_push.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_pull_push.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_request_reply.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_request_reply.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_set_methods.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_set_methods.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_shutdown.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_shutdown.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_sync_pub_sub.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_sync_pub_sub.py" />
-      <change beforePath="$PROJECT_DIR$/osbrain_examples/osbrain_test.py" afterPath="$PROJECT_DIR$/osbrain_examples/osbrain_test.py" />
-      <change beforePath="$PROJECT_DIR$/settings.py" afterPath="$PROJECT_DIR$/settings.py" />
-      <change beforePath="$PROJECT_DIR$/vppems_v01.py" afterPath="$PROJECT_DIR$/vppems_v01.py" />
       <change beforePath="$PROJECT_DIR$/vpps_only.py" afterPath="$PROJECT_DIR$/vpps_only.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -392,8 +17,8 @@
       <file leaf-file-name="vpps_only.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/vpps_only.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="359">
-              <caret line="90" column="21" lean-forward="true" selection-start-line="90" selection-start-column="21" selection-end-line="90" selection-end-column="21" />
+            <state relative-caret-position="470">
+              <caret line="90" column="13" lean-forward="true" selection-start-line="90" selection-start-column="13" selection-end-line="90" selection-end-column="13" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -444,8 +69,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>power_bala</find>
-      <find>global_time_set</find>
       <find>global_time</find>
       <find>@Pyro4.expose</find>
       <find>I have</find>
@@ -474,6 +97,8 @@
       <find>all pr</find>
       <find>n_re</find>
       <find>n_reques</find>
+      <find>derive</find>
+      <find>erase</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -536,8 +161,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
       <pane id="Scratches" />
+      <pane id="ProjectPane" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -820,7 +445,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18867925" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4754601" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33333334" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1179,8 +804,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/vpps_only.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="359">
-          <caret line="90" column="21" lean-forward="true" selection-start-line="90" selection-start-column="21" selection-end-line="90" selection-end-column="21" />
+        <state relative-caret-position="470">
+          <caret line="90" column="13" lean-forward="true" selection-start-line="90" selection-start-column="13" selection-end-line="90" selection-end-column="13" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>

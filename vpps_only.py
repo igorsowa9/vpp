@@ -25,16 +25,17 @@ def global_time_set(new_time):
     print("--- all time variables set to: " + str(new_time) + " ---")
 
 
-def request_handler(self, message):  # Excess' reaction for a request from deficit agent
+def request_handler(self, message):  # Excess' reaction for a request from deficit agent (price curve or rejection)
     self.log_info('Request received from: ' + str(message[0]) +
                   ' Value: ' + str(message[1]) +
                   ' Other content: ' + str(message[2]))
-    self.set_attr(n_requests=self.get_attr('n_requests')+1)
+    self.set_attr(n_requests=self.get_attr('n_requests')+1)  # counts number received requests
 
     # now, reply of the price curve should be triggered
     myaddr = self.bind('PUSH', alias='price_curve_reply')
     ns.proxy(message[0]).connect(myaddr, handler=price_curve_handler)
     power_balance = self.current_balance(self.get_attr('agent_time'))
+    self.set_attr(power_balance=power_balance)
 
     # check if is an excess now
     if power_balance > 0:
@@ -79,13 +80,16 @@ def bid_offer_handler(self, message):
     self.log_info(message)
     self.get_attr('iteration_memory_bid').append(message)
 
-    # gather all the bids
+    # gather all the bids, same number as number of requests, thus number of price curves sent etc.
     if len(self.get_attr('iteration_memory_bid')) == self.get_attr('n_requests'):
-        # make the calcualtion for final accept of or other offers
-        #################################3
-        ##################################3
-        ##################################
-        self.log_info(self.get_attr('iteration_memory_bid'))
+        # make the calculation or just accept in some cases
+        vsum = 0
+        for bid in self.get_attr('iteration_memory_bid'):
+            vsum = vsum + float(bid[2])
+        if vsum <= self.get_attr('power_balance'): # if sum of all is less then excess -> accept all
+            self.log_info('Accept all bids')
+        else:
+            self.log_info('Need another negotiation iteration because sum of bid (' + vsum + ') > excess: (' + self.get_attr('power_balance') + ')')
 
 
 def runOneTimestep():
