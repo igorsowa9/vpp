@@ -1,30 +1,39 @@
+import time
 from osbrain import run_agent
 from osbrain import run_nameserver
 
 
-def reply_of_request(agent, message):
-    return 'Received ' + str(message) + ' from ' + agent.name
+def log_message(agent, message):
+    agent.log_info('Received: %s' % message)
+
+
+def log_message2(agent, message):
+    agent.log_info('Received: %s' % message)
+
 
 
 if __name__ == '__main__':
 
+    # System deployment
     ns = run_nameserver()
     alice = run_agent('Alice')
     bob = run_agent('Bob')
-    eve = run_agent('Eve')
 
-    alice.bind('REP', 'rrAlice', handler=reply_of_request)
-    bob.connect(alice.addr('rrAlice'), alias='BobToAlice')
+    # System configuration
+    addr = alice.bind('PUSH', alias='main')
+    bob.connect(addr, handler=log_message)
 
-    eve.bind('REP', 'rrEve', handler=reply_of_request)
-    bob.connect(eve.addr('rrEve'), alias='BobToEve')
+    # Send messages
+    for i in range(3):
+        time.sleep(1)
+        alice.send('main', 'Hello, Bob!')
 
-    for i in range(10):
-        bob.send('BobToAlice', i)
-        bob.send('BobToEve', i+0.5)
-        reply_to_bob1 = bob.recv('BobToAlice')
-        reply_to_bob2 = bob.recv('BobToEve')
-        print(reply_to_bob1)
-        print(reply_to_bob2)
+    addr2 = alice.bind('PUSH', alias='main2')
+    bob.connect(addr2, handler=log_message2)
+
+    # Send messages
+    for i in range(3):
+        time.sleep(1)
+        alice.send('main2', 'Hello, Bob2222222!')
 
     ns.shutdown()

@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/basictest.py" afterPath="$PROJECT_DIR$/basictest.py" />
       <change beforePath="$PROJECT_DIR$/vpps_only.py" afterPath="$PROJECT_DIR$/vpps_only.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,8 +18,20 @@
       <file leaf-file-name="vpps_only.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/vpps_only.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="470">
-              <caret line="90" column="13" lean-forward="true" selection-start-line="90" selection-start-column="13" selection-end-line="90" selection-end-column="13" />
+            <state relative-caret-position="270">
+              <caret line="96" column="31" lean-forward="true" selection-start-line="96" selection-start-column="31" selection-end-line="96" selection-end-column="31" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="basictest.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/basictest.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="162">
+              <caret line="9" column="16" lean-forward="false" selection-start-line="9" selection-start-column="16" selection-end-line="9" selection-end-column="16" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -29,7 +42,7 @@
       <file leaf-file-name="ext_agents.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ext_agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
+            <state relative-caret-position="42">
               <caret line="4" column="78" lean-forward="false" selection-start-line="4" selection-start-column="75" selection-end-line="4" selection-end-column="78" />
               <folding />
             </state>
@@ -69,11 +82,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>global_time</find>
-      <find>@Pyro4.expose</find>
-      <find>I have</find>
-      <find>power_balance</find>
-      <find>Received:</find>
       <find>request_function</find>
       <find>price_curve_function</find>
       <find>print_da</find>
@@ -99,6 +107,11 @@
       <find>n_reques</find>
       <find>derive</find>
       <find>erase</find>
+      <find>consens</find>
+      <find>I am ba</find>
+      <find>bid_offer</find>
+      <find>Accept all bid</find>
+      <find>ns.sh</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -114,7 +127,6 @@
         <option value="$PROJECT_DIR$/EMSParties.py" />
         <option value="$PROJECT_DIR$/test_ml.py" />
         <option value="$PROJECT_DIR$/ml_test.py" />
-        <option value="$PROJECT_DIR$/basictest.py" />
         <option value="$PROJECT_DIR$/osbrain_examples/osbrain_oop.py" />
         <option value="$PROJECT_DIR$/osbrain_examples/osbrain_basics.py" />
         <option value="$PROJECT_DIR$/osbrain_examples/osbrain_request_reply.py" />
@@ -135,15 +147,16 @@
         <option value="$PROJECT_DIR$/settings.py" />
         <option value="$PROJECT_DIR$/basictest2.py" />
         <option value="$PROJECT_DIR$/ext_agents.py" />
+        <option value="$PROJECT_DIR$/basictest.py" />
         <option value="$PROJECT_DIR$/vpps_only.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="64" />
-    <option name="y" value="-11" />
-    <option name="width" value="1857" />
-    <option name="height" value="1092" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="65" />
+    <option name="y" value="24" />
+    <option name="width" value="1855" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -161,8 +174,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="ProjectPane" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -170,17 +181,79 @@
               <item name="Root" type="cbb8eebc:String" user="Root" />
               <item name="vpp" type="cbb8eebc:String" user="vpp" />
             </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="External Dependencies" type="cbb8eebc:String" user="External Dependencies" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="External Dependencies" type="cbb8eebc:String" user="External Dependencies" />
+              <item name="/" type="cbb8eebc:String" user="/" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="External Dependencies" type="cbb8eebc:String" user="External Dependencies" />
+              <item name="/" type="cbb8eebc:String" user="/" />
+              <item name="home" type="cbb8eebc:String" user="home" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="External Dependencies" type="cbb8eebc:String" user="External Dependencies" />
+              <item name="/" type="cbb8eebc:String" user="/" />
+              <item name="home" type="cbb8eebc:String" user="home" />
+              <item name="iso" type="cbb8eebc:String" user="iso" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="External Dependencies" type="cbb8eebc:String" user="External Dependencies" />
+              <item name="/" type="cbb8eebc:String" user="/" />
+              <item name="home" type="cbb8eebc:String" user="home" />
+              <item name="iso" type="cbb8eebc:String" user="iso" />
+              <item name=".PyCharmCE2017.3" type="cbb8eebc:String" user=".PyCharmCE2017.3" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="External Dependencies" type="cbb8eebc:String" user="External Dependencies" />
+              <item name="/" type="cbb8eebc:String" user="/" />
+              <item name="home" type="cbb8eebc:String" user="home" />
+              <item name="iso" type="cbb8eebc:String" user="iso" />
+              <item name=".PyCharmCE2017.3" type="cbb8eebc:String" user=".PyCharmCE2017.3" />
+              <item name="system" type="cbb8eebc:String" user="system" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="External Dependencies" type="cbb8eebc:String" user="External Dependencies" />
+              <item name="/" type="cbb8eebc:String" user="/" />
+              <item name="home" type="cbb8eebc:String" user="home" />
+              <item name="iso" type="cbb8eebc:String" user="iso" />
+              <item name=".PyCharmCE2017.3" type="cbb8eebc:String" user=".PyCharmCE2017.3" />
+              <item name="system" type="cbb8eebc:String" user="system" />
+              <item name="python_stubs" type="cbb8eebc:String" user="python_stubs" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="External Dependencies" type="cbb8eebc:String" user="External Dependencies" />
+              <item name="/" type="cbb8eebc:String" user="/" />
+              <item name="home" type="cbb8eebc:String" user="home" />
+              <item name="iso" type="cbb8eebc:String" user="iso" />
+              <item name=".PyCharmCE2017.3" type="cbb8eebc:String" user=".PyCharmCE2017.3" />
+              <item name="system" type="cbb8eebc:String" user="system" />
+              <item name="python_stubs" type="cbb8eebc:String" user="python_stubs" />
+              <item name="-479595151" type="cbb8eebc:String" user="-479595151" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scratches" />
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$2/Languages" value="Python" />
     <property name="SearchEverywhereHistoryKey" value="sett&#9;ACTION&#9;ShowSettings&#10;setti&#9;ACTION&#9;ShowSettings&#10;settin&#9;ACTION&#9;ShowSettings&#10;setting&#9;ACTION&#9;ShowSettings&#10;settings&#9;ACTION&#9;ShowSettings&#10;import library&#9;null&#9;null" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../git_trialsites" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="456" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="456" />
@@ -217,6 +290,24 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.vpps_only">
+    <configuration name="basictest" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="vpp" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/basictest.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
     <configuration name="basictest2" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -248,24 +339,6 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="vpp" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/osbrain_examples/osbrain_async_rep.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
-    <configuration name="osbrain_pub_sub_filtered" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osbrain_examples" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="vpp" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/osbrain_examples/osbrain_pub_sub_filtered.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -374,19 +447,19 @@
       <option name="_new_targetType" value="&quot;PATH&quot;" />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.osbrain_pub_sub_filtered" />
-      <item index="1" class="java.lang.String" itemvalue="Python.osbrain_async_rep" />
-      <item index="2" class="java.lang.String" itemvalue="Python.osbrain_sync_pub_sub" />
-      <item index="3" class="java.lang.String" itemvalue="Python.vpps_only" />
-      <item index="4" class="java.lang.String" itemvalue="Python.basictest2" />
+      <item index="0" class="java.lang.String" itemvalue="Python.osbrain_async_rep" />
+      <item index="1" class="java.lang.String" itemvalue="Python.osbrain_sync_pub_sub" />
+      <item index="2" class="java.lang.String" itemvalue="Python.vpps_only" />
+      <item index="3" class="java.lang.String" itemvalue="Python.basictest2" />
+      <item index="4" class="java.lang.String" itemvalue="Python.basictest" />
     </list>
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Python.vpps_only" />
-        <item index="1" class="java.lang.String" itemvalue="Python.basictest2" />
-        <item index="2" class="java.lang.String" itemvalue="Python.osbrain_sync_pub_sub" />
-        <item index="3" class="java.lang.String" itemvalue="Python.osbrain_async_rep" />
-        <item index="4" class="java.lang.String" itemvalue="Python.osbrain_pub_sub_filtered" />
+        <item index="1" class="java.lang.String" itemvalue="Python.basictest" />
+        <item index="2" class="java.lang.String" itemvalue="Python.basictest2" />
+        <item index="3" class="java.lang.String" itemvalue="Python.osbrain_sync_pub_sub" />
+        <item index="4" class="java.lang.String" itemvalue="Python.osbrain_async_rep" />
       </list>
     </recent_temporary>
   </component>
@@ -439,13 +512,12 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="64" y="-11" width="1857" height="1092" extended-state="6" />
-    <editor active="true" />
+    <frame x="65" y="24" width="1855" height="1056" extended-state="0" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18867925" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33333334" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4294737" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -778,13 +850,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/basictest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="14" lean-forward="false" selection-start-line="0" selection-start-column="14" selection-end-line="0" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/basictest2.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
@@ -802,21 +867,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vpps_only.py">
+    <entry file="file://$PROJECT_DIR$/ext_agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="470">
-          <caret line="90" column="13" lean-forward="true" selection-start-line="90" selection-start-column="13" selection-end-line="90" selection-end-column="13" />
+        <state relative-caret-position="42">
+          <caret line="4" column="78" lean-forward="false" selection-start-line="4" selection-start-column="75" selection-end-line="4" selection-end-column="78" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/basictest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="16" lean-forward="false" selection-start-line="9" selection-start-column="16" selection-end-line="9" selection-end-column="16" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ext_agents.py">
+    <entry file="file://$PROJECT_DIR$/vpps_only.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="4" column="78" lean-forward="false" selection-start-line="4" selection-start-column="75" selection-end-line="4" selection-end-column="78" />
-          <folding />
+        <state relative-caret-position="270">
+          <caret line="96" column="31" lean-forward="true" selection-start-line="96" selection-start-column="31" selection-end-line="96" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

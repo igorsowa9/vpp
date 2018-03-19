@@ -71,7 +71,9 @@ def price_curve_handler(self, message): # Deficit reaction for the received pric
             price = b[1]
             bid_value = b[2]
             bid_offer_array = np.array([self.name, price, bid_value, "That's a bid."])
+
             myaddr = self.bind('PUSH', alias='bid_offer')
+            print(to_whom, myaddr, bid_offer_array)
             ns.proxy(to_whom).connect(myaddr, handler=bid_offer_handler)
             self.send('bid_offer', bid_offer_array)
 
@@ -79,6 +81,7 @@ def price_curve_handler(self, message): # Deficit reaction for the received pric
 def bid_offer_handler(self, message):
     self.log_info(message)
     self.get_attr('iteration_memory_bid').append(message)
+    myaddr = self.bind('PUSH', alias='bid_answer')
 
     # gather all the bids, same number as number of requests, thus number of price curves sent etc.
     if len(self.get_attr('iteration_memory_bid')) == self.get_attr('n_requests'):
@@ -86,10 +89,36 @@ def bid_offer_handler(self, message):
         vsum = 0
         for bid in self.get_attr('iteration_memory_bid'):
             vsum = vsum + float(bid[2])
+
         if vsum <= self.get_attr('power_balance'): # if sum of all is less then excess -> accept all
-            self.log_info('Accept all bids')
+            self.log_info('Accept all bids - send accept messages.')
+
+            # send accept to bidders
+            for bid in self.get_attr('iteration_memory_bid'):
+                to_whom = bid[0]
+                bid_answer_array = np.array([self.name, True, "That's an accept message for the bid."])
+
+                print(to_whom, myaddr, bid_answer_array)
+                ns.proxy(to_whom).connect(myaddr, handler=bid_accept_handler)
+                self.send('bid_answer', bid_answer_array)
+
+
+
+
+
+
+            self.set_attr(consensus=True)
+            self.log_info("CONSENSUS")
+
         else:
             self.log_info('Need another negotiation iteration because sum of bid (' + vsum + ') > excess: (' + self.get_attr('power_balance') + ')')
+
+
+def bid_accept_handler(self, message):
+    pass
+    #self.log_info("I received this accept: ", message)
+    #self.set_attr(consensus=True)
+    #self.log_info("CONSENSUS")
 
 
 def runOneTimestep():
@@ -133,6 +162,7 @@ def runOneTimestep():
                 agent.log_info("I am balanced")
                 agent.set_attr(current_status=['B', power_balance])
                 agent.set_attr(consensus=True)
+                agent.log_info("CONSENSUS")
 
         multi_consensus = True
 
