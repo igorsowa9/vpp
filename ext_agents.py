@@ -8,7 +8,10 @@ from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_m
 class VPP_ext_agent(Agent):
 
     def on_init(self):
-        #self.agent_time= 13
+        #self.data_names = data_names
+        #self.data_names_dict = data_names_dict
+        #self.data_paths = data_paths
+        #self.adj_matrix = adj_matrix
         pass
 
     def load_data(self, path):
@@ -29,15 +32,16 @@ class VPP_ext_agent(Agent):
         memory = self.get_attr('iteration_memory_pc')
         need = abs(self.get_attr('current_status')[1])
 
-        sorted_memory = sorted(memory, key=lambda price: price[2])
+        sorted_memory = sorted(memory, key=lambda price: price[3])
+
         bid = []
         for pc in sorted_memory:
-            pc_vpp = pc[0]
-            pc_max = float(pc[1])
-            pc_price = float(pc[2])
+            pc_vpp_idx = pc[1]
+            pc_max = float(pc[2])
+            pc_price = float(pc[3])
             if need > pc_max:
-                bid.append([pc_vpp, pc_price, pc_max])
+                bid.append([pc_vpp_idx, pc_price, pc_max])
                 need = need - pc_max
             else:
-                bid.append([pc_vpp, pc_price, need])
-        return(bid)
+                bid.append([pc_vpp_idx, pc_price, need])
+        return bid

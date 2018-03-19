@@ -2,17 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 
+ts_n = 10  # number of timestamps of whole simulation
+
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}
 data_paths = ["data/vpp1.json", "data/vpp2.json", "data/vpp3.json", "data/vpp4.json"]
 vpp_n = len(data_names)
-ts_n = 10  # number of timestamps of whole simulation
 
-# connections for negotiations defined (square) - i.e. network/electrical adjacency matrix
-adj_matrix = np.array([[True, True, False, True],
+adj_matrix = [[True, True, False, True],
                        [True, True, True, False],
                        [False, True, True, True],
-                       [True, False, True, True]], dtype=bool)
+                       [True, False, True, True]]
 
 
 def print_data():

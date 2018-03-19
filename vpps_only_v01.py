@@ -1,18 +1,44 @@
 import time
 import json
-import numpy as np
+#import numpy as npsettings
 import sys
+import numpy
 from osbrain import run_agent
 from osbrain import run_nameserver
 from pprint import pprint as pp
 from osbrain import Agent
 import Pyro4
+import array
+
+import numpy
+import zmq
 
 from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix, print_data
 from ext_agents import VPP_ext_agent
 
+import osbrain
+serializer_name = 'dill'
+#osbrain.config['SERIALIZER'] = serializer_name
 
 global_time = 0
+
+
+def send_array(self, A, flags=0, copy=True, track=False):
+    """send a numpy array with metadata"""
+    md = dict(
+        dtype=str(A.dtype),
+        shape=A.shape,
+    )
+    self.send_json(md, flags | zmq.SNDMORE)
+    return self.send(A, flags, copy=copy, track=track)
+
+
+def recv_array(self, flags=0, copy=True, track=False):
+    """recv a numpy array"""
+    md = self.recv_json(flags=flags)
+    msg = self.recv(flags=flags, copy=copy, track=track)
+    A = numpy.frombuffer(msg, dtype=md['dtype'])
+    return A.reshape(md['shape'])
 
 
 def global_time_set(new_time):
@@ -42,11 +68,11 @@ def request_handler(self, message):  # Excess' reaction for a request from defic
         self.log_info("I have " + str(power_balance) + " to sell. Sending price curve...")
         val = float(message[1]) if power_balance >= float(message[1]) else power_balance
         price = self.current_price(self.get_attr('agent_time'))
-        price_curve_array = np.array([self.name, val, price, "I send the price curve"])
+        price_curve_array = [self.name, val, price, "I send the price curve"]
         self.send('price_curve_reply', price_curve_array)
     else:
         self.log_info("I cannot sell (D of B). Sending rejection...")
-        price_curve_array = np.array([self.name, False, False, "Rejection. No price curve"])
+        price_curve_array = [self.name, False, False, "Rejection. No price curve"]
         self.send('price_curve_reply', price_curve_array)
 
 
@@ -70,10 +96,10 @@ def price_curve_handler(self, message): # Deficit reaction for the received pric
             to_whom = b[0]
             price = b[1]
             bid_value = b[2]
-            bid_offer_array = np.array([self.name, price, bid_value, "That's a bid."])
+            bid_offer_array = [self.name, price, bid_value, "That's a bid."]
 
             myaddr = self.bind('PUSH', alias='bid_offer')
-            print(to_whom, myaddr, bid_offer_array)
+            #print(to_whom, myaddr, bid_offer_array)
             ns.proxy(to_whom).connect(myaddr, handler=bid_offer_handler)
             self.send('bid_offer', bid_offer_array)
 
@@ -81,7 +107,6 @@ def price_curve_handler(self, message): # Deficit reaction for the received pric
 def bid_offer_handler(self, message):
     self.log_info(message)
     self.get_attr('iteration_memory_bid').append(message)
-    myaddr = self.bind('PUSH', alias='bid_answer')
 
     # gather all the bids, same number as number of requests, thus number of price curves sent etc.
     if len(self.get_attr('iteration_memory_bid')) == self.get_attr('n_requests'):
@@ -96,29 +121,34 @@ def bid_offer_handler(self, message):
             # send accept to bidders
             for bid in self.get_attr('iteration_memory_bid'):
                 to_whom = bid[0]
-                bid_answer_array = np.array([self.name, True, "That's an accept message for the bid."])
 
-                print(to_whom, myaddr, bid_answer_array)
+                #bid_answer_array = {"name": self.name, "value": True, "text": "That's an accept message for the bid."}
+                bid_answer_array = [self.name, True, "That's an accept message for the bid."]
+                #bid_answer_array = np.array([self.name, True, "That's an accept message for the bid."])
+                #bid_answer_array = 1
+
+                #bid_answer_array = array.array('i', bid_answer_array)
+
+                #print(to_whom, myaddr, bid_answer_array)
+                myaddr = self.bind('PUSH', alias='bid_answer', serializer='raw')
                 ns.proxy(to_whom).connect(myaddr, handler=bid_accept_handler)
                 self.send('bid_answer', bid_answer_array)
-
-
-
-
-
-
             self.set_attr(consensus=True)
-            self.log_info("CONSENSUS")
 
         else:
             self.log_info('Need another negotiation iteration because sum of bid (' + vsum + ') > excess: (' + self.get_attr('power_balance') + ')')
 
 
-def bid_accept_handler(self, message):
-    pass
-    #self.log_info("I received this accept: ", message)
-    #self.set_attr(consensus=True)
-    #self.log_info("CONSENSUS")
+def bid_accept_handler(self, message2):
+    self.log_info("I received this accept: ", message2)
+    #time.sleep(1)
+    asd = message2
+    print(asd)
+    #self.get_attr('iteration_memory_bid_accept').append(message)
+    # gather all the bids accepts, same number as number
+    # if len(self.get_attr('iteration_memory_bid')) == self.get_attr('n_requests'):
+    #     pass
+    self.set_attr(consensus=True)
 
 
 def runOneTimestep():
@@ -155,14 +185,13 @@ def runOneTimestep():
                 agent.set_attr(current_status=['D', power_balance])
 
                 # request in the following form: name, quantity, some content
-                message_request = np.array([ns.agents()[vpp_idx], -1*power_balance, "I need help"])
+                message_request = [ns.agents()[vpp_idx], -1*power_balance, "I need help"]
                 agent.send('main', message_request, topic='request_topic')
 
             else:
                 agent.log_info("I am balanced")
                 agent.set_attr(current_status=['B', power_balance])
                 agent.set_attr(consensus=True)
-                agent.log_info("CONSENSUS")
 
         multi_consensus = True
 
@@ -183,6 +212,7 @@ if __name__ == '__main__':
 
     #  initialization of the agents
     ns = run_nameserver()
+
     for vpp_idx in range(vpp_n):
         agent = run_agent(data_names[vpp_idx], base=VPP_ext_agent)
         agent.set_attr(myname=str(data_names[vpp_idx]))
@@ -207,6 +237,7 @@ if __name__ == '__main__':
 
     global_time_set(1)
     runOneTimestep()
+    time.sleep(1)
     ns.shutdown()
     sys.exit()
 
@@ -215,5 +246,5 @@ if __name__ == '__main__':
         time.sleep(1)
         global_time_set(t)
 
-    ns.shutdown()
+    #ns.shutdown()
 
