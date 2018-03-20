@@ -17,8 +17,6 @@ from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_m
 from ext_agents import VPP_ext_agent
 
 import osbrain
-serializer_name = 'pickle'
-#osbrain.config['SERIALIZER'] = serializer_name
 
 global_time = 0
 message_id_request = 1
@@ -36,6 +34,11 @@ def global_time_set(new_time):
         a.set_attr(agent_time=global_time)
     print("--- all time variables set to: " + str(new_time) + " ---")
 
+# message_request = {"message_id_request": message_id_request, "my_name": my_name,
+#                                    "power_balance": float(-1*power_balance)}
+########################3 CONVERT to dictionaries....
+###################################3
+####################################
 
 def request_handler(self, message):  # Excess' reaction for a request from deficit agent (price curve or rejection)
     vpp_idx = message[1]
@@ -177,9 +180,10 @@ def runOneTimestep():
                 agent.log_info("I am deficit. I'll publish requests to neighbours.")
                 agent.set_attr(current_status=['D', power_balance])
 
-                my_idx = vpp_idx
+                my_name = data_names[vpp_idx]
                 # request in the following form: name, quantity, some content
-                message_request = [message_id_request, my_idx, float(-1*power_balance)]
+                message_request = {"message_id_request": message_id_request, "my_name": my_name,
+                                   "power_balance": float(-1*power_balance)}
                 agent.send('main', message_request, topic='request_topic')
 
             else:
