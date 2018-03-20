@@ -34,44 +34,46 @@ def global_time_set(new_time):
         a.set_attr(agent_time=global_time)
     print("--- all time variables set to: " + str(new_time) + " ---")
 
-# message_request = {"message_id_request": message_id_request, "my_name": my_name,
-#                                    "power_balance": float(-1*power_balance)}
+
+# message_request = {"message_id": message_id_request, "vpp_name": my_name,
+#                    "value": float(-1 * power_balance)}
 ########################3 CONVERT to dictionaries....
 ###################################3
 ####################################
 
 def request_handler(self, message):  # Excess' reaction for a request from deficit agent (price curve or rejection)
-    vpp_idx = message[1]
-    power_value = message[2]
-    self.log_info('Request received from (idx): ' + str(vpp_idx) + ' Value: ' + str(power_value))
+    from_vpp = message["vpp_name"]
+    power_value = message["value"]
+    self.log_info('Request received from (idx): ' + str(from_vpp) + ' Value: ' + str(power_value))
     self.set_attr(n_requests=self.get_attr('n_requests')+1)  # counts number received requests
 
     # now, reply of the price curve should be triggered
     myaddr = self.bind('PUSH', alias='price_curve_reply')
-    ns.proxy(data_names[vpp_idx]).connect(myaddr, handler=price_curve_handler)
+    ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
     power_balance = self.current_balance(self.get_attr('agent_time'))
     self.set_attr(power_balance=power_balance)
 
-    my_idx = data_names_dict[self.name]
     # check if is an excess now
     if power_balance > 0:
         self.log_info("I have " + str(power_balance) + " to sell. Sending price curve...")
         val = float(power_value) if power_balance >= float(power_value) else power_balance
         price = float(self.current_price(self.get_attr('agent_time')))
-        price_curve_message = [message_id_price_curve, my_idx, val, price]
+        price_curve_message = {"message_id": message_id_price_curve, "vpp_name": self.name,
+                               "value": val, "price": price}
         self.send('price_curve_reply', price_curve_message)
     else:
         self.log_info("I cannot sell (D of B). Sending rejection...")
-        price_curve_message = [message_id_price_curve, my_idx, 0, 0]
+        price_curve_message = {"message_id": message_id_price_curve, "vpp_name": self.name,
+                               "value": 0, "price": 0}
         self.send('price_curve_reply', price_curve_message)
 
 
 def price_curve_handler(self, message):  # Deficit reaction for the received price curve from Excess
-    vpp_idx = message[1]
-    possible_quantity = message[2]
-    price = message[3]
+    from_vpp = message["vpp_name"]
+    possible_quantity = message["value"]
+    price = message["price"]
 
-    self.log_info('Price curve received from (idx): ' + str(vpp_idx) +
+    self.log_info('Price curve received from (idx): ' + from_vpp +
                   ' Possible quantity: ' + str(possible_quantity) +
                   ' Price: ' + str(price))
     # save all the curves
@@ -90,7 +92,8 @@ def price_curve_handler(self, message):  # Deficit reaction for the received pri
             vpp_idx_1bid = b[0]
             price = b[1]
             bid_value = b[2]
-            bid_offer_message = [message_id_bid_offer, my_idx, price, bid_value]
+            bid_offer_message = {"message_id": message_id_bid_offer, "vpp_name": self.name,
+                               "price": price, "bid_value": bid_value}
             myaddr = self.bind('PUSH', alias='bid_offer')
             ns.proxy(data_names[vpp_idx_1bid]).connect(myaddr, handler=bid_offer_handler)
             self.send('bid_offer', bid_offer_message)
@@ -182,8 +185,8 @@ def runOneTimestep():
 
                 my_name = data_names[vpp_idx]
                 # request in the following form: name, quantity, some content
-                message_request = {"message_id_request": message_id_request, "my_name": my_name,
-                                   "power_balance": float(-1*power_balance)}
+                message_request = {"message_id": message_id_request, "vpp_name": my_name,
+                                   "value": float(-1 * power_balance)}
                 agent.send('main', message_request, topic='request_topic')
 
             else:

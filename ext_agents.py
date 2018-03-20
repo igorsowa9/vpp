@@ -34,6 +34,12 @@ class VPP_ext_agent(Agent):
 
         sorted_memory = sorted(memory, key=lambda price: price[3])
 
+        # {"message_id": message_id_price_curve, "vpp_name": self.name,
+        #  "value": 0, "price": 0}
+        #########################################3
+        ######################################
+        ####################################
+
         bid = []
         for pc in sorted_memory:
             pc_vpp_idx = pc[1]
