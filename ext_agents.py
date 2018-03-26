@@ -1,8 +1,11 @@
 from osbrain import Agent
 import json
 import settings
+import time
 from pprint import pprint as pp
 from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix, print_data
+
+#from vpps_only_v03 import system_consensus_check
 
 
 class VPP_ext_agent(Agent):
@@ -32,22 +35,29 @@ class VPP_ext_agent(Agent):
         memory = self.get_attr('iteration_memory_pc')
         need = abs(self.get_attr('current_status')[1])
 
-        sorted_memory = sorted(memory, key=lambda price: price[3])
+        memory_list = []
+        for mem in memory:
+            memory_list.append([data_names_dict[mem["vpp_name"]], mem["value"], mem["price"]])
 
-        # {"message_id": message_id_price_curve, "vpp_name": self.name,
-        #  "value": 0, "price": 0}
-        #########################################3
-        ######################################
-        ####################################
+        sorted_memory = sorted(memory_list, key=lambda price: price[2])
 
-        bid = []
+        bids = []
         for pc in sorted_memory:
-            pc_vpp_idx = pc[1]
-            pc_max = float(pc[2])
-            pc_price = float(pc[3])
-            if need > pc_max:
-                bid.append([pc_vpp_idx, pc_price, pc_max])
-                need = need - pc_max
+            pc_vpp_idx = pc[0]
+            pc_maxval = float(pc[1])
+            pc_price = float(pc[2])
+            if need > pc_maxval:
+                bids.append([pc_vpp_idx, pc_price, pc_maxval])
+                need = need - pc_maxval
             else:
-                bid.append([pc_vpp_idx, pc_price, need])
-        return bid
+                bids.append([pc_vpp_idx, pc_price, need])
+        return bids
+
+
+    def set_consensus_if_norequest(self):
+
+        time.sleep(0.1)
+        if self.get_attr('n_requests') == 0:
+            self.log_info('I am E and I nobody wants to buy from me (n_requests=' + str(self.get_attr('n_requests')) +
+                          '). I set consensus.')
+            self.set_attr(consensus=True)

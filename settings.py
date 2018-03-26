@@ -9,10 +9,12 @@ data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}
 data_paths = ["data/vpp1.json", "data/vpp2.json", "data/vpp3.json", "data/vpp4.json"]
 vpp_n = len(data_names)
 
+system_status = np.zeros([ts_n, vpp_n])
+
 adj_matrix = [[True, True, False, True],
-                       [True, True, True, False],
-                       [False, True, True, True],
-                       [True, False, True, True]]
+              [True, True, True, False],
+              [False, True, True, False],
+              [True, False, False, True]]
 
 
 def print_data():

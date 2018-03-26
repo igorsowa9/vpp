@@ -2,7 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/vpp.iml" afterPath="$PROJECT_DIR$/.idea/vpp.iml" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/basictest.py" afterPath="$PROJECT_DIR$/basictest.py" />
+      <change beforePath="$PROJECT_DIR$/data/vpp1.json" afterPath="$PROJECT_DIR$/data/vpp1.json" />
+      <change beforePath="$PROJECT_DIR$/data/vpp2.json" afterPath="$PROJECT_DIR$/data/vpp2.json" />
+      <change beforePath="$PROJECT_DIR$/data/vpp3.json" afterPath="$PROJECT_DIR$/data/vpp3.json" />
+      <change beforePath="$PROJECT_DIR$/data/vpp4.json" afterPath="$PROJECT_DIR$/data/vpp4.json" />
       <change beforePath="$PROJECT_DIR$/ext_agents.py" afterPath="$PROJECT_DIR$/ext_agents.py" />
+      <change beforePath="$PROJECT_DIR$/settings.py" afterPath="$PROJECT_DIR$/settings.py" />
       <change beforePath="$PROJECT_DIR$/vpps_only_v03.py" afterPath="$PROJECT_DIR$/vpps_only_v03.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -14,22 +22,26 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="basictest.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/basictest.py">
+      <file leaf-file-name="vpps_only_v03.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/vpps_only_v03.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="198">
+              <caret line="130" column="52" lean-forward="false" selection-start-line="130" selection-start-column="52" selection-end-line="130" selection-end-column="52" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="vpps_only_v03.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vpps_only_v03.py">
+      <file leaf-file-name="ext_agents.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ext_agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
-              <caret line="65" column="30" lean-forward="false" selection-start-line="65" selection-start-column="30" selection-end-line="66" selection-end-column="54" />
-              <folding />
+            <state relative-caret-position="1080">
+              <caret line="60" column="116" lean-forward="false" selection-start-line="60" selection-start-column="116" selection-end-line="60" selection-end-column="116" />
+              <folding>
+                <element signature="e#0#25#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -37,22 +49,10 @@
       <file leaf-file-name="settings.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="108">
-              <caret line="6" column="10" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="10" />
+            <state relative-caret-position="270">
+              <caret line="15" column="39" lean-forward="false" selection-start-line="15" selection-start-column="39" selection-end-line="15" selection-end-column="39" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ext_agents.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ext_agents.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="40" column="44" lean-forward="false" selection-start-line="40" selection-start-column="44" selection-end-line="40" selection-end-column="44" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -79,36 +79,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>n_reques</find>
-      <find>derive</find>
-      <find>erase</find>
-      <find>consens</find>
-      <find>I am ba</find>
-      <find>bid_offer</find>
-      <find>Accept all bid</find>
-      <find>ns.sh</find>
-      <find>ns.</find>
-      <find>nameser</find>
-      <find>I recei</find>
-      <find>seriali</find>
-      <find>request_topic</find>
-      <find>message_id_price_curve</find>
-      <find>sys.ex</find>
-      <find>My bid</find>
-      <find>print</find>
-      <find>Price curve received from (idx</find>
-      <find>pp</find>
-      <find>request_handler</find>
-      <find>vpp_idx</find>
-      <find>float(bid[2])</find>
-      <find>float(</find>
-      <find>my_idx</find>
-      <find>pp(</find>
-      <find>message_id_offer</find>
+      <find>system_consensus_check</find>
+      <find>system_c</find>
+      <find>erase_timestep_memory</find>
+      <find>self.set_attr(con</find>
+      <find>agent.set_attr(timestep_memory_mydeals=[0])</find>
+      <find>agent.set_attr(timestep_memory_mydeals=</find>
+      <find>the bid</find>
+      <find>self.set_attr(timestep_memory_mydeals=</find>
+      <find>timestep_memory_myd</find>
+      <find>set_attr(consensus=True)</find>
+      <find>SET self.my</find>
+      <find>timestep_memory_mydeals</find>
+      <find>global_time</find>
+      <find>received from (idx)</find>
+      <find>All price cur</find>
+      <find>iteration_memory_bid</find>
+      <find>n_reque</find>
+      <find>sleep</find>
+      <find>Need another negotiation</find>
       <find>message_id_bid_answer</find>
-      <find>array</find>
-      <find>vpps_only_v02.py</find>
-      <find>message_id_request</find>
+      <find>Received bid from deficit</find>
+      <find>increased</find>
+      <find>bid_accept_handler</find>
+      <find>message_id_final_answer</find>
+      <find>iteration_memory_bid_accept</find>
+      <find>vpp_seller</find>
+      <find>price_increase_factor</find>
+      <find>Accept all bids</find>
+      <find>erase_iteration_memory</find>
+      <find>Price curve received from</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -136,27 +136,27 @@
         <option value="$PROJECT_DIR$/data/data_VPP3_Int.json" />
         <option value="$PROJECT_DIR$/data/data_VPP4_Int.json" />
         <option value="$PROJECT_DIR$/issues.txt" />
-        <option value="$PROJECT_DIR$/data/vpp1.json" />
-        <option value="$PROJECT_DIR$/data/vpp2.json" />
-        <option value="$PROJECT_DIR$/data/vpp3.json" />
-        <option value="$PROJECT_DIR$/data/vpp4.json" />
         <option value="$PROJECT_DIR$/message_handlers.py" />
         <option value="$PROJECT_DIR$/basictest2.py" />
         <option value="$PROJECT_DIR$/vpps_only.py" />
         <option value="$PROJECT_DIR$/serialsocket.py" />
-        <option value="$PROJECT_DIR$/basictest.py" />
-        <option value="$PROJECT_DIR$/settings.py" />
         <option value="$PROJECT_DIR$/vpps_only_v02.py" />
-        <option value="$PROJECT_DIR$/vpps_only_v03.py" />
+        <option value="$PROJECT_DIR$/data/vpp1.json" />
+        <option value="$PROJECT_DIR$/data/vpp2.json" />
+        <option value="$PROJECT_DIR$/data/vpp3.json" />
+        <option value="$PROJECT_DIR$/data/vpp4.json" />
         <option value="$PROJECT_DIR$/ext_agents.py" />
+        <option value="$PROJECT_DIR$/settings.py" />
+        <option value="$PROJECT_DIR$/basictest.py" />
+        <option value="$PROJECT_DIR$/vpps_only_v03.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="85" />
-    <option name="y" value="-4" />
-    <option name="width" value="1855" />
-    <option name="height" value="1084" />
+    <option name="x" value="64" />
+    <option name="y" value="-11" />
+    <option name="width" value="1857" />
+    <option name="height" value="1092" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -174,8 +174,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
-      <pane id="Scratches" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -183,10 +181,17 @@
               <item name="Root" type="cbb8eebc:String" user="Root" />
               <item name="vpp" type="cbb8eebc:String" user="vpp" />
             </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="vpp" type="cbb8eebc:String" user="vpp" />
+              <item name="data" type="cbb8eebc:String" user="data" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scratches" />
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -232,7 +237,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.vpps_only_v02">
+  <component name="RunManager" selected="Python.vpps_only_v03">
     <configuration name="basictest" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -246,24 +251,6 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="vpp" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/basictest.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
-    <configuration name="serialsocket" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="vpp" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/archive/serialsocket.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -318,6 +305,24 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="vpp" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/vpps_only_v02.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="vpps_only_v03" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="vpp" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/vpps_only_v03.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -392,17 +397,17 @@
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.vpps_only" />
       <item index="1" class="java.lang.String" itemvalue="Python.basictest" />
-      <item index="2" class="java.lang.String" itemvalue="Python.serialsocket" />
-      <item index="3" class="java.lang.String" itemvalue="Python.vppems_v02" />
-      <item index="4" class="java.lang.String" itemvalue="Python.vpps_only_v02" />
+      <item index="2" class="java.lang.String" itemvalue="Python.vppems_v02" />
+      <item index="3" class="java.lang.String" itemvalue="Python.vpps_only_v02" />
+      <item index="4" class="java.lang.String" itemvalue="Python.vpps_only_v03" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.vpps_only_v02" />
+        <item index="0" class="java.lang.String" itemvalue="Python.vpps_only_v03" />
         <item index="1" class="java.lang.String" itemvalue="Python.basictest" />
-        <item index="2" class="java.lang.String" itemvalue="Python.vppems_v02" />
-        <item index="3" class="java.lang.String" itemvalue="Python.vpps_only" />
-        <item index="4" class="java.lang.String" itemvalue="Python.serialsocket" />
+        <item index="2" class="java.lang.String" itemvalue="Python.vpps_only_v02" />
+        <item index="3" class="java.lang.String" itemvalue="Python.vppems_v02" />
+        <item index="4" class="java.lang.String" itemvalue="Python.vpps_only" />
       </list>
     </recent_temporary>
   </component>
@@ -463,28 +468,18 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3783231" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.48364007" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960325" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.398773" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4294737" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960325" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18867925" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925585" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.398773" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -724,34 +719,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp1.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp3.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="4" column="17" lean-forward="true" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="3" column="24" lean-forward="true" selection-start-line="3" selection-start-column="24" selection-end-line="3" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp2.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="4" column="15" lean-forward="true" selection-start-line="4" selection-start-column="15" selection-end-line="4" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/osbrain/agent.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="173">
@@ -801,42 +768,52 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="169">
           <caret line="35" column="18" lean-forward="false" selection-start-line="35" selection-start-column="18" selection-end-line="35" selection-end-column="18" />
-          <folding>
-            <element signature="e#63#74#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/basictest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/vpps_only_v02.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2">
-          <caret line="120" column="41" lean-forward="true" selection-start-line="120" selection-start-column="41" selection-end-line="120" selection-end-column="41" />
-          <folding>
-            <element signature="e#0#11#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="222">
+          <caret line="82" column="29" lean-forward="true" selection-start-line="82" selection-start-column="29" selection-end-line="82" selection-end-column="29" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vpps_only_v03.py">
+    <entry file="file://$PROJECT_DIR$/data/vpp1.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="65" column="30" lean-forward="false" selection-start-line="65" selection-start-column="30" selection-end-line="66" selection-end-column="54" />
+        <state relative-caret-position="72">
+          <caret line="4" column="20" lean-forward="false" selection-start-line="4" selection-start-column="20" selection-end-line="4" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp2.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="4" column="18" lean-forward="false" selection-start-line="4" selection-start-column="18" selection-end-line="4" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp3.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="25" lean-forward="false" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="4" column="18" lean-forward="false" selection-start-line="4" selection-start-column="18" selection-end-line="4" selection-end-column="18" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="6" column="10" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="10" />
+        <state relative-caret-position="270">
+          <caret line="15" column="39" lean-forward="false" selection-start-line="15" selection-start-column="39" selection-end-line="15" selection-end-column="39" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
@@ -845,10 +822,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ext_agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="40" column="44" lean-forward="false" selection-start-line="40" selection-start-column="44" selection-end-line="40" selection-end-column="44" />
+        <state relative-caret-position="1080">
+          <caret line="60" column="116" lean-forward="false" selection-start-line="60" selection-start-column="116" selection-end-line="60" selection-end-column="116" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/basictest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="6" column="4" lean-forward="true" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vpps_only_v03.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="130" column="52" lean-forward="false" selection-start-line="130" selection-start-column="52" selection-end-line="130" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
