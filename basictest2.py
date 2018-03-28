@@ -24,11 +24,11 @@ if __name__ == '__main__':
     alice = run_agent('Alice')
     bob = run_agent('Bob')
 
-    addr = alice.bind('ASYNC_REP', handler=reply_late)
-    bob.connect(addr, alias='main', handler=process_reply)
+    addr = alice.bind('ASYNC_REP', handler=reply_late)  # receiver
+    bob.connect(addr, alias='main', handler=process_reply)  # sender
 
-    #bob.send('main', 'Hello, Alice!')
-    bob.send('main', 'Hello, Alice!', handler=deaf)
+    bob.send('main', 'Hello, Alice!')
+   # bob.send('main', 'Hello, Alice!', handler=deaf)
     bob.log_info('I am done!')
 
     bob.log_info('Waiting for Alice to reply...')
