@@ -1,11 +1,31 @@
-import cmath
-import sys
+from osbrain import run_agent
+from osbrain import run_nameserver
+import time
 
-d = 1
-s = 50*1j
 
-a = -3.26e-394*cmath.exp(-8.0*d*s)*(6.2e361*cmath.exp(7.0*d*s))
+def reply_func(agent, message):
+    yield "sth for bob"
+    time.sleep(.1)
+    agent.log_info(message)
 
-print(a)
 
-# a = (-3.26e-394*math.exp(-8.0*d*s)*(6.2e361*math.exp(7.0*d*s) - math.exp(8.0*d*s)*(7e404 - 5.73e404i)))*s^34
+if __name__ == '__main__':
+
+    ns = run_nameserver()
+    alice = run_agent('Alice')
+    john = run_agent('John')
+    bob = run_agent('Bob')
+
+    addr = alice.bind('REP', handler=reply_func)
+    addr2 = john.bind('REP', handler=reply_func)
+
+    bob.connect(addr, alias='main')
+    bob.connect(addr2, alias='main2')
+
+    for i in range(10):
+        bob.send('main', i)
+        bob.send('main2', i+.5)
+        print(bob.recv('main'))
+        print(bob.recv('main2'))
+
+    ns.shutdown()

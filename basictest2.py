@@ -1,28 +1,37 @@
-import sys
+import time
+
 from osbrain import run_agent
 from osbrain import run_nameserver
 
 
-def doSomething1(param1):
-    for alias in ns.agents():
-        agent = ns.proxy(alias)
-        print("Agent: " + alias + "Status: " + str(agent.get_attr('s')))
+def reply_late(agent, message):
+    time.sleep(1)
+    agent.log_info('I received: ' + message)
+    return 'Hello, Bob!'
 
 
-def doSomething2(param2):
-    for alias in ns.agents():
-        agent = ns.proxy(alias)
-        print("Second task Value: " + str(agent.get_attr('v')))
+def process_reply(agent, message):
+    agent.log_info('Processed reply: %s' % message)
+
+
+def deaf(agent, message):
+    agent.log_info('I am deaf...')
 
 
 if __name__ == '__main__':
 
     ns = run_nameserver()
-    run_agent('Alice', attributes=dict(s='E', v=2))
-    run_agent('Bob', attributes=dict(s='D', v=-3))
-    run_agent('Charlie', attributes=dict(s='B', v=0))
+    alice = run_agent('Alice')
+    bob = run_agent('Bob')
 
+    addr = alice.bind('ASYNC_REP', handler=reply_late)
+    bob.connect(addr, alias='main', handler=process_reply)
 
-    doSomething1(1)
-    doSomething2(3)
+    #bob.send('main', 'Hello, Alice!')
+    bob.send('main', 'Hello, Alice!', handler=deaf)
+    bob.log_info('I am done!')
 
+    bob.log_info('Waiting for Alice to reply...')
+    time.sleep(2)
+
+    ns.shutdown()
