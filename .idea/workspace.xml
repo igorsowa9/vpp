@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="">
+    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="v04 requests handled in the separate loop, but then the script hangs at the vpp2 execution (?)&#10;- try to do each step separately like the requests?">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/vpps_only_v04.py" afterPath="$PROJECT_DIR$/vpps_only_v04.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,8 +20,8 @@
             <file leaf-file-name="vpps_only_v04.py" pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/vpps_only_v04.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="950">
-                    <caret line="271" column="49" lean-forward="false" selection-start-line="271" selection-start-column="49" selection-end-line="271" selection-end-column="49" />
+                  <state relative-caret-position="338">
+                    <caret line="237" column="0" lean-forward="true" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
                     <folding>
                       <element signature="e#0#11#0" expanded="true" />
                     </folding>
@@ -38,8 +39,8 @@
       <file leaf-file-name="basictest.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/basictest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="403">
-              <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+            <state relative-caret-position="421">
+              <caret line="24" column="23" lean-forward="false" selection-start-line="24" selection-start-column="23" selection-end-line="24" selection-end-column="23" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
               </folding>
@@ -472,7 +473,14 @@
       <option name="project" value="LOCAL" />
       <updated>1522245669294</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="v04 requests handled in the separate loop, but then the script hangs at the vpp2 execution (?)&#10;- try to do each step separately like the requests?">
+      <created>1522245760274</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1522245760274</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -891,22 +899,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vpps_only_v04.py">
+    <entry file="file://$PROJECT_DIR$/basictest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="950">
-          <caret line="271" column="49" lean-forward="false" selection-start-line="271" selection-start-column="49" selection-end-line="271" selection-end-column="49" />
+        <state relative-caret-position="421">
+          <caret line="24" column="23" lean-forward="false" selection-start-line="24" selection-start-column="23" selection-end-line="24" selection-end-column="23" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#0#29#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/basictest.py">
+    <entry file="file://$PROJECT_DIR$/vpps_only_v04.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="403">
-          <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+        <state relative-caret-position="338">
+          <caret line="237" column="0" lean-forward="true" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
           <folding>
-            <element signature="e#0#29#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
