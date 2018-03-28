@@ -125,10 +125,10 @@ def bid_offer_handler(self, message):  # Exc react if they receive a bid from De
             temp = self.get_attr("timestep_memory_n_iter") + 1
             self.set_attr(timestep_memory_n_iter=temp)
 
-            ########################################
-            ########################################
-            ########################################
-            ########################################
+            ###########################
+            ###########################
+            ###########################
+
 
             erase_iteration_memory()
 
