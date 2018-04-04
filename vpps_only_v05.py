@@ -1,23 +1,14 @@
 import time
-import json
-import numpy as np
 import sys
 from osbrain import run_agent
 from osbrain import run_nameserver
 from pprint import pprint as pp
-from osbrain import Agent
-import Pyro4
-import array
 import copy
 
-import numpy
-import zmq
-
 from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix, print_data, system_status, \
-    small_wait
-from ext_agents import VPP_ext_agent
-
-import osbrain
+    small_wait, price_increase_factor
+from other_agents import VPP_ext_agent
+from utilities import system_consensus_check, erase_iteration_memory, erase_timestep_memory
 
 global_time = 0
 
@@ -26,8 +17,6 @@ message_id_price_curve = 2
 message_id_bid_offer = 3
 message_id_bid_accept = 4
 message_id_final_answer = 5
-
-price_increase_factor = 6
 
 
 def global_time_set(new_time):
@@ -141,40 +130,15 @@ def bid_offer_handler(self, message):  # Exc react if they receive a bid from De
                 ns.proxy(bid['vpp_name']).connect(myaddr, handler=bid_answer_handler)
                 self.send('bid_answer', bid_answer_message)
 
-                # receiver_addr = ns.proxy(bid["vpp_name"]).bind('ASYNC_REP',
-                #                                                handler=bid_answer_handler)  # handler for receiver
-                # self.connect(receiver_addr, alias='bid_answer', handler=final_confirm_handler)  # handler for myself
-                # self.send('bid_answer', bid_answer_message)
 
         else:  # send refuse and new price curve (new iteration)
             self.log_info('Need another negotiation iteration because sum of bids (' + str(vsum) + ') > excess: (' +
                           str(self.get_attr('power_balance')) + ') - I increase the price and send new price curves '
                                                                 '(return)...')
             n_i = copy.deepcopy(self.get_attr("n_iteration"))
-            print('n_iteration: ', n_i)
             n_i = n_i + 1  # increase iteration (based on local value)
-
-            self.set_attr(n_iteration=n_i)  # attribute setting to the executing agent does not work in the function below
-            #forall_iteration_set(n_i, self.name)
-
+            self.set_attr(n_iteration=n_i)  # setting higher iteration value for the price increase only to this agent
             return  # break to start from the PC curve with increased iteration step
-
-            # for bid in self.get_attr('iteration_memory_bid'):  # loop to send new price curves i.e. refuses (push)
-            #
-            #     # power_value = bid["bid_value"]
-            #     power_balance = self.get_attr('power_balance')
-            #     # val = float(power_value) if power_balance >= float(power_value) else power_balance
-            #     val = power_balance # send all available resources offer instead of only as request
-            #     price = float(self.current_price(self.get_attr('agent_time'))) + \
-            #             price_increase_factor*self.get_attr("timestep_memory_n_iter")
-            #
-            #     self.log_info("I have " + str(power_balance) + " to sell. Sending INCREASED price curve... "
-            #                                                    "(val=" + str(val) + ", for price=" + str(price) + ")")
-            #     price_curve_message = {"message_id": message_id_price_curve, "vpp_name": self.name,
-            #                            "value": val, "price": price, 'str': 'This is new pc, being also a refuse.'}
-            #     myaddr = self.bind('PUSH', alias='price_curve_reply')
-            #     ns.proxy(bid["vpp_name"]).connect(myaddr, handler=price_curve_handler)
-            #     self.send('price_curve_reply', price_curve_message)
 
 
 def bid_answer_handler(self, message):  # executed in Defs
@@ -210,53 +174,29 @@ def bid_final_confirm_handler(self, message):  # executed in Exc
     self.set_attr(consensus=True)
 
 
-# def final_confirm_handler(self, message):
-#     self.log_info('Processed reply (of final accept as True value, if False another iteration needed...): %s' % message)
-#     if message:
-#         self.set_attr(consensus=True)
-
-
-def erase_iteration_memory():
-    print('--- iteration M erase ---')
-    for vpp_idx in range(vpp_n):
-        a = ns.proxy(data_names[vpp_idx])
-        a.set_attr(iteration_memory_pc=[])
-        a.set_attr(iteration_memory_bid=[])
-        a.set_attr(iteration_memory_bid_accept=[])
-        a.set_attr(n_bids=0)
-
-
-def erase_timestep_memory():
-    print('--- timestamp M erase ---')
-    for vpp_idx in range(vpp_n):
-        a = ns.proxy(data_names[vpp_idx])
-        a.set_attr(timestep_memory_mydeals=[])
-        a.set_attr(n_iteration=0)
-        a.set_attr(n_requests=0)
-        a.set_attr(consensus=False)
-        a.set_attr(requests=[])
-
-
 def runOneTimestep():
     """
     Should include all iterations of negotiations.
+     1 iteration includes steps:
+     * D agents request (#1) loop including storing them, counting requests - to all adjacent;
+        - E responses (#2) with PRICE CURVES to all interested, if any;
+        - D evaluates all received price curves (through opf) and send BIDS (#3) to E according to its opf
+        - E ACCEPTS or REFUSES bids (#4)and if so then terminates i.e. triggers new iteration
+        - D sends final CONFIRMATION (#5) if all of its bids are accepted
     :return:
     """
     multi_consensus = False
 
-    erase_timestep_memory()
+    erase_timestep_memory(ns)
 
     print('--- Deficit agents initialization - making requests: ---')
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
-
-        # each agent checks the internal resources (from data or from internal agent (OPF))
         power_balance = agent.current_balance(global_time)
         if power_balance < 0:
             agent.log_info("I am deficit. I'll publish requests to neighbours.")
             agent.set_attr(current_status=['D', power_balance])
             my_name = data_names[vpp_idx]
-            # request in the following form: name, quantity, some content
             message_request = {"message_id": message_id_request, "vpp_name": my_name,
                                "value": float(-1 * power_balance)}
             agent.send('main', message_request, topic='request_topic')
@@ -270,14 +210,7 @@ def runOneTimestep():
 
     while not multi_consensus:
 
-        # 1 iteration loop includes separate steps (loops):
-        #   - D request loop
-        #       when all are distributed then each E that receive a request evaluates own opf
-        #   - E response with price curves to all interested
-        #   - D evaluates all received curves (OPF) and send bids to E according to its OPF
-        #   - E accept bid or refuses and if so then send a new curve ---> new iteration
-
-        erase_iteration_memory()
+        erase_iteration_memory(ns)
 
         time.sleep(small_wait)
         print('--- Def loop: Execute requests ---')
@@ -287,25 +220,19 @@ def runOneTimestep():
                 requests_execute(agent, data_names[vpp_idx], agent.get_attr('requests'))
 
         time.sleep(small_wait)
-        count = 0
-        for vpp_idx in range(vpp_n):
-            agent = ns.proxy(data_names[vpp_idx])
-            if agent.get_attr('consensus'):
-                count = count+1
-        print('- Def loop: Consensus Check 1: ' + str(count) + '/' + str(vpp_n) + '-')
+        print('- Def loop: Consensus Check 1')
+        system_consensus_check(ns, global_time)
 
         print('--- Excess and balanced agents loop: ---')
         for vpp_idx in range(vpp_n):
             agent = ns.proxy(data_names[vpp_idx])
 
-            if agent.get_attr('consensus')==True:
+            if agent.get_attr('consensus'):
                 agent.log_info('I already have consensus from deficit loop.')
                 continue
 
-            if agent.get_attr('consensus') == False:
-                # each agent checks the internal resources (from data or from internal agent (OPF))
+            if not agent.get_attr('consensus'):
                 power_balance = agent.current_balance(global_time)
-                # each deficit agent publishes deficit to the neighbours only
                 if power_balance > 0:
                     agent.log_info("I am excess")
                     agent.set_attr(current_status=['E', power_balance])
@@ -316,40 +243,14 @@ def runOneTimestep():
                     agent.set_attr(timestep_memory_mydeals=[])
                     agent.set_attr(consensus=True)
                 elif power_balance < 0:
-                    print("should be handled earlier...")
+                    agent.log_info("I'm a deficit agent, shouldn't I be handled earlier...")
 
         time.sleep(small_wait)
-        count = 0
-        for vpp_idx in range(vpp_n):
-            agent = ns.proxy(data_names[vpp_idx])
-            if agent.get_attr('consensus'):
-                count = count+1
-        print('- Def loop: Consensus Check 2: ' + str(count) + '/' + str(vpp_n) + '-')
+        print('- Def loop: Consensus Check 2: ')
+        system_consensus_check(ns, global_time)
 
-        #  check the consensus status
         time.sleep(small_wait)
-
-        multi_consensus = system_consensus_check()
-
-
-def system_consensus_check():
-        n_consensus = 0
-        for alias in ns.agents():
-            a = ns.proxy(alias)
-            if a.get_attr('consensus')==True:
-                n_consensus = n_consensus + 1
-
-        if n_consensus == vpp_n:
-            print("CONSENSUS reached for time: ", global_time)
-            print("----- Deals: -----")
-            for alias in ns.agents():
-                a = ns.proxy(alias)
-                print(alias + " deals (with?, value buy+/-sell, price): ", a.get_attr('timestep_memory_mydeals'))
-
-            return True
-        else:
-            print("CONSENSUS NOT reached for time: ", global_time)
-            return False
+        multi_consensus = system_consensus_check(ns, global_time)
 
 
 if __name__ == '__main__':
@@ -357,8 +258,6 @@ if __name__ == '__main__':
     #print_data()
 
     ##### Initial Settings #####
-
-    #  initialization of the agents
     ns = run_nameserver()
 
     for vpp_idx in range(vpp_n):
@@ -366,7 +265,7 @@ if __name__ == '__main__':
         agent.set_attr(myname=str(data_names[vpp_idx]))
         agent.set_attr(adj=adj_matrix[vpp_idx])
 
-    # subscriptions to neighbours only
+    # subscriptions to neighbours
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
         addr = agent.bind('PUB', alias='main') # this agent will publish to neighbours
@@ -381,7 +280,7 @@ if __name__ == '__main__':
     # ##### RUN the simulation
 
     ## TEST for one time only ###
-    global_time_set(3)          #
+    global_time_set(2)          #
     runOneTimestep()            #
     time.sleep(1)               #
     ns.shutdown()               #

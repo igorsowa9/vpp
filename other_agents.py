@@ -53,7 +53,6 @@ class VPP_ext_agent(Agent):
                 bids.append([pc_vpp_idx, pc_price, need])
         return bids
 
-
     def set_consensus_if_norequest(self):
 
         time.sleep(0.1)

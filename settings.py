@@ -17,6 +17,8 @@ adj_matrix = [[True, True, False, True],
               [True, False, False, True]]
 
 small_wait = 0.3  # waiting time to separate some steps, for testing
+price_increase_factor = 6.0
+
 
 def print_data():
     gen_sum = np.zeros(ts_n)

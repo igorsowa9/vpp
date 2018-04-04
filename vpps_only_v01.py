@@ -14,7 +14,7 @@ import numpy
 import zmq
 
 from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix, print_data
-from ext_agents import VPP_ext_agent
+from other_agents import VPP_ext_agent
 
 import osbrain
 serializer_name = 'dill'
