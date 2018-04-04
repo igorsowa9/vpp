@@ -1,7 +1,7 @@
 {
 	"name":"name of vpp3",
 	"desc":"test aggregated values obtained by controller of VPP for generation and load, i.e. after optimization etc.",    
-	"generation": [7,10,7,9,11,8,6,9,11,9],
-	"load": [5,10,8,11,12,9,4,2,3,6],
+	"generation": 	[7,10,7,9,11,8,6,9,11,9],
+	"load": 		[5,10,8,11,12,9,4,2,3,6],
 	"price": [20, 20, 20, 20, 20, 20, 20, 20, 20, 20]
 }

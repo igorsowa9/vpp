@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="v04 requests handled in the separate loop, but then the script hangs at the vpp2 execution (?)&#10;- try to do each step separately like the requests?">
+    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="v04 requests handled in the separate loop, but then the script hangs at the vpp2 execution (?)&#10;- try to do each step separately like the requests?&#10;- check the rep/req - maybe vpp2 waits for reply???????????">
+      <change beforePath="" afterPath="$PROJECT_DIR$/vpps_only_v05.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/vpps_only_v04.py" afterPath="$PROJECT_DIR$/vpps_only_v04.py" />
+      <change beforePath="$PROJECT_DIR$/data/vpp1.json" afterPath="$PROJECT_DIR$/data/vpp1.json" />
+      <change beforePath="$PROJECT_DIR$/data/vpp2.json" afterPath="$PROJECT_DIR$/data/vpp2.json" />
+      <change beforePath="$PROJECT_DIR$/data/vpp3.json" afterPath="$PROJECT_DIR$/data/vpp3.json" />
+      <change beforePath="$PROJECT_DIR$/data/vpp4.json" afterPath="$PROJECT_DIR$/data/vpp4.json" />
+      <change beforePath="$PROJECT_DIR$/settings.py" afterPath="$PROJECT_DIR$/settings.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,11 +22,11 @@
       <content type="file-editors">
         <state>
           <leaf>
-            <file leaf-file-name="vpps_only_v04.py" pinned="false" current-in-tab="true">
-              <entry file="file://$PROJECT_DIR$/vpps_only_v04.py">
+            <file leaf-file-name="vpps_only_v05.py" pinned="false" current-in-tab="true">
+              <entry file="file://$PROJECT_DIR$/vpps_only_v05.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="338">
-                    <caret line="237" column="0" lean-forward="true" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
+                  <state relative-caret-position="554">
+                    <caret line="383" column="33" lean-forward="true" selection-start-line="383" selection-start-column="33" selection-end-line="383" selection-end-column="33" />
                     <folding>
                       <element signature="e#0#11#0" expanded="true" />
                     </folding>
@@ -36,11 +41,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="basictest.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="basictest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/basictest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="421">
-              <caret line="24" column="23" lean-forward="false" selection-start-line="24" selection-start-column="23" selection-end-line="24" selection-end-column="23" />
+            <state relative-caret-position="162">
+              <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
               </folding>
@@ -51,8 +56,8 @@
       <file leaf-file-name="basictest2.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/basictest2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="500">
-              <caret line="30" column="4" lean-forward="false" selection-start-line="30" selection-start-column="4" selection-end-line="30" selection-end-column="4" />
+            <state relative-caret-position="486">
+              <caret line="27" column="57" lean-forward="false" selection-start-line="27" selection-start-column="44" selection-end-line="27" selection-end-column="57" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -60,11 +65,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ext_agents.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ext_agents.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ext_agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="162">
-              <caret line="39" column="23" lean-forward="false" selection-start-line="39" selection-start-column="12" selection-end-line="39" selection-end-column="23" />
+            <state relative-caret-position="180">
+              <caret line="28" column="34" lean-forward="true" selection-start-line="28" selection-start-column="34" selection-end-line="28" selection-end-column="34" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
               </folding>
@@ -75,8 +80,8 @@
       <file leaf-file-name="settings.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="15" column="39" lean-forward="false" selection-start-line="15" selection-start-column="39" selection-end-line="15" selection-end-column="39" />
+            <state relative-caret-position="172">
+              <caret line="24" column="13" lean-forward="false" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -105,36 +110,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>message_id_bid_answer</find>
-      <find>Received bid from deficit</find>
-      <find>increased</find>
-      <find>bid_accept_handler</find>
-      <find>message_id_final_answer</find>
-      <find>iteration_memory_bid_accept</find>
-      <find>vpp_seller</find>
-      <find>price_increase_factor</find>
-      <find>Accept all bids</find>
-      <find>Price curve received from</find>
-      <find>increased</find>
-      <find>sleep</find>
-      <find>erase_iteration_memory</find>
-      <find>message_id_bid_answ</find>
-      <find>final acc</find>
-      <find>bid_final_accept_handler</find>
-      <find>Bid answer</find>
-      <find>Bid</find>
-      <find>timestep_memory_n_iter</find>
-      <find>My n_b</find>
-      <find>Excess and b</find>
-      <find>consens</find>
-      <find>Processed reply</find>
-      <find>n_iter</find>
-      <find>.append</find>
-      <find>contin</find>
       <find>request_handler</find>
+      <find>reques</find>
+      <find>async_rep</find>
       <find>request_handler_continue</find>
+      <find>print</find>
+      <find>all agent</find>
+      <find>set self.n_iterat</find>
       <find>forall_iteration_set</find>
+      <find>erase_iteration_memory</find>
+      <find>forall</find>
+      <find>I have</find>
       <find>need anot</find>
+      <find>I need</find>
+      <find>price_increase_factor</find>
+      <find>bid_value</find>
+      <find>bid_price</find>
+      <find>system_consensus_check</find>
+      <find>message_id_final_answer</find>
+      <find>bid_final_confirm_handler</find>
+      <find>set self.conse</find>
+      <find>Final bid accept re</find>
+      <find>That's an a</find>
+      <find>All my bids with acc</find>
+      <find>myaddr</find>
+      <find>return</find>
+      <find>time.sleep</find>
+      <find>R</find>
+      <find>Requests</find>
+      <find>Resulting req</find>
+      <find>balan</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -166,16 +171,17 @@
         <option value="$PROJECT_DIR$/vpps_only.py" />
         <option value="$PROJECT_DIR$/serialsocket.py" />
         <option value="$PROJECT_DIR$/vpps_only_v02.py" />
-        <option value="$PROJECT_DIR$/data/vpp1.json" />
-        <option value="$PROJECT_DIR$/data/vpp2.json" />
-        <option value="$PROJECT_DIR$/data/vpp3.json" />
-        <option value="$PROJECT_DIR$/data/vpp4.json" />
         <option value="$PROJECT_DIR$/ext_agents.py" />
-        <option value="$PROJECT_DIR$/settings.py" />
         <option value="$PROJECT_DIR$/vpps_only_v03.py" />
         <option value="$PROJECT_DIR$/basictest.py" />
         <option value="$PROJECT_DIR$/basictest2.py" />
         <option value="$PROJECT_DIR$/vpps_only_v04.py" />
+        <option value="$PROJECT_DIR$/settings.py" />
+        <option value="$PROJECT_DIR$/vpps_only_v05.py" />
+        <option value="$PROJECT_DIR$/data/vpp3.json" />
+        <option value="$PROJECT_DIR$/data/vpp2.json" />
+        <option value="$PROJECT_DIR$/data/vpp1.json" />
+        <option value="$PROJECT_DIR$/data/vpp4.json" />
       </list>
     </option>
   </component>
@@ -201,6 +207,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -217,7 +224,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="ProjectPane" />
     </panes>
   </component>
@@ -244,12 +250,12 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/archive" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/osbrain_examples" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/archive" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -264,7 +270,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.vpps_only_v04">
+  <component name="RunManager" selected="Python.vpps_only_v05">
     <configuration name="basictest" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -301,24 +307,6 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
-    <configuration name="vpps_only_v02" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="vpp" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/vpps_only_v02.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
     <configuration name="vpps_only_v03" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -350,6 +338,24 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="vpp" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/vpps_only_v04.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="vpps_only_v05" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="vpp" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/vpps_only_v05.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -423,18 +429,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.basictest" />
-      <item index="1" class="java.lang.String" itemvalue="Python.vpps_only_v02" />
-      <item index="2" class="java.lang.String" itemvalue="Python.vpps_only_v03" />
-      <item index="3" class="java.lang.String" itemvalue="Python.basictest2" />
-      <item index="4" class="java.lang.String" itemvalue="Python.vpps_only_v04" />
+      <item index="1" class="java.lang.String" itemvalue="Python.vpps_only_v03" />
+      <item index="2" class="java.lang.String" itemvalue="Python.basictest2" />
+      <item index="3" class="java.lang.String" itemvalue="Python.vpps_only_v04" />
+      <item index="4" class="java.lang.String" itemvalue="Python.vpps_only_v05" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.vpps_only_v04" />
-        <item index="1" class="java.lang.String" itemvalue="Python.basictest2" />
-        <item index="2" class="java.lang.String" itemvalue="Python.basictest" />
-        <item index="3" class="java.lang.String" itemvalue="Python.vpps_only_v03" />
-        <item index="4" class="java.lang.String" itemvalue="Python.vpps_only_v02" />
+        <item index="0" class="java.lang.String" itemvalue="Python.vpps_only_v05" />
+        <item index="1" class="java.lang.String" itemvalue="Python.vpps_only_v04" />
+        <item index="2" class="java.lang.String" itemvalue="Python.basictest2" />
+        <item index="3" class="java.lang.String" itemvalue="Python.basictest" />
+        <item index="4" class="java.lang.String" itemvalue="Python.vpps_only_v03" />
       </list>
     </recent_temporary>
   </component>
@@ -480,7 +486,14 @@
       <option name="project" value="LOCAL" />
       <updated>1522245760274</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="v04 requests handled in the separate loop, but then the script hangs at the vpp2 execution (?)&#10;- try to do each step separately like the requests?&#10;- check the rep/req - maybe vpp2 waits for reply???????????">
+      <created>1522245846187</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1522245846187</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -524,7 +537,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4386503" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.38343558" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960325" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -575,7 +588,8 @@
     <MESSAGE value="testing update for the integration of git in pycharm" />
     <MESSAGE value="v04 initialization with the req/rep for the bid answer and final confirmation, respectively" />
     <MESSAGE value="v04 requests handled in the separate loop, but then the script hangs at the vpp2 execution (?)&#10;- try to do each step separately like the requests?" />
-    <option name="LAST_COMMIT_MESSAGE" value="v04 requests handled in the separate loop, but then the script hangs at the vpp2 execution (?)&#10;- try to do each step separately like the requests?" />
+    <MESSAGE value="v04 requests handled in the separate loop, but then the script hangs at the vpp2 execution (?)&#10;- try to do each step separately like the requests?&#10;- check the rep/req - maybe vpp2 waits for reply???????????" />
+    <option name="LAST_COMMIT_MESSAGE" value="v04 requests handled in the separate loop, but then the script hangs at the vpp2 execution (?)&#10;- try to do each step separately like the requests?&#10;- check the rep/req - maybe vpp2 waits for reply???????????" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -584,7 +598,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///usr/local/lib/python3.6/dist-packages/osbrain/agent.py" />
     <entry file="file://$PROJECT_DIR$/basictest.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -766,14 +779,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/message_handlers.py" />
-    <entry file="file://$PROJECT_DIR$/issues.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="18" lean-forward="false" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/zmq/sugar/socket.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="146">
@@ -803,6 +808,98 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/osbrain/proxy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="260" column="0" lean-forward="false" selection-start-line="260" selection-start-column="0" selection-end-line="260" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/Pyro4/message.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="199">
+          <caret line="167" column="0" lean-forward="false" selection-start-line="167" selection-start-column="0" selection-end-line="167" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/Pyro4/core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="199">
+          <caret line="453" column="0" lean-forward="false" selection-start-line="453" selection-start-column="0" selection-end-line="453" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vpps_only_v03.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="100" column="0" lean-forward="true" selection-start-line="100" selection-start-column="0" selection-end-line="100" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/issues.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="2" column="18" lean-forward="false" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/basictest2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="486">
+          <caret line="27" column="57" lean-forward="false" selection-start-line="27" selection-start-column="44" selection-end-line="27" selection-end-column="57" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vpps_only_v04.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="770">
+          <caret line="130" column="35" lean-forward="false" selection-start-line="130" selection-start-column="35" selection-end-line="130" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#11#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/basictest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="172">
+          <caret line="24" column="13" lean-forward="false" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp3.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="20" lean-forward="false" selection-start-line="3" selection-start-column="20" selection-end-line="3" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp2.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="20" lean-forward="false" selection-start-line="3" selection-start-column="20" selection-end-line="3" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp1.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="72">
@@ -811,110 +908,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp3.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="3" column="25" lean-forward="false" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="15" column="39" lean-forward="false" selection-start-line="15" selection-start-column="39" selection-end-line="15" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/osbrain/proxy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="260" column="0" lean-forward="false" selection-start-line="260" selection-start-column="0" selection-end-line="260" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/Pyro4/message.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="167" column="0" lean-forward="false" selection-start-line="167" selection-start-column="0" selection-end-line="167" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/Pyro4/core.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="453" column="0" lean-forward="false" selection-start-line="453" selection-start-column="0" selection-end-line="453" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vpps_only_v03.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="100" column="0" lean-forward="true" selection-start-line="100" selection-start-column="0" selection-end-line="100" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#11#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp2.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="54">
+          <caret line="3" column="20" lean-forward="false" selection-start-line="3" selection-start-column="20" selection-end-line="3" selection-end-column="20" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vpps_only_v05.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="554">
+          <caret line="383" column="33" lean-forward="true" selection-start-line="383" selection-start-column="33" selection-end-line="383" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ext_agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="39" column="23" lean-forward="false" selection-start-line="39" selection-start-column="12" selection-end-line="39" selection-end-column="23" />
+        <state relative-caret-position="180">
+          <caret line="28" column="34" lean-forward="true" selection-start-line="28" selection-start-column="34" selection-end-line="28" selection-end-column="34" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/basictest2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="500">
-          <caret line="30" column="4" lean-forward="false" selection-start-line="30" selection-start-column="4" selection-end-line="30" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/basictest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="421">
-          <caret line="24" column="23" lean-forward="false" selection-start-line="24" selection-start-column="23" selection-end-line="24" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vpps_only_v04.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="338">
-          <caret line="237" column="0" lean-forward="true" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
