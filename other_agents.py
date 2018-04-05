@@ -40,7 +40,7 @@ class VPP_ext_agent(Agent):
             memory_list.append([data_names_dict[mem["vpp_name"]], mem["value"], mem["price"]])
 
         sorted_memory = sorted(memory_list, key=lambda price: price[2])
-
+        print(sorted_memory)
         bids = []
         for pc in sorted_memory:
             pc_vpp_idx = pc[0]

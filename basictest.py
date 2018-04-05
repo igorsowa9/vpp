@@ -1,31 +1,27 @@
-from osbrain import run_agent
-from osbrain import run_nameserver
-import time
+from oct2py import octave
+
+octave.addpath('/home/iso/PycharmProjects/vpp/matpow_cases')
+octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0')
+octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0/t')
+
+# load basic topology
+# update the current generation constraints (weather), fixed loads (curves loads) or flexible loads constraints
+#   (but usually they are fixed according to contracts with clients)
+# update bid offers in own system i.e. simulate what would be if you accept them, i.e. run OPF:
+#   * to be modified:
+#       - load at slack bus as negative generator
+#       - price of that load (i.e. negative generator)
 
 
-def reply_func(agent, message):
-    yield "sth for bob"
-    time.sleep(.1)
-    agent.log_info(message)
+#   - is revenue increased then?
+#   - LATER: influence of mediating to increase the revenue...?
+#   - EXTENSION: maximize the revenue within the bid offer
 
 
-if __name__ == '__main__':
+ppc = octave.case5_vpp()
+mpopt = octave.mpoption('out.all', 1)
+r = octave.rundcopf(ppc, mpopt)
+print('SUCCESS?: ', r['success'])
 
-    ns = run_nameserver()
-    alice = run_agent('Alice')
-    john = run_agent('John')
-    bob = run_agent('Bob')
 
-    addr = alice.bind('REP', handler=reply_func)
-    addr2 = john.bind('REP', handler=reply_func)
-
-    bob.connect(addr, alias='main')
-    bob.connect(addr2, alias='main2')
-
-    for i in range(10):
-        bob.send('main', i)
-        bob.send('main2', i+.5)
-        print(bob.recv('main'))
-        print(bob.recv('main2'))
-
-    ns.shutdown()
+def upload_bid_to_mpc(mpc0, bids):

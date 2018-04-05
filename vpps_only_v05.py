@@ -280,7 +280,7 @@ if __name__ == '__main__':
     # ##### RUN the simulation
 
     ## TEST for one time only ###
-    global_time_set(2)          #
+    global_time_set(1)          #
     runOneTimestep()            #
     time.sleep(1)               #
     ns.shutdown()               #
