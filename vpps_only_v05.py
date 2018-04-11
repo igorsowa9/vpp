@@ -197,6 +197,7 @@ def runOneTimestep():
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
         power_balance = agent.powerbalance_at(global_time)
+        agent.set_attr(power_balance=power_balance)
         if power_balance < 0:
             agent.log_info("I am deficit. I'll publish requests to neighbours.")
             agent.set_attr(current_status=['D', power_balance])

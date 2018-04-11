@@ -2,12 +2,43 @@ from settings import *
 import matplotlib.pyplot as plt
 import json
 from oct2py import octave
-import copy
+import copy, sys
 from pprint import pprint as pp
+
+from pypower.api import *
+from case5_vpp import case5_vpp
+from rundcopf_noprint import rundcopf
 
 octave.addpath('/home/iso/PycharmProjects/vpp/matpow_cases')
 octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0')
 octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0/t')
+
+
+def system_printing_opf(mpc_t, t, data):
+    """
+    Analogous to system_update_state_and_balance in the agents' methods
+    """
+    generation = data['max_generation']
+    load = data['fixed_load']
+    price = data['price']
+    slack_idx = data['slack_idx']
+
+    mpc_t['bus'][:, 2] = load[t]
+    mpc_t['gen'][:, 8] = generation[t]
+    mpc_t['gencost'][:, 4] = price[t]
+
+    res = rundcopf(mpc_t, ppoption(VERBOSE=0))
+    if res['gen'][slack_idx, 1] > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
+        power_balance = round(-1 * res['gen'][slack_idx, 1], 1)  # from vpp perspective i.e. negative if deficit
+        objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * mpc_t['gencost'][slack_idx][4], 1)
+        max_excess = 0
+
+    else:  # no need for external power - BALANCE or EXCESS
+        power_balance = round(-1 * res['gen'][slack_idx, 1])
+        max_excess = round(sum(mpc_t['gen'][:, 8]) - mpc_t['gen'][slack_idx, 8] - (sum(res['gen'][:, 1])
+                                                                                   - res['gen'][slack_idx, 1]), 1)
+        objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * mpc_t['gencost'][slack_idx][4], 1)
+    return power_balance, objf_noslackcost, max_excess
 
 
 def print_data():
@@ -24,10 +55,10 @@ def print_data():
         plt.ylabel('exemplary price (2.) in: ' + data_names[vi])
 
         plt.figure(2)
-        mpc = cases[ar['case']]()
+        ppc = cases[ar['case']]()
         power_balance_m = np.zeros(ts_n)
         for t in range(ts_n):
-            power_balance_m[t], objf_noslackcost, max_reserve = system_state_update_and_balance(copy.deepcopy(mpc), t, ar)
+            power_balance_m[t], objf_noslackcost, max_reserve = system_printing_opf(copy.deepcopy(ppc), t, ar)
             balance_sum[t] = balance_sum[t] + power_balance_m[t]
         plt.subplot(vi + 221)
         pb = plt.plot(power_balance_m)

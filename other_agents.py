@@ -12,6 +12,8 @@ octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0')
 octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0/t')
 
 from pypower.api import *
+from case5_vpp import case5_vpp
+from rundcopf_noprint import rundcopf
 
 
 class VPP_ext_agent(Agent):
@@ -26,28 +28,16 @@ class VPP_ext_agent(Agent):
             arr = json.load(f)
         return arr
 
-    def powerbalance_at(self, time):
+    def powerbalance_at(self, t):
         """
         This should be internal PF in order to define excess/deficit.
         :param time:
         :return: It returns the excess/deficit at the PCC, cost without balancing costs, excess
         """
         data = self.load_data(data_paths[data_names_dict[self.name]])
-        print(data)
-        #mpc = cases[data['case']]()
-        #mpc = octave.case5_vpp()
-        mpc = mpc0
-        power_balance, _, _ = self.system_state_update_and_balance(copy.deepcopy(mpc), time, data)
-        print(power_balance)
+        ppc = cases[data['case']]()
+        power_balance, _, _ = self.system_state_update_and_balance(copy.deepcopy(ppc), t, data)
         return power_balance
-
-    def sys_octave_test(self, mpc):
-        res = octave.rundcopf(mpc)
-        return res['success']
-
-    def sys_pypower_test(self, ppc):
-        r = rundcopf(ppc)
-        return r['success']
 
     def system_state_update_and_balance(self, mpc_t, t, data):
         """
@@ -66,19 +56,17 @@ class VPP_ext_agent(Agent):
         mpc_t['gen'][:, 8] = generation[t]
         mpc_t['gencost'][:, 4] = price[t]
 
-        res = octave.rundcopf(mpc_t, octave.mpoption('out.all', 0))
+        res = rundcopf(mpc_t, ppoption(VERBOSE=1))
         if res['gen'][slack_idx, 1] > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
             power_balance = round(-1 * res['gen'][slack_idx, 1], 1)  # from vpp perspective i.e. negative if deficit
             objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * mpc_t['gencost'][slack_idx][4], 1)
             max_excess = 0
-            # print("DEFICIT (p_balance, max_reserve, objf_noslackcost): ", power_balance, max_excess, objf_noslackcost)
 
         else:  # no need for external power - BALANCE or EXCESS
             power_balance = round(-1 * res['gen'][slack_idx, 1])
             max_excess = round(sum(mpc_t['gen'][:, 8]) - mpc_t['gen'][slack_idx, 8] - (sum(res['gen'][:, 1])
                                                                                        - res['gen'][slack_idx, 1]), 1)
             objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * mpc_t['gencost'][slack_idx][4], 1)
-            # print("BALANCE or EXCESS (p_balance, max_reserve, objf_noslackcost): ", power_balance, max_excess, objf_noslackcost)
 
         return power_balance, objf_noslackcost, max_excess
 
@@ -139,3 +127,11 @@ class VPP_ext_agent(Agent):
         :param price_curves
         :return: bids that are sent back to the excess agents of interest
         """
+
+    def sys_octave_test(self, mpc):
+        res = octave.rundcopf(mpc)
+        return res['success']
+
+    def sys_pypower_test(self, ppc):
+        r = rundcopf(ppc)
+        return r['success']
