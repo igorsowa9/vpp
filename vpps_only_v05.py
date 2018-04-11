@@ -4,11 +4,12 @@ from osbrain import run_agent
 from osbrain import run_nameserver
 from pprint import pprint as pp
 import copy
+from settings import *
 
-from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix, print_data, system_status, \
+from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix, system_status, \
     small_wait, price_increase_factor
 from other_agents import VPP_ext_agent
-from utilities import system_consensus_check, erase_iteration_memory, erase_timestep_memory
+from utilities import system_consensus_check, erase_iteration_memory, erase_timestep_memory, print_data
 
 global_time = 0
 
@@ -55,8 +56,11 @@ def requests_execute(self, myname, requests):
         # now, reply of the price curve should be triggered
         myaddr = self.bind('PUSH', alias='price_curve_reply')
         ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
-        power_balance = self.current_balance(self.get_attr('agent_time'))
-        self.set_attr(power_balance=power_balance)
+        if self.get_attr('power_balance'):
+            power_balance = self.get_attr('power_balance')
+        else:
+            power_balance = self.powerbalance_at(self.get_attr('agent_time'))
+            self.set_attr(power_balance=power_balance)
 
         # check if is an excess now
         if power_balance > 0:
@@ -192,7 +196,7 @@ def runOneTimestep():
     print('--- Deficit agents initialization - making requests: ---')
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
-        power_balance = agent.current_balance(global_time)
+        power_balance = agent.powerbalance_at(global_time)
         if power_balance < 0:
             agent.log_info("I am deficit. I'll publish requests to neighbours.")
             agent.set_attr(current_status=['D', power_balance])
@@ -205,8 +209,10 @@ def runOneTimestep():
     print("- Resulting requests: -")
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
-        print(str(data_names[vpp_idx]) + " (balance: " + str(agent.current_balance(global_time)) +
+        print(str(data_names[vpp_idx]) + " (balance: " + str(agent.get_attr('power_balance')) +
               ") (no. of requests: " + str(agent.get_attr('n_requests')) + ") : " + str(agent.get_attr('requests')))
+
+    sys.exit()
 
     while not multi_consensus:
 
@@ -232,7 +238,11 @@ def runOneTimestep():
                 continue
 
             if not agent.get_attr('consensus'):
-                power_balance = agent.current_balance(global_time)
+                if agent.get_attr('power_balance'):
+                    power_balance = agent.get_attr('power_balance')
+                else:
+                    power_balance = agent.powerbalance_at(agent.get_attr('agent_time'))
+                    agent.set_attr(power_balance=power_balance)
                 if power_balance > 0:
                     agent.log_info("I am excess")
                     agent.set_attr(current_status=['E', power_balance])
@@ -256,6 +266,7 @@ def runOneTimestep():
 if __name__ == '__main__':
 
     #print_data()
+    #sys.exit()
 
     ##### Initial Settings #####
     ns = run_nameserver()
@@ -280,7 +291,7 @@ if __name__ == '__main__':
     # ##### RUN the simulation
 
     ## TEST for one time only ###
-    global_time_set(1)          #
+    global_time_set(0)          #
     runOneTimestep()            #
     time.sleep(1)               #
     ns.shutdown()               #

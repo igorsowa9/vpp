@@ -1,4 +1,48 @@
 from settings import *
+import matplotlib.pyplot as plt
+import json
+from oct2py import octave
+import copy
+from pprint import pprint as pp
+
+octave.addpath('/home/iso/PycharmProjects/vpp/matpow_cases')
+octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0')
+octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0/t')
+
+
+def print_data():
+
+    balance_sum = np.zeros(ts_n)
+    for vi in range(vpp_n):
+        with open(data_paths[vi], 'r') as f:
+            ar = json.load(f)
+
+        plt.figure(1)
+        plt.subplot(vi + 221)
+        price = plt.plot(list(zip(*ar['price']))[4])
+        plt.setp(price, 'color', 'y', 'linewidth', 2.0)
+        plt.ylabel('exemplary price (2.) in: ' + data_names[vi])
+
+        plt.figure(2)
+        mpc = cases[ar['case']]()
+        power_balance_m = np.zeros(ts_n)
+        for t in range(ts_n):
+            power_balance_m[t], objf_noslackcost, max_reserve = system_state_update_and_balance(copy.deepcopy(mpc), t, ar)
+            balance_sum[t] = balance_sum[t] + power_balance_m[t]
+        plt.subplot(vi + 221)
+        pb = plt.plot(power_balance_m)
+        plt.setp(pb, 'color', 'b', 'linewidth', 2.0)
+        plt.ylabel('power balance in: ' + data_names[vi])
+        plt.axhline(0, color='black')
+
+    plt.figure(3)
+    ps = plt.plot(balance_sum)
+    plt.setp(ps, 'color', 'r', 'linewidth', 2.0)
+    plt.ylabel('total balance power of the system')
+    plt.axhline(0, color='black')
+
+    plt.show()
+
 
 def system_consensus_check(ns, global_time):
     n_consensus = 0
@@ -13,7 +57,6 @@ def system_consensus_check(ns, global_time):
         for alias in ns.agents():
             a = ns.proxy(alias)
             print(alias + " deals (with?, value buy+/-sell, price): ", a.get_attr('timestep_memory_mydeals'))
-
         return True
     else:
         print("- Multi-consensus NOT reached (" + str(n_consensus) + "/" + str(vpp_n) + ") for time: ", global_time)
@@ -39,3 +82,4 @@ def erase_timestep_memory(ns):
         a.set_attr(n_requests=0)
         a.set_attr(consensus=False)
         a.set_attr(requests=[])
+        a.set_attr(power_balance=[])

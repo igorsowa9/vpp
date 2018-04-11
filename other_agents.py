@@ -1,21 +1,20 @@
 from osbrain import Agent
 import json
-import settings
+from settings import *
+#from utilities import system_state_update_and_balance
 import time
 from pprint import pprint as pp
-from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix, print_data
+from oct2py import octave
+import copy
 
-#from vpps_only_v03 import system_consensus_check
+octave.addpath('/home/iso/PycharmProjects/vpp/matpow_cases')
+octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0')
+octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0/t')
+
+from pypower.api import *
 
 
 class VPP_ext_agent(Agent):
-
-    def on_init(self):
-        #self.data_names = data_names
-        #self.data_names_dict = data_names_dict
-        #self.data_paths = data_paths
-        #self.adj_matrix = adj_matrix
-        pass
 
     def load_data(self, path):
         """
@@ -27,14 +26,62 @@ class VPP_ext_agent(Agent):
             arr = json.load(f)
         return arr
 
-    def current_balance(self, time):
+    def powerbalance_at(self, time):
         """
-        This should be internal PF in order to define excess/deficit. I returns the excess/deficit at the PCC.
+        This should be internal PF in order to define excess/deficit.
         :param time:
+        :return: It returns the excess/deficit at the PCC, cost without balancing costs, excess
+        """
+        data = self.load_data(data_paths[data_names_dict[self.name]])
+        print(data)
+        #mpc = cases[data['case']]()
+        #mpc = octave.case5_vpp()
+        mpc = mpc0
+        power_balance, _, _ = self.system_state_update_and_balance(copy.deepcopy(mpc), time, data)
+        print(power_balance)
+        return power_balance
+
+    def sys_octave_test(self, mpc):
+        res = octave.rundcopf(mpc)
+        return res['success']
+
+    def sys_pypower_test(self, ppc):
+        r = rundcopf(ppc)
+        return r['success']
+
+    def system_state_update_and_balance(self, mpc_t, t, data):
+        """
+        Updates the system mpc at time t according to data
+        :param mpc_t:
+        :param t:
+        :param data:
         :return:
         """
-        json_data = self.load_data(data_paths[data_names_dict[self.name]])
-        return float(json_data["generation"][time] - json_data["load"][time])
+        generation = data['max_generation']
+        load = data['fixed_load']
+        price = data['price']
+        slack_idx = data['slack_idx']
+
+        mpc_t['bus'][:, 2] = load[t]
+        mpc_t['gen'][:, 8] = generation[t]
+        mpc_t['gencost'][:, 4] = price[t]
+
+        res = octave.rundcopf(mpc_t, octave.mpoption('out.all', 0))
+        if res['gen'][slack_idx, 1] > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
+            power_balance = round(-1 * res['gen'][slack_idx, 1], 1)  # from vpp perspective i.e. negative if deficit
+            objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * mpc_t['gencost'][slack_idx][4], 1)
+            max_excess = 0
+            # print("DEFICIT (p_balance, max_reserve, objf_noslackcost): ", power_balance, max_excess, objf_noslackcost)
+
+        else:  # no need for external power - BALANCE or EXCESS
+            power_balance = round(-1 * res['gen'][slack_idx, 1])
+            max_excess = round(sum(mpc_t['gen'][:, 8]) - mpc_t['gen'][slack_idx, 8] - (sum(res['gen'][:, 1])
+                                                                                       - res['gen'][slack_idx, 1]), 1)
+            objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * mpc_t['gencost'][slack_idx][4], 1)
+            # print("BALANCE or EXCESS (p_balance, max_reserve, objf_noslackcost): ", power_balance, max_excess, objf_noslackcost)
+
+        return power_balance, objf_noslackcost, max_excess
+
 
     def current_price(self, time):
         """

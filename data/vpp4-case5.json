@@ -1,0 +1,21 @@
+{
+	"name":"name of vpp4",
+
+	"desc":"data for the case5_vpp from matpower, 3 time stamps",
+
+	"max_generation": 	[[1e4, 50, 60, 40, 30],
+						[1e4, 14, 62, 45, 33],
+						[1e4, 12, 61, 46, 36]],
+
+	"fixed_load": 	[[0, 25, 30, 40, 65],
+					[0, 26, 31, 41, 66],
+					[0, 27, 32, 42, 67]],
+
+	"price": 	[[1e4, 4, 21, 32, 103],
+				[1e4, 3, 22, 32.5, 100],
+				[1e4, 2, 21, 33, 90]],
+
+	"case":	"case5",
+
+	"slack_idx": 0
+}

@@ -43,9 +43,9 @@ mpc.branch = [
 %	1	startup	shutdown	n	x1	y1	...	xn	yn
 %	2	startup	shutdown	n	c(n-1)	...	c0
 mpc.gencost = [
-    2	0	0	2	1e4	    0;
+    2	0	0	2	1e4	    0; # cost of a virtual generator (from negotiations)
 	2	0	0	2	4	    0;
 	2	0	0	2	21	    0;
 	2	0	0	2	32	    0;
-    2   0   0   2   103     0; # cost of a virtual generator (from negotiations)
+    2   0   0   2   103     0;
 ];

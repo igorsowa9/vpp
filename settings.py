@@ -1,12 +1,15 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import json
+from oct2py import octave
 
-ts_n = 10  # number of timestamps of whole simulation
+octave.addpath('/home/iso/PycharmProjects/vpp/matpow_cases')
+octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0')
+octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0/t')
+
+ts_n = 3  # number of timestamps of whole simulation
 
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}
-data_paths = ["data/vpp1.json", "data/vpp2.json", "data/vpp3.json", "data/vpp4.json"]
+data_paths = ["data/vpp1-case5.json", "data/vpp2-case5.json", "data/vpp3-case5.json", "data/vpp4-case5.json"]
 vpp_n = len(data_names)
 
 system_status = np.zeros([ts_n, vpp_n])
@@ -19,33 +22,59 @@ adj_matrix = [[True, True, False, True],
 small_wait = 0.3  # waiting time to separate some steps, for testing
 price_increase_factor = 6.0
 
+cases = {'case5': octave.case5_vpp,
+         'case4gs': octave.case4gs_vpp}
 
-def print_data():
-    gen_sum = np.zeros(ts_n)
-    load_sum = np.zeros(ts_n)
+mpc0 = octave.case5_vpp()
 
-    plt.figure(1)
-    for vi in range(vpp_n):
-        with open("data/" + data_names[vi] + ".json", 'r') as f:
-            ar = json.load(f)
-
-        plt.subplot(vi + 221)
-        gen = plt.plot(ar["generation"])
-        load = plt.plot(ar["load"])
-
-        plt.setp(gen, 'color', 'b', 'linewidth', 2.0)
-        plt.setp(load, 'color', 'r', 'linewidth', 2.0)
-
-        plt.ylabel('gen/load aggr. power ' + data_names[vi])
-
-        gen_sum = np.sum([gen_sum, np.array([ar["generation"]])], axis=0)
-        load_sum = np.sum([load_sum, np.array([ar["load"]])], axis=0)
-
-    plt.figure(2)  # sum of all laods generations etc.
-    gen = plt.plot(gen_sum[0])
-    load = plt.plot(load_sum[0])
-    plt.setp(gen, 'color', 'b', 'linewidth', 2.0)
-    plt.setp(load, 'color', 'r', 'linewidth', 2.0)
-    plt.ylabel('total gen/load power of the system')
-
-    plt.show()
+# mpc0 = {'version': '2',
+#         'baseMVA': 100.0,
+#         'bus': [[  1. ,   3. ,   0. ,   0. ,   0. ,   0. ,   1. ,   1. ,   0. ,
+#         230. ,   1. ,   1.1,   0.9],
+#        [  2. ,   1. ,  25. ,   0. ,   0. ,   0. ,   1. ,   1. ,   0. ,
+#         230. ,   1. ,   1.1,   0.9],
+#        [  3. ,   1. ,  30. ,   0. ,   0. ,   0. ,   1. ,   1. ,   0. ,
+#         230. ,   1. ,   1.1,   0.9],
+#        [  4. ,   1. ,  40. ,   0. ,   0. ,   0. ,   1. ,   1. ,   0. ,
+#         230. ,   1. ,   1.1,   0.9],
+#        [  5. ,   1. ,  65. ,   0. ,   0. ,   0. ,   1. ,   1. ,   0. ,
+#         230. ,   1. ,   1.1,   0.9]],
+#         'gen': [[1.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e+00, 1.e+02, 1.e+00,
+#         1.e+04, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00,
+#         0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00],
+#        [2.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e+00, 1.e+02, 1.e+00,
+#         5.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00,
+#         0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00],
+#        [3.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e+00, 1.e+02, 1.e+00,
+#         6.e+01, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00,
+#         0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00],
+#        [4.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e+00, 1.e+02, 1.e+00,
+#         4.e+01, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00,
+#         0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00],
+#        [5.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e+00, 1.e+02, 1.e+00,
+#         3.e+01, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00,
+#         0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00]],
+#         'branch': [[ 1.000e+00,  2.000e+00,  2.810e-03,  2.810e-02,  7.120e-03,
+#          4.000e+01,  4.000e+01,  4.000e+01,  0.000e+00,  0.000e+00,
+#          1.000e+00, -3.600e+02,  3.600e+02],
+#        [ 1.000e+00,  4.000e+00,  3.040e-03,  3.040e-02,  6.580e-03,
+#          0.000e+00,  0.000e+00,  0.000e+00,  0.000e+00,  0.000e+00,
+#          1.000e+00, -3.600e+02,  3.600e+02],
+#        [ 1.000e+00,  5.000e+00,  6.400e-04,  6.400e-03,  3.126e-02,
+#          0.000e+00,  0.000e+00,  0.000e+00,  0.000e+00,  0.000e+00,
+#          1.000e+00, -3.600e+02,  3.600e+02],
+#        [ 2.000e+00,  3.000e+00,  1.080e-03,  1.080e-02,  1.852e-02,
+#          0.000e+00,  0.000e+00,  0.000e+00,  0.000e+00,  0.000e+00,
+#          1.000e+00, -3.600e+02,  3.600e+02],
+#        [ 3.000e+00,  4.000e+00,  2.970e-03,  2.970e-02,  6.740e-03,
+#          0.000e+00,  0.000e+00,  0.000e+00,  0.000e+00,  0.000e+00,
+#          1.000e+00, -3.600e+02,  3.600e+02],
+#        [ 4.000e+00,  5.000e+00,  2.970e-03,  2.970e-02,  6.740e-03,
+#          2.400e+01,  2.400e+01,  2.400e+01,  0.000e+00,  0.000e+00,
+#          1.000e+00, -3.600e+02,  3.600e+02]],
+#         'gencost': [[2.00e+00, 0.00e+00, 0.00e+00, 2.00e+00, 1.00e+04, 0.00e+00],
+#        [2.00e+00, 0.00e+00, 0.00e+00, 2.00e+00, 4.00e+00, 0.00e+00],
+#        [2.00e+00, 0.00e+00, 0.00e+00, 2.00e+00, 2.10e+01, 0.00e+00],
+#        [2.00e+00, 0.00e+00, 0.00e+00, 2.00e+00, 3.20e+01, 0.00e+00],
+#        [2.00e+00, 0.00e+00, 0.00e+00, 2.00e+00, 1.03e+02, 0.00e+00]]}
+#
