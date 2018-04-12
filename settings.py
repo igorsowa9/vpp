@@ -28,3 +28,10 @@ cases = {'case5': case5_vpp,
 
 # cases = {'case5': octave.case5_vpp,
 #          'case4gs': octave.case4gs_vpp}
+
+opf1_verbose = 0
+opf1_prinpf = False
+
+# ASSUMPTIONS:
+# slack bus as the first one with idx 0.
+# only linear cost in gencost matrix

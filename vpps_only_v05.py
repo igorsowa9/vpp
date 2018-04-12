@@ -51,43 +51,53 @@ def request_handler(self, message):  # Excesses' reaction for a request from def
 
 
 def requests_execute(self, myname, requests):
+    """
+    The agents that receive some requests answer either NO or with price curves.
+    :param self:
+    :param myname:
+    :param requests: e.g. {'message_id': 1, 'vpp_name': 'vpp1', 'value': 25.0}
+    :return:
+    """
     for req in requests:
         from_vpp = req["vpp_name"]
-        # now, reply of the price curve should be triggered
         myaddr = self.bind('PUSH', alias='price_curve_reply')
         ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
-        if self.get_attr('power_balance'):
-            power_balance = self.get_attr('power_balance')
-        else:
-            power_balance = self.powerbalance_at(self.get_attr('agent_time'))
-            self.set_attr(power_balance=power_balance)
+        if self.get_attr('opf1'):
+            opf1 = self.get_attr('opf1')
+        else:  # run opf1 if does not exist, but it should already
+            opf1 = self.opf1(self.get_attr('agent_time'))
+            self.set_attr(opf1=opf1)
+            print("NO OPF1??")
+            sys.exit()
 
-        # check if is an excess now
-        if power_balance > 0:
-            # val = float(power_value) if power_balance >= float(power_value) else power_balance
-            val = float(power_balance)  # send all available power
-            price = float(self.current_price(self.get_attr('agent_time'))) + \
-                    price_increase_factor*self.get_attr("n_iteration")
-            self.log_info("I have " + str(power_balance) + " to sell. Sending price curve... "
-                                                           "(val="+str(val)+", for price="+str(price)+")")
+        if opf1[0] == 0 and opf1[1] > 0:  # max_excess > 0
+            # val = float(power_value) if opf1[0] >= float(power_value) else opf1[0]
+            val = float(opf1[1])  # max_excess
+            price_curve = copy.deepcopy(opf1[3])
+            prices = [price_curve[2]]
+            new_prices = [x + price_increase_factor*self.get_attr("n_iteration") for x in prices]
+            price_curve[2] = new_prices
+
+            self.log_info("I have " + str(opf1[0]) + " to sell. Sending price curve... "
+                                                           "(val="+str(val)+", with price curves)")
             price_curve_message = {"message_id": message_id_price_curve, "vpp_name": myname,
-                                   "value": val, "price": price}
+                                   "value": val, "price_curve": price_curve}
             self.send('price_curve_reply', price_curve_message)
         else:
             self.log_info("I cannot sell (I am D or B). Sending rejection...")
             price_curve_message = {"message_id": message_id_price_curve, "vpp_name": myname,
-                                   "value": 0, "price": 0}
+                                   "value": 0, "price_curve": 0}
             self.send('price_curve_reply', price_curve_message)
 
 
 def price_curve_handler(self, message):  # Deficit reaction for the received price curve from Excess
     from_vpp = message["vpp_name"]
     possible_quantity = message["value"]
-    price = message["price"]
+    price_curve = message["price_curve"]
 
     self.log_info('Price curve received from: ' + from_vpp +
                   ' Possible quantity: ' + str(possible_quantity) +
-                  ' Price: ' + str(price))
+                  ' Price: ' + str(price_curve))
     # save all the curves
     self.get_attr('iteration_memory_pc').append(message)
 
@@ -196,24 +206,24 @@ def runOneTimestep():
     print('--- Deficit agents initialization - making requests: ---')
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
-        power_balance = agent.powerbalance_at(global_time)
-        agent.set_attr(power_balance=power_balance)
-        if power_balance < 0:
+        agent.set_attr(opf1=agent.runopf1(global_time))
+    for vpp_idx in  range(vpp_n):
+        agent = ns.proxy(data_names[vpp_idx])
+        opf1 = agent.get_attr('opf1')
+        if opf1[0] < 0:
             agent.log_info("I am deficit. I'll publish requests to neighbours.")
-            agent.set_attr(current_status=['D', power_balance])
+            agent.set_attr(current_status=['D', opf1])
             my_name = data_names[vpp_idx]
             message_request = {"message_id": message_id_request, "vpp_name": my_name,
-                               "value": float(-1 * power_balance)}
+                               "value": float(-1 * opf1[0])}
             agent.send('main', message_request, topic='request_topic')
 
     time.sleep(small_wait)  # show gathered requests
     print("- Resulting requests: -")
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
-        print(str(data_names[vpp_idx]) + " (balance: " + str(agent.get_attr('power_balance')) +
+        print(str(data_names[vpp_idx]) + " (to balance, max exc, objf noslack: " + str(agent.get_attr('opf1')) +
               ") (no. of requests: " + str(agent.get_attr('n_requests')) + ") : " + str(agent.get_attr('requests')))
-
-    sys.exit()
 
     while not multi_consensus:
 
@@ -230,6 +240,8 @@ def runOneTimestep():
         print('- Def loop: Consensus Check 1')
         system_consensus_check(ns, global_time)
 
+        sys.exit()
+
         print('--- Excess and balanced agents loop: ---')
         for vpp_idx in range(vpp_n):
             agent = ns.proxy(data_names[vpp_idx])
@@ -239,21 +251,21 @@ def runOneTimestep():
                 continue
 
             if not agent.get_attr('consensus'):
-                if agent.get_attr('power_balance'):
-                    power_balance = agent.get_attr('power_balance')
+                if agent.get_attr('opf1'):
+                    opf1 = agent.get_attr('opf1')
                 else:
-                    power_balance = agent.powerbalance_at(agent.get_attr('agent_time'))
+                    opf1 = agent.runopf1(agent.get_attr('agent_time'))
                     agent.set_attr(power_balance=power_balance)
-                if power_balance > 0:
+                if opf1[0] > 0:
                     agent.log_info("I am excess")
                     agent.set_attr(current_status=['E', power_balance])
                     agent.set_consensus_if_norequest()
-                elif power_balance == 0:
+                elif opf1[0] == 0:
                     agent.log_info("I am balanced")
                     agent.set_attr(current_status=['B', power_balance])
                     agent.set_attr(timestep_memory_mydeals=[])
                     agent.set_attr(consensus=True)
-                elif power_balance < 0:
+                elif opf1[0] < 0:
                     agent.log_info("I'm a deficit agent, shouldn't I be handled earlier...")
 
         time.sleep(small_wait)

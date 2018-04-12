@@ -5,7 +5,7 @@ from settings import *
 import time
 from pprint import pprint as pp
 from oct2py import octave
-import copy
+import copy, sys
 
 octave.addpath('/home/iso/PycharmProjects/vpp/matpow_cases')
 octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0')
@@ -28,47 +28,59 @@ class VPP_ext_agent(Agent):
             arr = json.load(f)
         return arr
 
-    def powerbalance_at(self, t):
+
+    def runopf1(self, t):
         """
         This should be internal PF in order to define excess/deficit.
-        :param time:
-        :return: It returns the excess/deficit at the PCC, cost without balancing costs, excess
-        """
-        data = self.load_data(data_paths[data_names_dict[self.name]])
-        ppc = cases[data['case']]()
-        power_balance, _, _ = self.system_state_update_and_balance(copy.deepcopy(ppc), t, data)
-        return power_balance
-
-    def system_state_update_and_balance(self, mpc_t, t, data):
-        """
-        Updates the system mpc at time t according to data
+        Updates the system ppc at time t according to data and runs opf.
+        If excess, derive price curve.
         :param mpc_t:
         :param t:
         :param data:
-        :return:
+        :return: balance needed at PCC, max possible excess, objf with subtracted virtual slack cost
         """
-        generation = data['max_generation']
-        load = data['fixed_load']
+        data = self.load_data(data_paths[data_names_dict[self.name]])
+        ppc0 = cases[data['case']]()
+        ppc_t = copy.deepcopy(ppc0)
+
+        max_generation = data['max_generation']
+        fixed_load = data['fixed_load']
         price = data['price']
         slack_idx = data['slack_idx']
 
-        mpc_t['bus'][:, 2] = load[t]
-        mpc_t['gen'][:, 8] = generation[t]
-        mpc_t['gencost'][:, 4] = price[t]
+        ppc_t['bus'][:, 2] = fixed_load[t]
+        ppc_t['gen'][:, 8] = max_generation[t]
+        ppc_t['gencost'][:, 4] = price[t]
 
-        res = rundcopf(mpc_t, ppoption(VERBOSE=1))
-        if res['gen'][slack_idx, 1] > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
+        res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
+        if opf1_prinpf == True: printpf(res)
+        if round(res['gen'][slack_idx, 1],1) > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
             power_balance = round(-1 * res['gen'][slack_idx, 1], 1)  # from vpp perspective i.e. negative if deficit
-            objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * mpc_t['gencost'][slack_idx][4], 1)
-            max_excess = 0
+            objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 1)
+            max_excess = False
+            pc_matrix = False
 
         else:  # no need for external power - BALANCE or EXCESS
-            power_balance = round(-1 * res['gen'][slack_idx, 1])
-            max_excess = round(sum(mpc_t['gen'][:, 8]) - mpc_t['gen'][slack_idx, 8] - (sum(res['gen'][:, 1])
+            power_balance = -1 * round(res['gen'][slack_idx, 1])
+            max_excess = round(sum(ppc_t['gen'][:, 8]) - ppc_t['gen'][slack_idx, 8] - (sum(res['gen'][:, 1])
                                                                                        - res['gen'][slack_idx, 1]), 1)
-            objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * mpc_t['gencost'][slack_idx][4], 1)
+            objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 1)
 
-        return power_balance, objf_noslackcost, max_excess
+            # derive the price curve: (matrix having indeces, exces values per gen, their LINEAR prices
+
+            idx = ppc_t['gen'][1:, 0] if slack_idx == 0 else print("Is slack at 0 bus?")
+            pexc = ppc_t['gen'][1:, 8] - res['gen'][1:, 1]
+            gcost = ppc_t['gencost'][1:, 4]
+            gens_exc_price = np.array([idx, pexc, gcost])
+            sorted = np.round(gens_exc_price[:, gens_exc_price[2, :].argsort()], 1)
+            sorted_nonzero = sorted[:, np.nonzero(sorted[1, :])]
+            sorted_nonzero_squeezed = np.reshape(sorted_nonzero, np.squeeze(sorted_nonzero).shape)
+            pc_matrix = np.ndarray.tolist(sorted_nonzero_squeezed)
+            self.log_info("Final pc matrix: " + str(pc_matrix))
+
+        if res['success'] == 1:
+            self.log_info("I have successfully run the OPF1.")
+        return power_balance, max_excess, objf_noslackcost, pc_matrix
 
 
     def current_price(self, time):
@@ -88,8 +100,9 @@ class VPP_ext_agent(Agent):
         """
         # opf asa system is integrated
         memory = self.get_attr('iteration_memory_pc')
-        need = abs(self.get_attr('current_status')[1])
-
+        need = abs(self.get_attr('opf1')[0])
+        print(memory, need)
+        sys.exit()
         memory_list = []
         for mem in memory:
             memory_list.append([data_names_dict[mem["vpp_name"]], mem["value"], mem["price"]])

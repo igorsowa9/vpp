@@ -113,4 +113,4 @@ def erase_timestep_memory(ns):
         a.set_attr(n_requests=0)
         a.set_attr(consensus=False)
         a.set_attr(requests=[])
-        a.set_attr(power_balance=[])
+        a.set_attr(opf1=[])
