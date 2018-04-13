@@ -33,5 +33,9 @@ opf1_verbose = 0
 opf1_prinpf = False
 
 # ASSUMPTIONS:
-# slack bus as the first one with idx 0.
-# only linear cost in gencost matrix
+# slack bus as the first one with idx 0 (some simplification, non universalities in the code, e.g. in PC building)
+# only linear cost in gencost matrix, no offset.
+# deficit agents can buy only the amount of their deficit power, even if the excess of the neighbour migh be cheaper,
+#   than their own resources (deficit agents do not run opf when they receive PCs, but just take the cheapest resources)
+#   from the neighbours' excess, according to simple sorting i.e. starting from the cheapest
+#   - but if so, where is that effort for ML then...?

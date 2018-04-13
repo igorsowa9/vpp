@@ -3,7 +3,7 @@
 
 	"desc":"data for the case5_vpp from matpower, 3 time stamps",
 
-	"max_generation": 	[[1e4, 45, 60, 40, 30],
+	"max_generation": 	[[1e4, 45, 43, 40, 30],
 						[1e4, 4, 62, 45, 30],
 						[1e4, 2, 61, 46, 30]],
 

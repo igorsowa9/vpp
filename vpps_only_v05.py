@@ -74,19 +74,22 @@ def requests_execute(self, myname, requests):
             # val = float(power_value) if opf1[0] >= float(power_value) else opf1[0]
             val = float(opf1[1])  # max_excess
             price_curve = copy.deepcopy(opf1[3])
-            prices = [price_curve[2]]
-            new_prices = [x + price_increase_factor*self.get_attr("n_iteration") for x in prices]
+            prices = price_curve[2]
+            if type(prices) == float:  # i.e. if there is only one excess generator, there is no list but float
+                new_prices = prices + price_increase_factor*self.get_attr("n_iteration")
+            else:
+                new_prices = [x + price_increase_factor*self.get_attr("n_iteration") for x in prices]
             price_curve[2] = new_prices
 
             self.log_info("I have " + str(opf1[0]) + " to sell. Sending price curve... "
-                                                           "(val="+str(val)+", with price curves)")
+                                                           "(val="+str(val)+", with price curves matrix)")
             price_curve_message = {"message_id": message_id_price_curve, "vpp_name": myname,
                                    "value": val, "price_curve": price_curve}
             self.send('price_curve_reply', price_curve_message)
         else:
             self.log_info("I cannot sell (I am D or B). Sending rejection...")
             price_curve_message = {"message_id": message_id_price_curve, "vpp_name": myname,
-                                   "value": 0, "price_curve": 0}
+                                   "value": False, "price_curve": False}
             self.send('price_curve_reply', price_curve_message)
 
 
@@ -96,49 +99,54 @@ def price_curve_handler(self, message):  # Deficit reaction for the received pri
     price_curve = message["price_curve"]
 
     self.log_info('Price curve received from: ' + from_vpp +
-                  ' Possible quantity: ' + str(possible_quantity) +
-                  ' Price: ' + str(price_curve))
+                  ' Possible total quantity: ' + str(possible_quantity) +
+                  ' Price curve matrix: ' + str(price_curve))
     # save all the curves
     self.get_attr('iteration_memory_pc').append(message)
 
-    # after receiving all the curves&rejections, need to run my own opf now, implement to own system, create the bids...
+    # after receiving all the curves&rejections, need to run my own opf (OPF2) now, implement to own system,
+    # create the bids...
     if len(self.get_attr('iteration_memory_pc')) == sum(self.get_attr('adj'))-1:
         self.log_info('All price curves received (from all neigh.) (' + str(len(self.get_attr('iteration_memory_pc'))) +
                       '), need to run new opf, derive bids etc...')
-        bids = self.new_opf()  # bids come as lists
-        # send bids back to the price-curve senders
-        for b in bids:
-            self.set_attr(n_bids=self.get_attr('n_bids') + 1)  # counts number bids I send
-            vpp_idx_1bid = b[0]
-            price = b[1]
-            bid_value = b[2]
-            bid_offer_message = {"message_id": message_id_bid_offer, "vpp_name": self.name,
-                               "price": price, "value": bid_value}
-            myaddr = self.bind('PUSH', alias='bid_offer')
-            ns.proxy(data_names[vpp_idx_1bid]).connect(myaddr, handler=bid_offer_handler)
-            self.send('bid_offer', bid_offer_message)
+        bids = self.runopf2()  # bids come as multi-list: [vpp_idx, gen_idx, bidgen_value, gen_price],[...]
+        # segregate bids for same sender
+        #bids = sorted(bids, key=lambda vpp: vpp[0])
+        bids = np.array(bids)
+        for vi in range(0,vpp_n):
+            bid = bids[np.where(bids[:, 0] == vi), :][0]
+            if len(bid) > 0:  # send bids back to the price-curve senders
+                self.set_attr(n_bids=self.get_attr('n_bids') + 1)  # counts number bids I send
+                bid_matrix = bid.tolist()
+                vpp_idx_1bid = int(bid_matrix[0][0])
+                bid_offer_message = {"message_id": message_id_bid_offer, "vpp_name": self.name, "bid": bid_matrix}
+                myaddr = self.bind('PUSH', alias='bid_offer')
+                ns.proxy(data_names[vpp_idx_1bid]).connect(myaddr, handler=bid_offer_handler)
+                self.send('bid_offer', bid_offer_message)
 
 
 def bid_offer_handler(self, message):  # Exc react if they receive a bid from Def (based on the price curve sent before)
-    self.log_info("Received bid from deficit - " + message['vpp_name'])
+    self.log_info("Received bid matrix from deficit - " + message['vpp_name'])
     self.get_attr('iteration_memory_bid').append(message)
 
     # gather all the bids, same number as number of requests, thus number of price curves sent etc.
     if len(self.get_attr('iteration_memory_bid')) == self.get_attr('n_requests'):
         # make the calculation or just accept in some cases
 
-        vsum = 0
-        for bid in self.get_attr('iteration_memory_bid'):
-            vsum = vsum + float(bid["value"])
+        all_bids_np = np.array([])
+        for bid_message in self.get_attr('iteration_memory_bid'):
+            print("BID message[bid]", bid_message['bid'])
+            np.concatenate([all_bids_np, bid_message['bid']])
 
-        if vsum <= self.get_attr('power_balance'): # if sum of all is less then excess -> accept and wait for reply
+        vsum = sum(all_bids_np[:, 2])  # sum all the bidded power
+
+        if vsum <= self.get_attr('opf1')[1]:  # if sum of all is less then excess -> accept and wait for reply
             self.log_info('I accept all bids (bids sum < my excess) and send accept messages.')
 
             # send request of reply to deficit bidders, but do not set consensus yet, only when final accept is received
             for bid in self.get_attr('iteration_memory_bid'):
                 bid_answer_message = {'message_id': message_id_bid_accept, 'vpp_name': self.name,
-                                      'value': float(bid['value']), 'price': float(bid['price']),
-                                      'str': "That's an accept message for the bid."}
+                                      'bid': bid, 'str': "That's an accept message for the bid."}
 
                 myaddr = self.bind('PUSH', alias='bid_answer')
                 ns.proxy(bid['vpp_name']).connect(myaddr, handler=bid_answer_handler)
@@ -167,14 +175,13 @@ def bid_answer_handler(self, message):  # executed in Defs
 
         for bid in self.get_attr('iteration_memory_bid_accept'):
             myaddr = self.bind('PUSH', alias='bid_final_confirm')
-            bid_final_accept_message = {"message_id": message_id_final_answer, "vpp_name": self.name,
-                                       "value": bid['value'], "price": bid['price']}
+            bid_final_accept_message = {"message_id": message_id_final_answer, "vpp_name": self.name, "bid": bid}
             ns.proxy(bid["vpp_name"]).connect(myaddr, handler=bid_final_confirm_handler)
             self.send('bid_final_confirm', bid_final_accept_message)
 
         mydeals = []
         for accepted_bid in self.get_attr('iteration_memory_bid_accept'):
-            mydeals.append([accepted_bid['vpp_name'], accepted_bid['value'], accepted_bid['price']])
+            mydeals.append([accepted_bid['vpp_name'], accepted_bid['bid']])
         self.set_attr(timestep_memory_mydeals=mydeals)
         self.set_attr(consensus=True)
 
@@ -183,7 +190,7 @@ def bid_final_confirm_handler(self, message):  # executed in Exc
     self.log_info("Final bid accept received from: " + message['vpp_name'])
     mybids = []
     for bid in self.get_attr('iteration_memory_bid'):
-        mybids.append([bid["vpp_name"], -1 * float(bid['value']), float(bid['price'])])
+        mybids.append([bid["vpp_name"], bid['bid']])
     self.set_attr(timestep_memory_mydeals=mybids)
     self.set_attr(consensus=True)
 

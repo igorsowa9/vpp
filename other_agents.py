@@ -92,7 +92,7 @@ class VPP_ext_agent(Agent):
         json_data = self.load_data(data_paths[data_names_dict[self.name]])
         return json_data["price"][time]
 
-    def new_opf(self):
+    def runopf2(self):
         """
         After a deficit agent receives all price curves, it should define bids through running internal opf
         as defined in this function.
@@ -101,25 +101,35 @@ class VPP_ext_agent(Agent):
         # opf asa system is integrated
         memory = self.get_attr('iteration_memory_pc')
         need = abs(self.get_attr('opf1')[0])
-        print(memory, need)
-        sys.exit()
-        memory_list = []
-        for mem in memory:
-            memory_list.append([data_names_dict[mem["vpp_name"]], mem["value"], mem["price"]])
 
-        sorted_memory = sorted(memory_list, key=lambda price: price[2])
-        print(sorted_memory)
-        bids = []
-        for pc in sorted_memory:
-            pc_vpp_idx = pc[0]
-            pc_maxval = float(pc[1])
-            pc_price = float(pc[2])
-            if need > pc_maxval:
-                bids.append([pc_vpp_idx, pc_price, pc_maxval])
-                need = need - pc_maxval
+        all_pc = []
+        for mem in memory:
+            if type(mem['price_curve'][0]) == float:
+                all_pc.append([data_names_dict[mem["vpp_name"]], mem["price_curve"][0],
+                               mem["price_curve"][1], mem["price_curve"][2]])
             else:
-                bids.append([pc_vpp_idx, pc_price, need])
-        return bids
+                for gn in range(0, len(mem['price_curve'][0])):
+                    all_pc.append([data_names_dict[mem["vpp_name"]], mem["price_curve"][0][gn],
+                                   mem["price_curve"][1][gn], mem["price_curve"][2][gn]])
+
+
+        sorted_pc = sorted(all_pc, key=lambda price: price[3])
+        pp(sorted_pc)
+        bids = []
+        for pc in sorted_pc:
+            pc_vpp_idx = pc[0]
+            pc_gen_idx = pc[1]
+            pc_maxval = float(pc[2])
+            pc_price = float(pc[3])
+            if need != 0 and need > pc_maxval:
+                bids.append([pc_vpp_idx, pc_gen_idx, pc_maxval, pc_price])
+                need = need - pc_maxval
+            elif need != 0 and need < pc_maxval:
+                bids.append([pc_vpp_idx, pc_gen_idx, need, pc_price])
+                need = 0
+            elif need == 0:
+                break
+        return bids  # list: [vpp_idx, gen_idx, bidgen_value, gen_price]
 
     def set_consensus_if_norequest(self):
         """
