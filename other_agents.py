@@ -114,7 +114,7 @@ class VPP_ext_agent(Agent):
 
 
         sorted_pc = sorted(all_pc, key=lambda price: price[3])
-        pp(sorted_pc)
+        #pp(sorted_pc)
         bids = []
         for pc in sorted_pc:
             pc_vpp_idx = pc[0]

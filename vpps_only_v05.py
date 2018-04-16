@@ -111,9 +111,9 @@ def price_curve_handler(self, message):  # Deficit reaction for the received pri
                       '), need to run new opf, derive bids etc...')
         bids = self.runopf2()  # bids come as multi-list: [vpp_idx, gen_idx, bidgen_value, gen_price],[...]
         # segregate bids for same sender
-        #bids = sorted(bids, key=lambda vpp: vpp[0])
+        # bids = sorted(bids, key=lambda vpp: vpp[0])
         bids = np.array(bids)
-        for vi in range(0,vpp_n):
+        for vi in range(0, vpp_n):
             bid = bids[np.where(bids[:, 0] == vi), :][0]
             if len(bid) > 0:  # send bids back to the price-curve senders
                 self.set_attr(n_bids=self.get_attr('n_bids') + 1)  # counts number bids I send
@@ -132,13 +132,16 @@ def bid_offer_handler(self, message):  # Exc react if they receive a bid from De
     # gather all the bids, same number as number of requests, thus number of price curves sent etc.
     if len(self.get_attr('iteration_memory_bid')) == self.get_attr('n_requests'):
         # make the calculation or just accept in some cases
-
-        all_bids_np = np.array([])
+        self.log_info("iteration_memory_bid: " + str(self.get_attr('iteration_memory_bid')))
+        all_bids = []
         for bid_message in self.get_attr('iteration_memory_bid'):
-            print("BID message[bid]", bid_message['bid'])
-            np.concatenate([all_bids_np, bid_message['bid']])
+            self.log_info("BID message[bid]: " + str(bid_message['bid']))
+            for bid_message_gen in bid_message['bid']:
+                all_bids.append(bid_message_gen)
 
-        vsum = sum(all_bids_np[:, 2])  # sum all the bidded power
+        self.log_info("all_bids: " + str(all_bids))
+        all_bids_np = np.array(all_bids)
+        vsum = sum(all_bids_np[:, 2])  # sum all the bid power (vppidx, genidx, power, price)
 
         if vsum <= self.get_attr('opf1')[1]:  # if sum of all is less then excess -> accept and wait for reply
             self.log_info('I accept all bids (bids sum < my excess) and send accept messages.')
@@ -247,8 +250,6 @@ def runOneTimestep():
         print('- Def loop: Consensus Check 1')
         system_consensus_check(ns, global_time)
 
-        sys.exit()
-
         print('--- Excess and balanced agents loop: ---')
         for vpp_idx in range(vpp_n):
             agent = ns.proxy(data_names[vpp_idx])
@@ -262,14 +263,14 @@ def runOneTimestep():
                     opf1 = agent.get_attr('opf1')
                 else:
                     opf1 = agent.runopf1(agent.get_attr('agent_time'))
-                    agent.set_attr(power_balance=power_balance)
+                    agent.set_attr(power_balance=opf1)
                 if opf1[0] > 0:
                     agent.log_info("I am excess")
-                    agent.set_attr(current_status=['E', power_balance])
+                    agent.set_attr(current_status=['E', opf1])
                     agent.set_consensus_if_norequest()
                 elif opf1[0] == 0:
                     agent.log_info("I am balanced")
-                    agent.set_attr(current_status=['B', power_balance])
+                    agent.set_attr(current_status=['B', opf1])
                     agent.set_attr(timestep_memory_mydeals=[])
                     agent.set_attr(consensus=True)
                 elif opf1[0] < 0:
@@ -311,7 +312,7 @@ if __name__ == '__main__':
     # ##### RUN the simulation
 
     ## TEST for one time only ###
-    global_time_set(0)          #
+    global_time_set(1)          #
     runOneTimestep()            #
     time.sleep(1)               #
     ns.shutdown()               #
