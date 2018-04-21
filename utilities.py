@@ -34,7 +34,7 @@ def system_printing_opf(mpc_t, t, data):
         max_excess = 0
 
     else:  # no need for external power - BALANCE or EXCESS
-        power_balance = round(-1 * res['gen'][slack_idx, 1])
+        power_balance = round(-1 * res['gen'][slack_idx, 1], 1)
         max_excess = round(sum(mpc_t['gen'][:, 8]) - mpc_t['gen'][slack_idx, 8] - (sum(res['gen'][:, 1])
                                                                                    - res['gen'][slack_idx, 1]), 1)
         objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * mpc_t['gencost'][slack_idx][4], 1)
