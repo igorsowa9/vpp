@@ -10,7 +10,7 @@ def load_data(path):
         arr = json.load(f)
     return arr
 
-day = 3 # 1-30 of Sept 2017
+day = 1 # 1-30 of Sept 2017
 timesteps = 24*4
 load_mod = 1
 wind_mod = 1
