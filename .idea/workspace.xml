@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;- fix the showing deals at the end&#10;- make secondary opf&#10;- make other scenarios&#10;- integrate batteries&#10;- &#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,8 +19,8 @@
             <file leaf-file-name="runML.py" pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/runML.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="361">
-                    <caret line="86" column="33" lean-forward="true" selection-start-line="86" selection-start-column="33" selection-end-line="86" selection-end-column="33" />
+                  <state relative-caret-position="513">
+                    <caret line="94" column="48" lean-forward="true" selection-start-line="94" selection-start-column="48" selection-end-line="94" selection-end-column="48" />
                     <folding>
                       <element signature="e#0#25#0" expanded="true" />
                     </folding>
@@ -72,8 +74,8 @@
       <file leaf-file-name="case5_vpp.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/case5_vpp.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="546">
-              <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
+            <state relative-caret-position="280">
+              <caret line="24" column="36" selection-start-line="24" selection-start-column="36" selection-end-line="24" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -191,11 +193,11 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds">
     <option name="x" value="65" />
-    <option name="y" value="3" />
+    <option name="y" value="24" />
     <option name="width" value="1855" />
-    <option name="height" value="1048" />
+    <option name="height" value="1020" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -557,7 +559,14 @@
       <option name="project" value="LOCAL" />
       <updated>1524498409900</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;- fix the showing deals at the end&#10;- make secondary opf&#10;- make other scenarios&#10;- integrate batteries&#10;- &#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <created>1524670984570</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1524670984570</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -663,7 +672,8 @@
     <MESSAGE value="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;fix the showing deals at the end&#10;make secondary opf&#10;make other scenarios&#10;ML data and implementation, where, what.&#10;&#10;DATA in JSON uploaded - plan and import to OPF, pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs..." />
     <MESSAGE value="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;fix the showing deals at the end&#10;make secondary opf&#10;make other scenarios&#10;ML data and implementation, where, what.&#10;&#10;DATA in JSON uploaded - plan and import to OPF, pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10;&#10;solve printing of the upper constraint problem !!!!!!!!!!!!!!!" />
     <MESSAGE value="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;- fix the showing deals at the end&#10;- make secondary opf&#10;- make other scenarios&#10;make &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.&#10;&#10;DATA in JSON uploaded - plan and import to OPF, pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs..." />
-    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;- fix the showing deals at the end&#10;- make secondary opf&#10;- make other scenarios&#10;make &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.&#10;&#10;DATA in JSON uploaded - plan and import to OPF, pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs..." />
+    <MESSAGE value="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;- fix the showing deals at the end&#10;- make secondary opf&#10;- make other scenarios&#10;- integrate batteries&#10;- &#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;- fix the showing deals at the end&#10;- make secondary opf&#10;- make other scenarios&#10;- integrate batteries&#10;- &#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1007,8 +1017,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/runML.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="86" column="33" lean-forward="true" selection-start-line="86" selection-start-column="33" selection-end-line="86" selection-end-column="33" />
+        <state relative-caret-position="513">
+          <caret line="94" column="48" lean-forward="true" selection-start-line="94" selection-start-column="48" selection-end-line="94" selection-end-column="48" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
           </folding>
@@ -1017,8 +1027,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/case5_vpp.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="546">
-          <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
+        <state relative-caret-position="280">
+          <caret line="24" column="36" selection-start-line="24" selection-start-column="36" selection-end-line="24" selection-end-column="36" />
         </state>
       </provider>
     </entry>
