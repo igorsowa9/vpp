@@ -1,4 +1,4 @@
-from settings import *
+from settings_3busML import *
 import matplotlib.pyplot as plt
 import json
 from oct2py import octave
@@ -87,7 +87,10 @@ def system_consensus_check(ns, global_time):
         print("----- Deals: -----")
         for alias in ns.agents():
             a = ns.proxy(alias)
-            print(alias + " deals (with?, value buy+/-sell, price): ", a.get_attr('timestep_memory_mydeals'))
+            print("\n" + alias + " deals: ("+ str(a.get_attr('opf1')[0:2]) +")")
+            for deal in a.get_attr('timestep_memory_mydeals'):
+                print("\tWith: " + str(deal[0]))
+                print("\tBid value [vpp_idx, gen_idx, value, price]: " + str(deal[1][0]))
         return True
     else:
         print("- Multi-consensus NOT reached (" + str(n_consensus) + "/" + str(vpp_n) + ") for time: ", global_time)
@@ -98,9 +101,11 @@ def erase_iteration_memory(ns):
     print('--- iteration M erase ---')
     for vpp_idx in range(vpp_n):
         a = ns.proxy(data_names[vpp_idx])
-        a.set_attr(iteration_memory_pc=[])
+        a.set_attr(iteration_memory_received_pc=[])
+        a.set_attr(iteration_memory_my_pc=[])
         a.set_attr(iteration_memory_bid=[])
         a.set_attr(iteration_memory_bid_accept=[])
+        a.set_attr(iteration_memory_bid_finalanswer=[])
         a.set_attr(n_bids=0)
 
 

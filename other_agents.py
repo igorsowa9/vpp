@@ -1,15 +1,11 @@
 from osbrain import Agent
 import json
-from settings import *
+from settings_3busML import *
 #from utilities import system_state_update_and_balance
 import time
 from pprint import pprint as pp
 from oct2py import octave
 import copy, sys
-
-octave.addpath('/home/iso/PycharmProjects/vpp/matpow_cases')
-octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0')
-octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0/t')
 
 from pypower.api import *
 from case5_vpp import case5_vpp
@@ -99,7 +95,7 @@ class VPP_ext_agent(Agent):
         :return: bids that are sent back to the excess agents of interest
         """
         # opf asa system is integrated
-        memory = self.get_attr('iteration_memory_pc')
+        memory = self.get_attr('iteration_memory_received_pc')
         need = abs(self.get_attr('opf1')[0])
 
         all_pc = []

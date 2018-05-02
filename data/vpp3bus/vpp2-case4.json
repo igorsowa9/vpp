@@ -1,0 +1,21 @@
+{
+	"name":"name of vpp2 in 3busML case",
+
+	"description":"data for the case4_vpp, 3 time stamps",
+
+	"max_generation": 	[[1e4, 350, 0, 80],
+						[1e4, 150, 0, 380],
+						[1e4, 150, 0, 360]],
+
+	"fixed_load": 	[[0, 150, 100, 80],
+					[0, 170, 200, 85],
+					[0, 170, 200, 95]],
+
+	"price": 	[[1e4, 2, 0, 24],
+				[1e4, 2, 0, 24],
+				[1e4, 2, 0, 24]],
+
+	"case":	"case4",
+
+	"slack_idx": 0
+}
