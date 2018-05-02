@@ -1,17 +1,11 @@
 from settings_3busML import *
 import matplotlib.pyplot as plt
 import json
-from oct2py import octave
 import copy, sys
 from pprint import pprint as pp
-
 from pypower.api import *
 from case5_vpp import case5_vpp
 from rundcopf_noprint import rundcopf
-
-octave.addpath('/home/iso/PycharmProjects/vpp/matpow_cases')
-octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0')
-octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0/t')
 
 
 def system_printing_opf(mpc_t, t, data):

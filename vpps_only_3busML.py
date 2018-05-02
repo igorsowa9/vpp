@@ -141,11 +141,10 @@ def bid_offer_handler(self, message):
         # make the calculation or just accept in some cases
         all_bids = []
         for bid_message in self.get_attr('iteration_memory_bid'):
-            # self.log_info("BID message[bid]: " + str(bid_message['bid']))
             for bid_message_gen in bid_message['bid']:
                 all_bids.append(bid_message_gen)
-
         self.log_info("My all bids from deficit vpps: " + str(all_bids))
+
         all_bids_np = np.array(all_bids)
         vsum = sum(all_bids_np[:, 2])  # sum all the bid power (vppidx, genidx, power, price)
 
@@ -156,13 +155,11 @@ def bid_offer_handler(self, message):
             # for bid_message in self.get_attr('iteration_memory_bid'):
 
             mypc_np = np.array(self.get_attr('iteration_memory_my_pc'))
-            print(mypc_np)
-            print(all_bids_np)
 
             for gen in mypc_np[0]:
                 bid_1gen = all_bids_np[all_bids_np[:, 1] == gen]
                 if sum(bid_1gen[:, 2]) > mypc_np[1, mypc_np[0, :] == gen]:
-                    self.log_info("Need sharing between the gens i.e. counteroffer.")
+                    self.log_info("Need sharing between the gens i.e. modify the bids")
                     break
                 # If every bid-per-gen sum is less then available power then send accept
                 # send request of reply to deficit bidders, but do not set consensus yet, only when final accept is received
@@ -174,13 +171,23 @@ def bid_offer_handler(self, message):
                     ns.proxy(bid_msg['vpp_name']).connect(myaddr, handler=bid_answer_handler)
                     self.send('bid_answer', bid_answer_message)
 
-            for bid_msg in self.get_attr('iteration_memory_bid'):
+            imb_mod = self.get_attr('iteration_memory_bid')
+            mypc_mod = mypc_np
 
+            print(imb_mod, mypc_mod)
+
+            for bid_msg in self.get_attr('iteration_memory_bid'):
+                print(bid_msg)
                 bids_sum = sum(np.array(bid_msg['bid'])[:, 2])  # =request value in other words
                 mod = bids_sum/vsum
-                bid_mod = bid_msg['bid']
+                bid_mod = np.array(bid_msg['bid'])
+                bid_mod[:, 2] = bid_mod[:, 2] * mod
+                print(bid_mod)
 
-                print(bid_msg)
+                for bm in bid_mod:
+                    print(mypc_mod[1, mypc_mod[0, :] == bm[1]] - bm[2])
+                sys.exit()
+
 
                 for gen in mypc_np[0]:
                     bid_1gen = all_bids_np[all_bids_np[:, 1] == gen]
