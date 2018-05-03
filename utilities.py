@@ -82,9 +82,12 @@ def system_consensus_check(ns, global_time):
         for alias in ns.agents():
             a = ns.proxy(alias)
             print("\n" + alias + " deals: ("+ str(a.get_attr('opf1')[0:2]) +")")
-            for deal in a.get_attr('timestep_memory_mydeals'):
-                print("\tWith: " + str(deal[0]))
-                print("\tBid value [vpp_idx, gen_idx, value, price]: " + str(deal[1][0]))
+
+            for deal_vpp in a.get_attr('timestep_memory_mydeals'):
+                print("\tWith: " + str(deal_vpp[0]))
+                print("\t\tBid values [vpp_idx (where selling generator is), gen_idx, value, price]: ")
+                for bid in deal_vpp[1]:
+                    print("\t\t" + str(bid))
         return True
     else:
         print("- Multi-consensus NOT reached (" + str(n_consensus) + "/" + str(vpp_n) + ") for time: ", global_time)

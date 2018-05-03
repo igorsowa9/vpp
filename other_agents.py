@@ -153,3 +153,77 @@ class VPP_ext_agent(Agent):
     def sys_pypower_test(self, ppc):
         r = rundcopf(ppc)
         return r['success']
+
+    def bids_alignment1(self, mypc0, all_bids0):
+
+        all_bids = copy.deepcopy(all_bids0)
+
+        print(all_bids0)
+        print(mypc0)
+        #sys.exit()
+
+        # fill the missing generators (0-bids)
+        for vpp in np.unique(all_bids0[:, 0]):
+            tobid_gens_n = len(mypc0)
+            if sum(all_bids0[:, 0] == vpp) != tobid_gens_n:
+                existing = set(all_bids0[all_bids0[:, 0] == vpp, 2])
+                allgen = set(mypc0[:, 0])
+                missing = np.array(list(allgen - existing))
+
+                for mis in missing:
+                    to_append = np.array([vpp,
+                                          all_bids0[0, 1],
+                                          mis,
+                                          0,
+                                          mypc0[mypc0[:, 0] == mis, 2]])
+
+                    all_bids = np.append(all_bids, [to_append], axis=0)
+
+        all_bids_sum = sum(all_bids0[:, 3])
+        print(all_bids)
+        all_bids_mod = copy.deepcopy(all_bids)
+        all_bids_mod[:, 3] = 0  # all bids values set to 0
+
+        for pc in mypc0:
+
+            gen_id = pc[0]
+            gen_pmax = pc[1]
+            bid_1gen = all_bids0[all_bids0[:, 2] == gen_id]
+            sum_bids_1gen = sum(bid_1gen[:, 3])
+
+            if gen_pmax < sum_bids_1gen:  # if resource exceeded for 1 generator, then share the exces
+                self.log_info("Modification of bids of over-bidded gens... ")
+                for bid_msg in self.get_attr('iteration_memory_bid'):
+                    vpp_idx = data_names_dict[bid_msg['vpp_name']]
+                    bid0 = np.array(bid_msg['bid'])
+                    bids_sum = sum(bid0[:, 2])  # =request value in other words. =25
+
+                    mod = bids_sum / all_bids_sum  # 25/55 - waga tej vpp
+
+                    c1 = np.where(all_bids_mod[:, 0] == vpp_idx)[0]  # raws where vpp
+                    c2 = np.where(all_bids_mod[:, 2] == gen_id)[0]  # raws where gens
+                    c3 = np.intersect1d(c1, c2)
+
+                    all_bids_mod[c3, 3] = np.round(mod * gen_pmax, 4)  # 25/55 * 20 = 9.1
+
+            else:
+                self.log_info("Filling bids with the other generators' excess... ")
+                for bid_msg in self.get_attr('iteration_memory_bid'):
+                    vpp_idx = data_names_dict[bid_msg['vpp_name']]
+                    bid0 = np.array(bid_msg['bid'])
+                    bids_sum = sum(bid0[:, 2])  # =request value in other words. =25
+
+                    c1 = np.where(all_bids_mod[:, 0] == vpp_idx)[0]
+                    bidded_sofar = sum(all_bids_mod[c1, 3])  # = 9.1
+                    c2 = np.where(all_bids_mod[:, 2] == gen_id)[0]
+                    c3 = np.intersect1d(c1, c2)
+                    #if not c3:  # i.e. there was no original bid for that generator (e.g. the first one was sufficient)
+                    all_bids_mod[c3, 3] = round(bids_sum - bidded_sofar, 4)
+
+            # final check if the bids does not exceed excess
+            c2 = np.where(all_bids_mod[:, 2] == gen_id)[0]
+            if all_bids_mod[c2, 3].any() > gen_pmax:
+                self.log_info("Wrong bid modification: some gen bids exceed the available excess!! STOP")
+                sys.exit()
+
+        return all_bids_mod
