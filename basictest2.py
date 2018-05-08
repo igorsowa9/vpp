@@ -1,9 +1,6 @@
 from pypower.api import *
-from case5_vpp import case5_vpp
 from case4_vpp import case4_vpp
-from rundcopf_noprint import rundcopf
-
-from other_agents import VPP_ext_agent
+from pypower_mod.rundcopf_noprint import rundcopf
 
 ppc = case4_vpp()
 opt = ppoption(VERBOSE=1)

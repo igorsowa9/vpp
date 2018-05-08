@@ -1,11 +1,9 @@
 from settings_3busML import *
 import matplotlib.pyplot as plt
 import json
-import copy, sys
-from pprint import pprint as pp
+import copy
 from pypower.api import *
-from case5_vpp import case5_vpp
-from rundcopf_noprint import rundcopf
+from pypower_mod.rundcopf_noprint import rundcopf
 
 
 def system_printing_opf(mpc_t, t, data):
@@ -116,3 +114,4 @@ def erase_timestep_memory(ns):
         a.set_attr(consensus=False)
         a.set_attr(requests=[])
         a.set_attr(opf1=[])
+        a.set_attr(opf1_resgen=[])

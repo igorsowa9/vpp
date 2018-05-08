@@ -1,7 +1,7 @@
 from pypower.api import *
 from case5_vpp import case5_vpp
-from rundcopf_noprint import rundcopf
-import copy, sys, json
+from pypower_mod.rundcopf_noprint import rundcopf
+import copy, json
 import numpy as np
 import matplotlib.pyplot as plt
 

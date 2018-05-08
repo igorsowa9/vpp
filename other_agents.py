@@ -4,11 +4,12 @@ from settings_3busML import *
 #from utilities import system_state_update_and_balance
 import time
 from pprint import pprint as pp
-import copy, sys
+import copy
+import sys
 
 from pypower.api import *
-from case5_vpp import case5_vpp
-from rundcopf_noprint import rundcopf
+from pypower_mod.rundcopf_noprint import rundcopf
+from pypower_mod.rundcpf_noprint import rundcpf
 
 
 class VPP_ext_agent(Agent):
@@ -23,6 +24,14 @@ class VPP_ext_agent(Agent):
             arr = json.load(f)
         return arr
 
+    def current_price(self, time):
+        """
+        Loads price of own resources / create price curve, at a time.
+        :param time:
+        :return: price value / price curve
+        """
+        json_data = self.load_data(data_paths[data_names_dict[self.name]])
+        return json_data["price"][time]
 
     def runopf1(self, t):
         """
@@ -75,19 +84,10 @@ class VPP_ext_agent(Agent):
 
         if res['success'] == 1:
             self.log_info("I have successfully run the OPF1.")
+            self.set_attr(opf1_resgen=res['gen'])
         return power_balance, max_excess, objf_noslackcost, pc_matrix
 
-
-    def current_price(self, time):
-        """
-        Loads price of own resources / create price curve, at a time.
-        :param time:
-        :return: price value / price curve
-        """
-        json_data = self.load_data(data_paths[data_names_dict[self.name]])
-        return json_data["price"][time]
-
-    def runopf2(self):
+    def runopf_d2(self):
         """
         After a deficit agent receives all price curves, it should define bids through running internal opf
         as defined in this function.
@@ -126,6 +126,48 @@ class VPP_ext_agent(Agent):
                 break
         return bids  # list: [vpp_idx, gen_idx, bidgen_value, gen_price]
 
+    def runopf_e3(self, all_bids_mod, t):
+        """
+        After an excess agent decides about the answers for the bids (original or modified),
+        it should check feasibility of such answer through (o)pf
+        """
+
+        # load raw data
+        data = self.load_data(data_paths[data_names_dict[self.name]])
+        ppc0 = cases[data['case']]()
+        ppc_t = copy.deepcopy(ppc0)
+
+        # load and modify according to current time
+        max_generation = data['max_generation']
+        fixed_load = data['fixed_load']
+        price = data['price']
+        slack_idx = data['slack_idx']
+        ppc_t['bus'][:, 2] = fixed_load[t]
+        ppc_t['gen'][:, 8] = max_generation[t]
+        ppc_t['gencost'][:, 4] = price[t]
+
+        # modify according to prospective accepted bids: loop through my generators (excluding slack)
+        origin_opf1_resgen = self.get_attr('opf1_resgen')
+
+        for gen_idx in np.unique(all_bids_mod[:, 2]):  # loop through the generators from bids (1,2,3) there should be no slack
+
+            c1 = np.where(all_bids_mod[:, 2] == gen_idx)[0]  # raws where gen
+            p_bid = np.round(np.sum(all_bids_mod[c1, 3]), 4)  # total value of bidded power for generator
+
+            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx)[0]
+            ppc_t['gen'][c2, 1] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1
+
+            c3 = np.where(ppc_t['gen'][:, 0] == gen_idx)[0]
+            ppc_t['gen'][c3, 1] += np.round(p_bid, 4)  # add value from bidding
+
+        # modify the load at the pcc i.e. slack bus id:0
+        bids_sum = np.round(np.sum(all_bids_mod[:, 3]), 4)
+        ppc_t['bus'][0, 2] += bids_sum
+
+        # with bids updated, verify the power flow if feasible
+        res = rundcpf(ppc_t, ppoption(VERBOSE=opf1_verbose))[0]
+        return res['success']
+
     def set_consensus_if_norequest(self):
         """
         This is called in case an excess agent does not have any requests from deficit agents in the deficit loop.
@@ -158,9 +200,9 @@ class VPP_ext_agent(Agent):
 
         all_bids = copy.deepcopy(all_bids0)
 
-        print(all_bids0)
-        print(mypc0)
-        #sys.exit()
+        # print(all_bids0)
+        # print(mypc0)
+        # sys.exit()
 
         # fill the missing generators (0-bids)
         for vpp in np.unique(all_bids0[:, 0]):
@@ -180,7 +222,7 @@ class VPP_ext_agent(Agent):
                     all_bids = np.append(all_bids, [to_append], axis=0)
 
         all_bids_sum = sum(all_bids0[:, 3])
-        print(all_bids)
+        # print(all_bids)
         all_bids_mod = copy.deepcopy(all_bids)
         all_bids_mod[:, 3] = 0  # all bids values set to 0
 

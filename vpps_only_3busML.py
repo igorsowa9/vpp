@@ -39,7 +39,10 @@ def forall_iteration_set(value, vpp_exclude):
     print("--- all agents set new iteration value: " + str(value) + " ---")
 
 
-def request_handler(self, message):  # Excesses' reaction for a request from deficit agent (price curve or rejection)
+def request_handler(self, message):
+    """
+    Excesses' gathering of requests
+    """
     from_vpp = message["vpp_name"]
     power_value = message["value"]
     self.log_info('Request received from: ' + str(from_vpp) + ' Value: ' + str(power_value))
@@ -50,7 +53,7 @@ def request_handler(self, message):  # Excesses' reaction for a request from def
 
 def requests_execute(self, myname, requests):
     """
-    The agents that receive some requests answer either NO or with price curves.
+    The Excess agents that receive some requests answer either NO or with price curves.
     :param self:
     :param myname:
     :param requests: e.g. {'message_id': 1, 'vpp_name': 'vpp1', 'value': 25.0}
@@ -112,7 +115,7 @@ def price_curve_handler(self, message):
     if len(self.get_attr('iteration_memory_received_pc')) == sum(self.get_attr('adj'))-1:
         self.log_info('All price curves received (from all neigh.) (' + str(len(self.get_attr('iteration_memory_received_pc'))) +
                       '), need to run new opf, derive bids etc...')
-        bids = self.runopf2()  # bids come as multi-list: [vpp_idx, gen_idx, bidgen_value, gen_price],[...]
+        bids = self.runopf_d2()  # bids come as multi-list: [vpp_idx, gen_idx, bidgen_value, gen_price],[...]
         # segregate bids for same sender
         # bids = sorted(bids, key=lambda vpp: vpp[0])
         bids = np.array(bids)
@@ -174,7 +177,11 @@ def bid_offer_handler(self, message):
             # bid modification: equal sharing (participation according to total bid value)
             # of the bids due to limited single gen excess:
             all_bids_mod = self.bids_alignment1(mypc0, all_bids_np)
-
+            # (o)pf should be checked if the transport of such a power is possible to the respective deficit vpps
+            # through the respective PCCs:
+            feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
+            self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility))
+            sys.exit()
             # make the messages / modify the old ones
             for bid_msg in self.get_attr('iteration_memory_bid'):
                 vpp_idx = data_names_dict[bid_msg['vpp_name']]

@@ -2,19 +2,19 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-"""Runs a DC optimal power flow.
+"""Runs a DC power flow.
 """
 
 from os.path import dirname, join
 
 from pypower.ppoption import ppoption
-from runopf_noprint import runopf
+from pypower_mod.runpf_noprint import runpf
 
 
-def rundcopf(casedata=None, ppopt=None, fname='', solvedcase=''):
-    """Runs a DC optimal power flow.
+def rundcpf(casedata=None, ppopt=None, fname='', solvedcase=''):
+    """Runs a DC power flow.
 
-    @see: L{runopf}, L{runduopf}
+    @see: L{runpf}
 
     @author: Ray Zimmerman (PSERC Cornell)
     """
@@ -23,4 +23,4 @@ def rundcopf(casedata=None, ppopt=None, fname='', solvedcase=''):
         casedata = join(dirname(__file__), 'case9')
     ppopt = ppoption(ppopt, PF_DC=True)
 
-    return runopf(casedata, ppopt, fname, solvedcase)
+    return runpf(casedata, ppopt, fname, solvedcase)
