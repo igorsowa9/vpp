@@ -129,7 +129,10 @@ class VPP_ext_agent(Agent):
     def runopf_e3(self, all_bids_mod, t):
         """
         After an excess agent decides about the answers for the bids (original or modified),
-        it should check feasibility of such answer through (o)pf
+        it should check feasibility of such answer through pf:
+            - added bids as more generation,
+            - added load at the pcc.
+        In case of unfeasible solution, further modification of bids has to be done.
         """
 
         # load raw data
@@ -163,9 +166,12 @@ class VPP_ext_agent(Agent):
         # modify the load at the pcc i.e. slack bus id:0
         bids_sum = np.round(np.sum(all_bids_mod[:, 3]), 4)
         ppc_t['bus'][0, 2] += bids_sum
-
+        print(ppc_t['branch'][:, 5:8])
         # with bids updated, verify the power flow if feasible
         res = rundcpf(ppc_t, ppoption(VERBOSE=opf1_verbose))[0]
+        printpf(res)
+        sys.exit()
+        if opf1_prinpf: printpf(res)
         return res['success']
 
     def set_consensus_if_norequest(self):

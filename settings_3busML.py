@@ -23,7 +23,7 @@ cases = {'case5': case5_vpp,
          'case4': case4_vpp}
 
 opf1_verbose = 0
-opf1_prinpf = False
+opf1_prinpf = True
 
 # ASSUMPTIONS:
 # slack bus as the first one with idx 0 (some simplification, non universalities in the code, e.g. in PC building)

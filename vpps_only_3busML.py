@@ -180,8 +180,12 @@ def bid_offer_handler(self, message):
             # (o)pf should be checked if the transport of such a power is possible to the respective deficit vpps
             # through the respective PCCs:
             feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
-            self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility))
-            sys.exit()
+            if feasibility:
+                self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility))
+            else:
+                self.log_info('Unhandled unfeasibility in pf_e3! Stop.')
+                sys.exit()
+
             # make the messages / modify the old ones
             for bid_msg in self.get_attr('iteration_memory_bid'):
                 vpp_idx = data_names_dict[bid_msg['vpp_name']]
