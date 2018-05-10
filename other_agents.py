@@ -80,6 +80,10 @@ class VPP_ext_agent(Agent):
             sorted_nonzero = sorted[:, np.nonzero(sorted[1, :])]
             sorted_nonzero_squeezed = np.reshape(sorted_nonzero, np.squeeze(sorted_nonzero).shape)
             pc_matrix = np.ndarray.tolist(sorted_nonzero_squeezed)
+            # increase price by a factor
+            pc_matrix = np.array(pc_matrix)
+            pc_matrix[2, :] *= pc_matrix_price_increase_factor
+            pc_matrix = np.round(pc_matrix, 4)
             self.log_info("Final pc matrix: " + str(pc_matrix))
 
         if res['success'] == 1:
@@ -107,7 +111,6 @@ class VPP_ext_agent(Agent):
                     all_pc.append([data_names_dict[mem["vpp_name"]], mem["price_curve"][0][gn],
                                    mem["price_curve"][1][gn], mem["price_curve"][2][gn]])
 
-
         sorted_pc = sorted(all_pc, key=lambda price: price[3])
         #pp(sorted_pc)
         bids = []
@@ -133,6 +136,7 @@ class VPP_ext_agent(Agent):
             - added bids as more generation,
             - added load at the pcc.
         In case of unfeasible solution, further modification of bids has to be done.
+        Furthermore, the objective function should be compared if lower cost is reached.
         """
 
         # load raw data
@@ -152,26 +156,35 @@ class VPP_ext_agent(Agent):
         # modify according to prospective accepted bids: loop through my generators (excluding slack)
         origin_opf1_resgen = self.get_attr('opf1_resgen')
 
-        for gen_idx in np.unique(all_bids_mod[:, 2]):  # loop through the generators from bids (1,2,3) there should be no slack
+        for gen_idx in np.unique(all_bids_mod[:, 2]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
 
-            c1 = np.where(all_bids_mod[:, 2] == gen_idx)[0]  # raws where gen
+            c1 = np.where(all_bids_mod[:, 2] == gen_idx)[0]  # rows where gen
             p_bid = np.round(np.sum(all_bids_mod[c1, 3]), 4)  # total value of bidded power for generator
 
             c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx)[0]
-            ppc_t['gen'][c2, 1] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1
+            ppc_t['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
+            ppc_t['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
 
             c3 = np.where(ppc_t['gen'][:, 0] == gen_idx)[0]
-            ppc_t['gen'][c3, 1] += np.round(p_bid, 4)  # add value from bidding
+            ppc_t['gen'][c3, [8, 9]] += np.round(p_bid, 4)  # add value from bidding, to Pmax,Pmin
 
-        # modify the load at the pcc i.e. slack bus id:0
+        # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
         bids_sum = np.round(np.sum(all_bids_mod[:, 3]), 4)
         ppc_t['bus'][0, 2] += bids_sum
-        print(ppc_t['branch'][:, 5:8])
-        # with bids updated, verify the power flow if feasible
-        res = rundcpf(ppc_t, ppoption(VERBOSE=opf1_verbose))[0]
-        printpf(res)
-        sys.exit()
-        if opf1_prinpf: printpf(res)
+
+        # with bids updated, verify the power flow if feasible - must be opf in order to include e.g. thermal limits
+        res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
+
+        # calculation of the costs: objective function minus revenue from selling
+        bids_revenue = 0
+        for bid in all_bids_mod:
+            bids_revenue += bid[3] * bid[4]
+
+        objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 1)
+        costs = np.round(objf_noslackcost - bids_revenue, 4)  # costs of vpp as costs of operation - revenue from bids
+        self.set_attr(opf_e3=costs)
+        if opf1_prinpf:
+            printpf(res)
         return res['success']
 
     def set_consensus_if_norequest(self):

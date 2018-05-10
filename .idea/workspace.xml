@@ -22,8 +22,8 @@
             <file leaf-file-name="vpps_only_3busML.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/vpps_only_3busML.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="306">
-                    <caret line="181" column="40" selection-start-line="181" selection-start-column="38" selection-end-line="181" selection-end-column="40" />
+                  <state relative-caret-position="659">
+                    <caret line="87" column="75" selection-start-line="87" selection-start-column="64" selection-end-line="87" selection-end-column="75" />
                     <folding>
                       <element signature="e#0#11#0" expanded="true" />
                     </folding>
@@ -34,8 +34,8 @@
             <file leaf-file-name="other_agents.py" pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/other_agents.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="306">
-                    <caret line="101" selection-start-line="101" selection-end-line="101" />
+                  <state relative-caret-position="1102">
+                    <caret line="85" column="46" lean-forward="true" selection-start-line="85" selection-start-column="46" selection-end-line="85" selection-end-column="46" />
                     <folding>
                       <element signature="e#0#25#0" expanded="true" />
                     </folding>
@@ -46,8 +46,8 @@
             <file leaf-file-name="settings_3busML.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/settings_3busML.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="475">
-                    <caret line="25" column="11" selection-start-line="25" selection-end-line="25" selection-end-column="11" />
+                  <state relative-caret-position="209">
+                    <caret line="11" column="39" lean-forward="true" selection-start-line="11" selection-start-column="39" selection-end-line="11" selection-end-column="39" />
                     <folding>
                       <element signature="e#0#18#0" expanded="true" />
                     </folding>
@@ -98,7 +98,7 @@
       <file leaf-file-name="basictest.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/basictest.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1368">
+            <state relative-caret-position="988">
               <caret line="72" column="10" selection-start-line="72" selection-start-column="10" selection-end-line="72" selection-end-column="10" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
@@ -120,7 +120,7 @@
         <entry file="file://$PROJECT_DIR$/data/vpp3bus/vpp2-case4.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="228">
-              <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
+              <caret line="12" selection-start-line="12" selection-end-line="12" />
             </state>
           </provider>
         </entry>
@@ -129,7 +129,7 @@
         <entry file="file://$PROJECT_DIR$/pypower_mod/runopf_noprint.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="722">
-              <caret line="45" column="12" lean-forward="true" selection-start-line="45" selection-start-column="12" selection-end-line="45" selection-end-column="12" />
+              <caret line="45" column="12" selection-start-line="45" selection-start-column="12" selection-end-line="45" selection-end-column="12" />
             </state>
           </provider>
         </entry>
@@ -137,8 +137,8 @@
       <file leaf-file-name="case4_vpp.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/case4_vpp.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="251">
-              <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
+            <state relative-caret-position="109">
+              <caret line="36" column="26" lean-forward="true" selection-start-line="36" selection-start-column="26" selection-end-line="36" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -173,15 +173,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>iteration_memory_bid_finalanswer</find>
-      <find>EXCESS agent</find>
-      <find>opf1_prinpf</find>
-      <find>load_data</find>
-      <find>vpp4</find>
-      <find>bids_ali</find>
-      <find>need sharing bet</find>
-      <find>print</find>
-      <find>opf</find>
       <find>octa</find>
       <find>bids_alignment1</find>
       <find>octave</find>
@@ -201,8 +192,17 @@
       <find>runopf_e3</find>
       <find>FEAS</find>
       <find>e3</find>
-      <find>feas</find>
+      <find>rundcop</find>
+      <find>fea</find>
       <find>feasi</find>
+      <find>opf_e3</find>
+      <find>price cu</find>
+      <find>set_attr(opf1</find>
+      <find>opf1</find>
+      <find>final pc ma</find>
+      <find>final pc</find>
+      <find>feasibi</find>
+      <find>feas</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -267,10 +267,10 @@
         <option value="$PROJECT_DIR$/rundcpf_noprint.py" />
         <option value="$PROJECT_DIR$/runpf_noprint.py" />
         <option value="$PROJECT_DIR$/pypower_mod/__init__.py" />
-        <option value="$PROJECT_DIR$/settings_3busML.py" />
+        <option value="$PROJECT_DIR$/case4_vpp.py" />
         <option value="$PROJECT_DIR$/vpps_only_3busML.py" />
         <option value="$PROJECT_DIR$/other_agents.py" />
-        <option value="$PROJECT_DIR$/case4_vpp.py" />
+        <option value="$PROJECT_DIR$/settings_3busML.py" />
       </list>
     </option>
   </component>
@@ -516,10 +516,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.vpps_only_3busML" />
+        <item itemvalue="Python.other_agents" />
         <item itemvalue="Python.settings_3busML" />
         <item itemvalue="Python.example_oct2py" />
         <item itemvalue="Python.basictest" />
-        <item itemvalue="Python.other_agents" />
       </list>
     </recent_temporary>
   </component>
@@ -813,13 +813,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/osbrain/agent.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="1795" column="19" selection-start-line="1795" selection-start-column="13" selection-end-line="1795" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/message_handlers.py" />
     <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/zmq/sugar/socket.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -1044,15 +1037,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="418">
           <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/basictest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1368">
+        <state relative-caret-position="988">
           <caret line="72" column="10" selection-start-line="72" selection-start-column="10" selection-end-line="72" selection-end-column="10" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
@@ -1084,7 +1074,7 @@
     <entry file="file://$PROJECT_DIR$/pypower_mod/runopf_noprint.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="722">
-          <caret line="45" column="12" lean-forward="true" selection-start-line="45" selection-start-column="12" selection-end-line="45" selection-end-column="12" />
+          <caret line="45" column="12" selection-start-line="45" selection-start-column="12" selection-end-line="45" selection-end-column="12" />
         </state>
       </provider>
     </entry>
@@ -1092,6 +1082,23 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="266">
           <caret line="304" column="12" lean-forward="true" selection-start-line="304" selection-start-column="12" selection-end-line="304" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp3bus/vpp2-case4.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/runML.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="27" column="11" selection-start-line="27" selection-end-line="27" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1112,57 +1119,47 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/runML.py">
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/osbrain/agent.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="27" column="11" selection-start-line="27" selection-end-line="27" selection-end-column="11" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="110">
+          <caret line="1711" column="22" lean-forward="true" selection-start-line="1711" selection-start-column="22" selection-end-line="1711" selection-end-column="22" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/settings_3busML.py">
+    <entry file="file://$PROJECT_DIR$/case4_vpp.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
-          <caret line="25" column="11" selection-start-line="25" selection-end-line="25" selection-end-column="11" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="109">
+          <caret line="36" column="26" lean-forward="true" selection-start-line="36" selection-start-column="26" selection-end-line="36" selection-end-column="26" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/vpps_only_3busML.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="181" column="40" selection-start-line="181" selection-start-column="38" selection-end-line="181" selection-end-column="40" />
+        <state relative-caret-position="659">
+          <caret line="87" column="75" selection-start-line="87" selection-start-column="64" selection-end-line="87" selection-end-column="75" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp3bus/vpp2-case4.json">
+    <entry file="file://$PROJECT_DIR$/settings_3busML.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
+        <state relative-caret-position="209">
+          <caret line="11" column="39" lean-forward="true" selection-start-line="11" selection-start-column="39" selection-end-line="11" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/other_agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="101" selection-start-line="101" selection-end-line="101" />
+        <state relative-caret-position="1102">
+          <caret line="85" column="46" lean-forward="true" selection-start-line="85" selection-start-column="46" selection-end-line="85" selection-end-column="46" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/case4_vpp.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="251">
-          <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
         </state>
       </provider>
     </entry>

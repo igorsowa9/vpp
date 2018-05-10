@@ -12,18 +12,23 @@ vpp_n = len(data_names)
 system_status = np.zeros([ts_n, vpp_n])
 
 adj_matrix = [[True, True, False, False],
-              [True, True, True, True],  # 1---2---3
+              [True, True, True, True],
               [False, True, True, False],
               [False, True, False, True]]
 
 small_wait = 0.3  # waiting time to separate some steps, for testing
 price_increase_factor = 6.0
 
+# the excess agents increase the original production prices when publishing the price curve, increase by 10%
+# when the excess is sold for the original prices, there is no benefit for excess agents since:
+# production_cost - bids_revenue = 0
+pc_matrix_price_increase_factor = 1.1
+
 cases = {'case5': case5_vpp,
          'case4': case4_vpp}
 
 opf1_verbose = 0
-opf1_prinpf = True
+opf1_prinpf = False
 
 # ASSUMPTIONS:
 # slack bus as the first one with idx 0 (some simplification, non universalities in the code, e.g. in PC building)

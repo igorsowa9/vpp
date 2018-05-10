@@ -181,7 +181,9 @@ def bid_offer_handler(self, message):
             # through the respective PCCs:
             feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
             if feasibility:
-                self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility))
+                self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
+                              ' . The costs changed from (opf1): ' + str(self.get_attr('opf1')[2]) +
+                              ' to (opf_e3-bid revenue): ' + str(self.get_attr('opf_e3')))
             else:
                 self.log_info('Unhandled unfeasibility in pf_e3! Stop.')
                 sys.exit()
