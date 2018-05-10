@@ -51,6 +51,7 @@ class VPP_ext_agent(Agent):
         fixed_load = data['fixed_load']
         price = data['price']
         slack_idx = data['slack_idx']
+        generation_type = data['generation_type']
 
         ppc_t['bus'][:, 2] = fixed_load[t]
         ppc_t['gen'][:, 8] = max_generation[t]
@@ -58,38 +59,78 @@ class VPP_ext_agent(Agent):
 
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
         if opf1_prinpf == True: printpf(res)
-        if round(res['gen'][slack_idx, 1],1) > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
-            power_balance = round(-1 * res['gen'][slack_idx, 1], 1)  # from vpp perspective i.e. negative if deficit
-            objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 1)
-            max_excess = False
-            pc_matrix = False
-
-        else:  # no need for external power - BALANCE or EXCESS
-            power_balance = -1 * round(res['gen'][slack_idx, 1])
-            max_excess = round(sum(ppc_t['gen'][:, 8]) - ppc_t['gen'][slack_idx, 8] - (sum(res['gen'][:, 1])
-                                                                                       - res['gen'][slack_idx, 1]), 1)
-            objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 1)
-
-            # derive the price curve: (matrix having indeces, exces values per gen, their LINEAR prices
-
-            idx = ppc_t['gen'][1:, 0] if slack_idx == 0 else print("Is slack at 0 bus?")
-            pexc = ppc_t['gen'][1:, 8] - res['gen'][1:, 1]
-            gcost = ppc_t['gencost'][1:, 4]
-            gens_exc_price = np.array([idx, pexc, gcost])
-            sorted = np.round(gens_exc_price[:, gens_exc_price[2, :].argsort()], 1)
-            sorted_nonzero = sorted[:, np.nonzero(sorted[1, :])]
-            sorted_nonzero_squeezed = np.reshape(sorted_nonzero, np.squeeze(sorted_nonzero).shape)
-            pc_matrix = np.ndarray.tolist(sorted_nonzero_squeezed)
-            # increase price by a factor
-            pc_matrix = np.array(pc_matrix)
-            pc_matrix[2, :] *= pc_matrix_price_increase_factor
-            pc_matrix = np.round(pc_matrix, 4)
-            self.log_info("Final pc matrix: " + str(pc_matrix))
 
         if res['success'] == 1:
             self.log_info("I have successfully run the OPF1.")
             self.set_attr(opf1_resgen=res['gen'])
-        return power_balance, max_excess, objf_noslackcost, pc_matrix
+
+            if round(res['gen'][slack_idx, 1], 1) > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
+                self.set_attr(current_status='D')
+                power_balance = round(-1 * res['gen'][slack_idx, 1], 1)  # from vpp perspective i.e. negative if deficit
+
+                # for deficit vpps objf includes costs of buying from DSO (at slack bus) for fixed higher price
+                objf = round(res['f'], 4)
+                objf_noslackcost = round(objf - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 1)
+
+                max_excess = False
+                pc_matrix_incr = False
+
+                self.set_attr(opf1={'power_balance': power_balance,
+                                    'max_excess': max_excess,
+                                    'objf': objf,
+                                    'objf_noslackcost': objf_noslackcost,
+                                    'objf_greentodso': False,
+                                    'pc_matrix': pc_matrix_incr})
+
+            else:  # no need for external power - BALANCE or EXCESS
+                power_balance = -1 * round(res['gen'][slack_idx, 1])
+                max_excess = round(sum(ppc_t['gen'][:, 8]) - ppc_t['gen'][slack_idx, 8] - (sum(res['gen'][:, 1])
+                                                                                           - res['gen'][slack_idx, 1]), 4)
+
+                if power_balance == 0 and max_excess == 0:
+                    self.set_attr(current_status='B')
+                else:
+                    self.set_attr(current_status='D')
+
+                # derive the price curve: (matrix having indeces, exces values per gen, their LINEAR prices
+                idx = ppc_t['gen'][1:, 0] if slack_idx == 0 else print("Is slack at 0 bus?")
+                pexc = ppc_t['gen'][1:, 8] - res['gen'][1:, 1]
+                gcost = ppc_t['gencost'][1:, 4]
+                gens_exc_price = np.array([idx, pexc, gcost])
+                sorted = np.round(gens_exc_price[:, gens_exc_price[2, :].argsort()], 1)
+                sorted_nonzero = sorted[:, np.nonzero(sorted[1, :])]
+                sorted_nonzero_squeezed = np.reshape(sorted_nonzero, np.squeeze(sorted_nonzero).shape)
+                pc_matrix = np.ndarray.tolist(sorted_nonzero_squeezed)
+                # increase price by a factor
+                pc_matrix = np.array(pc_matrix)
+                pc_matrix_incr = copy.deepcopy(pc_matrix)
+                pc_matrix_incr[2, :] *= pc_matrix_price_increase_factor
+                pc_matrix_incr = np.round(pc_matrix_incr, 4)
+                self.log_info("Final pc matrix for requesters: " + str(pc_matrix_incr))
+
+                # for balance/excess vpps: objf=objf_nonslackcost because balance_power is 0
+                # calculate prospective revenue if green energy sold to DSO
+
+                c1 = np.array(generation_type)[pc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
+                c2 = np.isin(c1, green_sources)  # choose only green ones
+                pc_matrix_green = pc_matrix[:, c2]
+
+                prospective_revenue_from_dso = np.sum(np.multiply(pc_matrix_green[1, :], pc_matrix_green[2, :]))
+                objf = round(res['f'], 4)
+                objf_noslackcost = round(objf - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 4)
+                objf_greentodso = objf - prospective_revenue_from_dso
+
+                self.set_attr(opf1={'power_balance': power_balance,
+                                    'max_excess': max_excess,
+                                    'objf': objf,
+                                    'objf_noslackcost': objf_noslackcost,
+                                    'objf_greentodso': objf_greentodso,
+                                    'pc_matrix': pc_matrix_incr})
+
+            return True
+        else:
+            self.log_info("OPF1 does not converge. STOP.")
+            sys.exit()
 
     def runopf_d2(self):
         """
@@ -99,7 +140,7 @@ class VPP_ext_agent(Agent):
         """
         # opf asa system is integrated
         memory = self.get_attr('iteration_memory_received_pc')
-        need = abs(self.get_attr('opf1')[0])
+        need = abs(self.get_attr('opf1')['power_balance'])
 
         all_pc = []
         for mem in memory:
@@ -112,7 +153,6 @@ class VPP_ext_agent(Agent):
                                    mem["price_curve"][1][gn], mem["price_curve"][2][gn]])
 
         sorted_pc = sorted(all_pc, key=lambda price: price[3])
-        #pp(sorted_pc)
         bids = []
         for pc in sorted_pc:
             pc_vpp_idx = pc[0]
@@ -174,15 +214,16 @@ class VPP_ext_agent(Agent):
 
         # with bids updated, verify the power flow if feasible - must be opf in order to include e.g. thermal limits
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
-
+        printpf(res)
         # calculation of the costs: objective function minus revenue from selling
         bids_revenue = 0
         for bid in all_bids_mod:
             bids_revenue += bid[3] * bid[4]
 
-        objf_noslackcost = round(res['f'] - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 1)
-        costs = np.round(objf_noslackcost - bids_revenue, 4)  # costs of vpp as costs of operation - revenue from bids
-        self.set_attr(opf_e3=costs)
+        costs = np.round(res['f'] - bids_revenue, 4)  # costs of vpp as costs of operation (slackcost for E = 0) - revenue from bids
+
+        self.set_attr(opf_e3={'objf_bidsrevenue': costs})
+
         if opf1_prinpf:
             printpf(res)
         return res['success']

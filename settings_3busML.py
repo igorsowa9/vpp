@@ -28,7 +28,7 @@ cases = {'case5': case5_vpp,
          'case4': case4_vpp}
 
 opf1_verbose = 0
-opf1_prinpf = False
+opf1_prinpf = True
 
 # ASSUMPTIONS:
 # slack bus as the first one with idx 0 (some simplification, non universalities in the code, e.g. in PC building)
@@ -37,3 +37,36 @@ opf1_prinpf = False
 #   than their own resources (deficit agents do not run opf when they receive PCs, but just take the cheapest resources)
 #   from the neighbours' excess, according to simple sorting i.e. starting from the cheapest
 #   - but if so, where is that effort for ML then...?
+# only linear cost of generation assumed (i.e. fixed prices), with no offset
+
+# Exchange with VPPs/DSO:
+# (cost of power from DSO is the price of the virtual generator at slack bus (idx 0))
+#
+# * Excess:
+#   - price curves offered to other VPPs are with prices of generation_cost * pc_matrix_price_increase_factor
+#   - green energy (PV, wind, biogas) can be always sold to DSO for the price of generation cost
+#   - gray energy (coal, atom, gas) should controlled i.e. reduced generation etc. or can be sold for lower price to DSO
+#                                                                                        (no scenarios for that for now)
+#   - the rest of excess (after making bids) can be sold to DSO with similar assumptions
+# * Deficit:
+#   - power can be bought from excess VPPs for the price in the price curve matrix
+#   - if the power is bought from DSO, there is a fixed price (i.e. price of virtual generator at slack bus)
+#       - contracts with DSO might be different for different VPPs (that could be learned by the other VPPs too)
+
+green_sources = [1, 2, 3, 4, 5]
+grey_sources = [11, 12, 13, 14, 15]
+
+# Generation types:
+# 0 DSO
+
+# 1 pv - green, intermittent
+# 2 onshore wind - green, intermittent
+# 3 offshore wind - green, intermittent
+
+# 4 bio gas - green, controllable
+# 5 hydro - green, controllable
+
+# 11 black coal - gray, controllable
+# 12 lignite - gray, controllable
+# 13 atom - gray, controllable
+# 14 natural gas - gray, controllable

@@ -71,10 +71,10 @@ def requests_execute(self, myname, requests):
             print("NO OPF1??")
             sys.exit()
 
-        if opf1[0] == 0 and opf1[1] > 0:  # max_excess > 0
+        if opf1['power_balance'] == 0 and opf1['max_excess'] > 0:  # max_excess > 0
             # val = float(power_value) if opf1[0] >= float(power_value) else opf1[0]
-            val = float(opf1[1])  # max_excess
-            price_curve = copy.deepcopy(opf1[3])
+            val = float(opf1['max_excess'])  # max_excess
+            price_curve = copy.deepcopy(opf1['pc_matrix'])
             prices = price_curve[2]
             if type(prices) == float:  # i.e. if there is only one excess generator, there is no list but float
                 new_prices = prices + price_increase_factor*self.get_attr("n_iteration")
@@ -82,7 +82,7 @@ def requests_execute(self, myname, requests):
                 new_prices = [x + price_increase_factor*self.get_attr("n_iteration") for x in prices]
             price_curve[2] = new_prices
 
-            self.log_info("I have " + str(opf1[1]) + " to sell. Sending price curve... "
+            self.log_info("I have " + str(opf1['max_excess']) + " to sell. Sending price curve... "
                                                      "(total excess=" + str(val) + ", with price curves matrix about generators)")
             price_curve_message = {"message_id": message_id_price_curve, "vpp_name": myname,
                                    "value": val, "price_curve": price_curve}
@@ -151,8 +151,8 @@ def bid_offer_handler(self, message):
         all_bids_np = np.array(all_bids)
         all_bids_sum = sum(all_bids_np[:, 3])  # sum all the bid power (vppidx, genidx, power, price)
 
-        if all_bids_sum <= self.get_attr('opf1')[1]:  # if sum of all is less then excess -> accept and wait for reply
-            self.log_info('I have sufficient generation to accept all bids (bids total sum ('+str(all_bids_sum)+') <= ('+str(self.get_attr('opf1')[1])+
+        if all_bids_sum <= self.get_attr('opf1')['max_excess']:  # if sum of all is less then excess -> accept and wait for reply
+            self.log_info('I have sufficient generation to accept all bids (bids total sum ('+str(all_bids_sum)+') <= ('+str(self.get_attr('opf1')['max_excess'])+
                           ') my whole excess), but I have to check according to available generators...')
             # need to share between the gens if necessary.
 
@@ -182,8 +182,9 @@ def bid_offer_handler(self, message):
             feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
             if feasibility:
                 self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
-                              ' . The costs changed from (opf1): ' + str(self.get_attr('opf1')[2]) +
-                              ' to (opf_e3-bid revenue): ' + str(self.get_attr('opf_e3')))
+                              ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
+                              ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opf1')['objf_greentodso']) +
+                              ' . Costs with bids revenue (opf_e3-bid revenue): ' + str(self.get_attr('opf_e3')['objf_bidsrevenue']))
             else:
                 self.log_info('Unhandled unfeasibility in pf_e3! Stop.')
                 sys.exit()
@@ -202,7 +203,7 @@ def bid_offer_handler(self, message):
 
         else:  # send refuse and new price curve (new iteration)
             self.log_info('Need another negotiation iteration because sum of bids (' + str(all_bids_sum) + ') > excess: (' +
-                          str(self.get_attr('opf1')[1]) + ') - I increase the price and send new price curves '
+                          str(self.get_attr('opf1')['max_excess']) + ') - I increase the price and send new price curves '
                                                                 '(return)...')
             n_i = copy.deepcopy(self.get_attr("n_iteration"))
             n_i = n_i + 1  # increase iteration (based on local value)
@@ -283,16 +284,15 @@ def runOneTimestep():
     print('--- Deficit agents initialization - making requests: ---')
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
-        agent.set_attr(opf1=agent.runopf1(global_time))
+        agent.runopf1(global_time)
     for vpp_idx in  range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
         opf1 = agent.get_attr('opf1')
-        if opf1[0] < 0:
+        if opf1['power_balance'] < 0:
             agent.log_info("I am deficit. I'll publish requests to neighbours.")
-            agent.set_attr(current_status=['D', opf1])
             my_name = data_names[vpp_idx]
             message_request = {"message_id": message_id_request, "vpp_name": my_name,
-                               "value": float(-1 * opf1[0])}
+                               "value": float(-1 * opf1['power_balance'])}
             agent.send('main', message_request, topic='request_topic')
 
     time.sleep(small_wait)  # show gathered requests
@@ -331,18 +331,15 @@ def runOneTimestep():
                 if agent.get_attr('opf1'):
                     opf1 = agent.get_attr('opf1')
                 else:
-                    opf1 = agent.runopf1(agent.get_attr('agent_time'))
-                    agent.set_attr(power_balance=opf1)
-                if opf1[0] > 0:
+                    agent.runopf1(agent.get_attr('agent_time'))
+                if opf1['power_balance'] > 0:
                     agent.log_info("I am excess")
-                    agent.set_attr(current_status=['E', opf1])
                     agent.set_consensus_if_norequest()
-                elif opf1[0] == 0:
+                elif opf1['power_balance'] == 0:
                     agent.log_info("I am balanced")
-                    agent.set_attr(current_status=['B', opf1])
                     agent.set_attr(timestep_memory_mydeals=[])
                     agent.set_attr(consensus=True)
-                elif opf1[0] < 0:
+                elif opf1['power_balance'] < 0:
                     agent.log_info("I'm a deficit agent, shouldn't I be handled earlier...")
 
         time.sleep(small_wait)
