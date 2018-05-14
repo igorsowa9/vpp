@@ -11,10 +11,10 @@ vpp_n = len(data_names)
 
 system_status = np.zeros([ts_n, vpp_n])
 
-adj_matrix = [[True, True, False, False],
+adj_matrix = [[True, True, True, True],
               [True, True, True, True],
-              [False, True, True, False],
-              [False, True, False, True]]
+              [True, True, True, False],
+              [True, True, False, True]]
 
 small_wait = 0.3  # waiting time to separate some steps, for testing
 price_increase_factor = 6.0
@@ -23,12 +23,13 @@ price_increase_factor = 6.0
 # when the excess is sold for the original prices, there is no benefit for excess agents since:
 # production_cost - bids_revenue = 0
 pc_matrix_price_increase_factor = 1.1
+dso_green_price_increase_factor = 1.05
 
 cases = {'case5': case5_vpp,
          'case4': case4_vpp}
 
 opf1_verbose = 0
-opf1_prinpf = True
+opf1_prinpf = False
 
 # ASSUMPTIONS:
 # slack bus as the first one with idx 0 (some simplification, non universalities in the code, e.g. in PC building)
@@ -44,7 +45,7 @@ opf1_prinpf = True
 #
 # * Excess:
 #   - price curves offered to other VPPs are with prices of generation_cost * pc_matrix_price_increase_factor
-#   - green energy (PV, wind, biogas) can be always sold to DSO for the price of generation cost
+#   - green energy (PV, wind, biogas) can be always sold to DSO for the price of generation cost + X% e.g. 5%
 #   - gray energy (coal, atom, gas) should controlled i.e. reduced generation etc. or can be sold for lower price to DSO
 #                                                                                        (no scenarios for that for now)
 #   - the rest of excess (after making bids) can be sold to DSO with similar assumptions

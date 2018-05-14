@@ -75,12 +75,13 @@ def requests_execute(self, myname, requests):
             # val = float(power_value) if opf1[0] >= float(power_value) else opf1[0]
             val = float(opf1['max_excess'])  # max_excess
             price_curve = copy.deepcopy(opf1['pc_matrix'])
-            prices = price_curve[2]
-            if type(prices) == float:  # i.e. if there is only one excess generator, there is no list but float
+
+            prices = price_curve[2, :]
+            if type(prices) == np.float64:  # i.e. if there is only one excess generator, there is no list but float
                 new_prices = prices + price_increase_factor*self.get_attr("n_iteration")
             else:
                 new_prices = [x + price_increase_factor*self.get_attr("n_iteration") for x in prices]
-            price_curve[2] = new_prices
+            price_curve[2, :] = new_prices
 
             self.log_info("I have " + str(opf1['max_excess']) + " to sell. Sending price curve... "
                                                      "(total excess=" + str(val) + ", with price curves matrix about generators)")

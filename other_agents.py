@@ -51,7 +51,7 @@ class VPP_ext_agent(Agent):
         fixed_load = data['fixed_load']
         price = data['price']
         slack_idx = data['slack_idx']
-        generation_type = data['generation_type']
+        generation_type = np.array(data['generation_type'])
 
         ppc_t['bus'][:, 2] = fixed_load[t]
         ppc_t['gen'][:, 8] = max_generation[t]
@@ -96,36 +96,62 @@ class VPP_ext_agent(Agent):
                 idx = ppc_t['gen'][1:, 0] if slack_idx == 0 else print("Is slack at 0 bus?")
                 pexc = ppc_t['gen'][1:, 8] - res['gen'][1:, 1]
                 gcost = ppc_t['gencost'][1:, 4]
-                gens_exc_price = np.array([idx, pexc, gcost])
-                sorted = np.round(gens_exc_price[:, gens_exc_price[2, :].argsort()], 1)
+                gens_exc_price = np.round(np.matrix([idx, pexc, gcost]), 1)
+                pp(gens_exc_price)
+                sorted = gens_exc_price[:, gens_exc_price[2, :].argsort()]
+                pp(sorted)
                 sorted_nonzero = sorted[:, np.nonzero(sorted[1, :])]
-                sorted_nonzero_squeezed = np.reshape(sorted_nonzero, np.squeeze(sorted_nonzero).shape)
-                pc_matrix = np.ndarray.tolist(sorted_nonzero_squeezed)
+                pp(sorted_nonzero)
+                # sorted_nonzero_squeezed = np.reshape(sorted_nonzero, np.squeeze(sorted_nonzero).shape)
+                # pc_matrix = np.ndarray.tolist(sorted_nonzero_squeezed)
                 # increase price by a factor
-                pc_matrix = np.array(pc_matrix)
+                pc_matrix = np.matrix(sorted_nonzero)
+                if pc_matrix.shape[0] == 1:
+                    pc_matrix = pc_matrix.T
+                pp(pc_matrix)
                 pc_matrix_incr = copy.deepcopy(pc_matrix)
                 pc_matrix_incr[2, :] *= pc_matrix_price_increase_factor
-                pc_matrix_incr = np.round(pc_matrix_incr, 4)
+                pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
+                #pc_matrix_incr = np.reshape(pc_matrix_incr, np.squeeze(pc_matrix_incr).shape)
+                pp(pc_matrix_incr)
+
+
                 self.log_info("Final pc matrix for requesters: " + str(pc_matrix_incr))
 
                 # for balance/excess vpps: objf=objf_nonslackcost because balance_power is 0
                 # calculate prospective revenue if green energy sold to DSO
-
-                c1 = np.array(generation_type)[pc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
+                print(generation_type)
+                print(pc_matrix[0, :].astype(int))
+                c1 = generation_type[pc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
+                print("c1:", str(c1))
                 c2 = np.isin(c1, green_sources)  # choose only green ones
-                pc_matrix_green = pc_matrix[:, c2]
+                print("c2:", str(c2))
+                c3 = np.reshape(c2, np.squeeze(c2).shape)
+                print("c3:", str(c3))
+                pc_matrix_green = pc_matrix[:, c3]
 
-                prospective_revenue_from_dso = np.sum(np.multiply(pc_matrix_green[1, :], pc_matrix_green[2, :]))
+                pp(pc_matrix_green)
+
                 objf = round(res['f'], 4)
                 objf_noslackcost = round(objf - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 4)
-                objf_greentodso = objf - prospective_revenue_from_dso
+
+                if pc_matrix_green.size > 0:
+                    # generation cost of green generators as for the costs in price curve
+                    generation_cost_for_dso = np.sum(np.multiply(pc_matrix_green[1, :], pc_matrix_green[2, :]))
+                    # only excess power from only green generators sold to DSO as generation_cost * e.g. 1.05 (+5%)
+                    prospective_revenue_from_dso = dso_green_price_increase_factor * \
+                                                   np.sum(np.multiply(pc_matrix_green[1, :], pc_matrix_green[2, :]))
+                    objf_greentodso = objf + generation_cost_for_dso - prospective_revenue_from_dso
+                else:
+                    objf_greentodso = objf
 
                 self.set_attr(opf1={'power_balance': power_balance,
                                     'max_excess': max_excess,
                                     'objf': objf,
                                     'objf_noslackcost': objf_noslackcost,
                                     'objf_greentodso': objf_greentodso,
-                                    'pc_matrix': pc_matrix_incr})
+                                    'pc_matrix': np.matrix(pc_matrix_incr)})
+                print(self.get_attr('opf1'))
 
             return True
         else:
@@ -141,16 +167,26 @@ class VPP_ext_agent(Agent):
         # opf asa system is integrated
         memory = self.get_attr('iteration_memory_received_pc')
         need = abs(self.get_attr('opf1')['power_balance'])
+        pp(memory)
 
         all_pc = []
         for mem in memory:
-            if type(mem['price_curve'][0]) == float:
-                all_pc.append([data_names_dict[mem["vpp_name"]], mem["price_curve"][0],
-                               mem["price_curve"][1], mem["price_curve"][2]])
+            # if type(mem['price_curve'][0]) == float:
+            #     all_pc.append([data_names_dict[mem["vpp_name"]],
+            #                    mem["price_curve"][0],
+            #                    mem["price_curve"][1],
+            #                    mem["price_curve"][2]])
+            if mem['value'] == False:
+                continue
             else:
-                for gn in range(0, len(mem['price_curve'][0])):
-                    all_pc.append([data_names_dict[mem["vpp_name"]], mem["price_curve"][0][gn],
-                                   mem["price_curve"][1][gn], mem["price_curve"][2][gn]])
+                print(mem["price_curve"])
+                print("len: " + str(len(mem['price_curve'])))
+                for gn in range(0, mem['price_curve'].shape[1]):
+                    print("gn:" + str(gn))
+                    all_pc.append([data_names_dict[mem["vpp_name"]],
+                                   mem["price_curve"][0, gn],
+                                   mem["price_curve"][1, gn],
+                                   mem["price_curve"][2, gn]])
 
         sorted_pc = sorted(all_pc, key=lambda price: price[3])
         bids = []
@@ -214,7 +250,7 @@ class VPP_ext_agent(Agent):
 
         # with bids updated, verify the power flow if feasible - must be opf in order to include e.g. thermal limits
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
-        printpf(res)
+        # printpf(res)
         # calculation of the costs: objective function minus revenue from selling
         bids_revenue = 0
         for bid in all_bids_mod:
