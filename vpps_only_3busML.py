@@ -119,7 +119,8 @@ def price_curve_handler(self, message):
         bids = self.runopf_d2()  # bids come as multi-list: [vpp_idx, gen_idx, bidgen_value, gen_price],[...]
         # segregate bids for same sender
         # bids = sorted(bids, key=lambda vpp: vpp[0])
-        bids = np.array(bids)
+        print(bids)
+        sys.exit()
         self.log_info(bids)
         for vi in range(0, vpp_n):
             bid = bids[np.where(bids[:, 0] == vi), :][0]

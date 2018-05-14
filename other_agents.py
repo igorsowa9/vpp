@@ -167,7 +167,6 @@ class VPP_ext_agent(Agent):
                                    mem["price_curve"][0, gn],
                                    mem["price_curve"][1, gn],
                                    mem["price_curve"][2, gn]])
-
         sorted_pc = sorted(all_pc, key=lambda price: price[3])
         bids = []
         for pc in sorted_pc:
@@ -183,6 +182,15 @@ class VPP_ext_agent(Agent):
                 need = 0
             elif need == 0:
                 break
+        # fill the bids with the unbidded vpps for refuse messages
+        bids = np.array(bids)
+        b = np.matrix(all_pc)
+        all = np.unique(np.array(b[:, 0]))
+        are = np.array(np.matrix(bids)[:, 0])
+        missing = np.setdiff1d(all, are)
+        for m in missing:
+            empty_bid = np.array([[m, 0, 0, 0]])
+            bids = np.concatenate((bids, empty_bid), axis=0)
         return bids  # list: [vpp_idx, gen_idx, bidgen_value, gen_price]
 
     def runopf_e3(self, all_bids_mod, t):
