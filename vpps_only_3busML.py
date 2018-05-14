@@ -120,6 +120,7 @@ def price_curve_handler(self, message):
         # segregate bids for same sender
         # bids = sorted(bids, key=lambda vpp: vpp[0])
         bids = np.array(bids)
+        self.log_info(bids)
         for vi in range(0, vpp_n):
             bid = bids[np.where(bids[:, 0] == vi), :][0]
             if len(bid) > 0:  # send bids back to the price-curve senders
@@ -136,9 +137,9 @@ def bid_offer_handler(self, message):
     """
     Exc react if they receive a bid from Def (based on the price curve sent before)
     """
-
-    self.log_info("Received bid matrix from deficit - " + message['vpp_name'] + ": " + str(message['bid']))
     self.get_attr('iteration_memory_bid').append(message)
+    self.log_info("Received bid matrix from deficit ("+str(len(self.get_attr('iteration_memory_bid')))+"/"
+                  +str(self.get_attr('n_requests'))+") - " + message['vpp_name'] + ": " + str(message['bid']))
 
     # gather all the bids, same number as number of requests, thus number of price curves sent etc.
     if len(self.get_attr('iteration_memory_bid')) == self.get_attr('n_requests'):

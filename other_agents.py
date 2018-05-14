@@ -97,40 +97,26 @@ class VPP_ext_agent(Agent):
                 pexc = ppc_t['gen'][1:, 8] - res['gen'][1:, 1]
                 gcost = ppc_t['gencost'][1:, 4]
                 gens_exc_price = np.round(np.matrix([idx, pexc, gcost]), 1)
-                pp(gens_exc_price)
                 sorted = gens_exc_price[:, gens_exc_price[2, :].argsort()]
-                pp(sorted)
                 sorted_nonzero = sorted[:, np.nonzero(sorted[1, :])]
-                pp(sorted_nonzero)
                 # sorted_nonzero_squeezed = np.reshape(sorted_nonzero, np.squeeze(sorted_nonzero).shape)
                 # pc_matrix = np.ndarray.tolist(sorted_nonzero_squeezed)
                 # increase price by a factor
                 pc_matrix = np.matrix(sorted_nonzero)
                 if pc_matrix.shape[0] == 1:
                     pc_matrix = pc_matrix.T
-                pp(pc_matrix)
                 pc_matrix_incr = copy.deepcopy(pc_matrix)
                 pc_matrix_incr[2, :] *= pc_matrix_price_increase_factor
                 pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
-                #pc_matrix_incr = np.reshape(pc_matrix_incr, np.squeeze(pc_matrix_incr).shape)
-                pp(pc_matrix_incr)
-
 
                 self.log_info("Final pc matrix for requesters: " + str(pc_matrix_incr))
 
                 # for balance/excess vpps: objf=objf_nonslackcost because balance_power is 0
                 # calculate prospective revenue if green energy sold to DSO
-                print(generation_type)
-                print(pc_matrix[0, :].astype(int))
                 c1 = generation_type[pc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
-                print("c1:", str(c1))
                 c2 = np.isin(c1, green_sources)  # choose only green ones
-                print("c2:", str(c2))
                 c3 = np.reshape(c2, np.squeeze(c2).shape)
-                print("c3:", str(c3))
                 pc_matrix_green = pc_matrix[:, c3]
-
-                pp(pc_matrix_green)
 
                 objf = round(res['f'], 4)
                 objf_noslackcost = round(objf - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 4)
@@ -141,9 +127,9 @@ class VPP_ext_agent(Agent):
                     # only excess power from only green generators sold to DSO as generation_cost * e.g. 1.05 (+5%)
                     prospective_revenue_from_dso = dso_green_price_increase_factor * \
                                                    np.sum(np.multiply(pc_matrix_green[1, :], pc_matrix_green[2, :]))
-                    objf_greentodso = objf + generation_cost_for_dso - prospective_revenue_from_dso
+                    objf_greentodso = np.round(objf + generation_cost_for_dso - prospective_revenue_from_dso, 4)
                 else:
-                    objf_greentodso = objf
+                    objf_greentodso = np.round(objf, 4)
 
                 self.set_attr(opf1={'power_balance': power_balance,
                                     'max_excess': max_excess,
@@ -151,8 +137,6 @@ class VPP_ext_agent(Agent):
                                     'objf_noslackcost': objf_noslackcost,
                                     'objf_greentodso': objf_greentodso,
                                     'pc_matrix': np.matrix(pc_matrix_incr)})
-                print(self.get_attr('opf1'))
-
             return True
         else:
             self.log_info("OPF1 does not converge. STOP.")
@@ -167,7 +151,6 @@ class VPP_ext_agent(Agent):
         # opf asa system is integrated
         memory = self.get_attr('iteration_memory_received_pc')
         need = abs(self.get_attr('opf1')['power_balance'])
-        pp(memory)
 
         all_pc = []
         for mem in memory:
@@ -179,10 +162,7 @@ class VPP_ext_agent(Agent):
             if mem['value'] == False:
                 continue
             else:
-                print(mem["price_curve"])
-                print("len: " + str(len(mem['price_curve'])))
                 for gn in range(0, mem['price_curve'].shape[1]):
-                    print("gn:" + str(gn))
                     all_pc.append([data_names_dict[mem["vpp_name"]],
                                    mem["price_curve"][0, gn],
                                    mem["price_curve"][1, gn],
