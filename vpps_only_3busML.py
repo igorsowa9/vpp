@@ -54,6 +54,8 @@ def request_handler(self, message):
 def requests_execute(self, myname, requests):
     """
     The Excess agents that receive some requests answer either NO or with price curves.
+    This includes running opf1.
+    Additionally the opf1 is extended to check the feasibility of price curves (and profitability)
     :param self:
     :param myname:
     :param requests: e.g. {'message_id': 1, 'vpp_name': 'vpp1', 'value': 25.0}
@@ -211,7 +213,7 @@ def bid_offer_handler(self, message):
                                   ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opf1')['objf_greentodso']) +
                                   ' . Costs with bids revenue (opf_e3-bid revenue): ' + str(self.get_attr('opf_e3')['objf_bidsrevenue']))
                 else:
-                    self.log_info('Unhandled unfeasibility in pf_e3! The bids are canceled and refused.')
+                    self.log_info('Unfeasibility in pf_e3! STOP.')
                     sys.exit()
                 # make the messages / modify the old ones
                 for bid_msg in self.get_attr('iteration_memory_bid'):

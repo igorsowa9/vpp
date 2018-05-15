@@ -111,6 +111,9 @@ class VPP_ext_agent(Agent):
 
                 self.log_info("Final pc matrix for requesters: " + str(pc_matrix_incr))
 
+                objf = round(res['f'], 4)
+                objf_noslackcost = round(objf - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 4)
+
                 # for balance/excess vpps: objf=objf_nonslackcost because balance_power is 0
                 # calculate prospective revenue if green energy sold to DSO
                 c1 = generation_type[pc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
@@ -118,8 +121,9 @@ class VPP_ext_agent(Agent):
                 c3 = np.reshape(c2, np.squeeze(c2).shape)
                 pc_matrix_green = pc_matrix[:, c3]
 
-                objf = round(res['f'], 4)
-                objf_noslackcost = round(objf - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 4)
+                ###############################################################################
+                ## checking feasibility of selling green to DSO or/and execess to other VPPs ##
+                ###############################################################################
 
                 if pc_matrix_green.size > 0:
                     # generation cost of green generators as for the costs in price curve
