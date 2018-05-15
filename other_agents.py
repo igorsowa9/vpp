@@ -64,13 +64,13 @@ class VPP_ext_agent(Agent):
             self.log_info("I have successfully run the OPF1.")
             self.set_attr(opf1_resgen=res['gen'])
 
-            if round(res['gen'][slack_idx, 1], 1) > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
+            if round(res['gen'][slack_idx, 1], 4) > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
                 self.set_attr(current_status='D')
-                power_balance = round(-1 * res['gen'][slack_idx, 1], 1)  # from vpp perspective i.e. negative if deficit
+                power_balance = round(-1 * res['gen'][slack_idx, 1], 4)  # from vpp perspective i.e. negative if deficit
 
                 # for deficit vpps objf includes costs of buying from DSO (at slack bus) for fixed higher price
                 objf = round(res['f'], 4)
-                objf_noslackcost = round(objf - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 1)
+                objf_noslackcost = round(objf - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 4)
 
                 max_excess = False
                 pc_matrix_incr = False
@@ -83,7 +83,7 @@ class VPP_ext_agent(Agent):
                                     'pc_matrix': pc_matrix_incr})
 
             else:  # no need for external power - BALANCE or EXCESS
-                power_balance = -1 * round(res['gen'][slack_idx, 1])
+                power_balance = -1 * round(res['gen'][slack_idx, 4])
                 max_excess = round(sum(ppc_t['gen'][:, 8]) - ppc_t['gen'][slack_idx, 8] - (sum(res['gen'][:, 1])
                                                                                            - res['gen'][slack_idx, 1]), 4)
 
@@ -96,9 +96,9 @@ class VPP_ext_agent(Agent):
                 idx = ppc_t['gen'][1:, 0] if slack_idx == 0 else print("Is slack at 0 bus?")
                 pexc = ppc_t['gen'][1:, 8] - res['gen'][1:, 1]
                 gcost = ppc_t['gencost'][1:, 4]
-                gens_exc_price = np.round(np.matrix([idx, pexc, gcost]), 1)
-                sorted = gens_exc_price[:, gens_exc_price[2, :].argsort()]
-                sorted_nonzero = sorted[:, np.nonzero(sorted[1, :])]
+                gens_exc_price = np.round(np.matrix([idx, pexc, gcost]), 4)
+                sorted_m = gens_exc_price[:, gens_exc_price[2, :].argsort()]
+                sorted_nonzero = sorted_m[:, np.nonzero(sorted_m[1, :])]
                 # sorted_nonzero_squeezed = np.reshape(sorted_nonzero, np.squeeze(sorted_nonzero).shape)
                 # pc_matrix = np.ndarray.tolist(sorted_nonzero_squeezed)
                 # increase price by a factor
@@ -202,23 +202,25 @@ class VPP_ext_agent(Agent):
         In case of unfeasible solution, further modification of bids has to be done.
         Furthermore, the objective function should be compared if lower cost is reached.
         """
-
+        print("checking feasibility")
+        pp(all_bids_mod)
         # load raw data
         data = self.load_data(data_paths[data_names_dict[self.name]])
         ppc0 = cases[data['case']]()
         ppc_t = copy.deepcopy(ppc0)
 
-        # load and modify according to current time
+        # modify according to prospective accepted bids: loop through my generators (excluding slack)
+        origin_opf1_resgen = self.get_attr('opf1_resgen')
+
+        # load and modify according to current time BUT current OPF1 results!!
         max_generation = data['max_generation']
         fixed_load = data['fixed_load']
         price = data['price']
         slack_idx = data['slack_idx']
-        ppc_t['bus'][:, 2] = fixed_load[t]
-        ppc_t['gen'][:, 8] = max_generation[t]
-        ppc_t['gencost'][:, 4] = price[t]
-
-        # modify according to prospective accepted bids: loop through my generators (excluding slack)
-        origin_opf1_resgen = self.get_attr('opf1_resgen')
+        ppc_t['bus'][:, 2] = fixed_load[t]  # from data - theyre not controlled
+        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1], 4)  # from OPF1, without slack
+        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1], 4)  # both bounds
+        ppc_t['gencost'][:, 4] = price[t]  # from data
 
         for gen_idx in np.unique(all_bids_mod[:, 2]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
 
@@ -238,7 +240,7 @@ class VPP_ext_agent(Agent):
 
         # with bids updated, verify the power flow if feasible - must be opf in order to include e.g. thermal limits
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
-        # printpf(res)
+
         # calculation of the costs: objective function minus revenue from selling
         bids_revenue = 0
         for bid in all_bids_mod:
@@ -248,7 +250,7 @@ class VPP_ext_agent(Agent):
 
         self.set_attr(opf_e3={'objf_bidsrevenue': costs})
 
-        if opf1_prinpf:
+        if opfe3_prinpf:
             printpf(res)
         return res['success']
 

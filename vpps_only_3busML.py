@@ -119,16 +119,13 @@ def price_curve_handler(self, message):
         bids = self.runopf_d2()  # bids come as multi-list: [vpp_idx, gen_idx, bidgen_value, gen_price],[...]
         # segregate bids for same sender
         # bids = sorted(bids, key=lambda vpp: vpp[0])
-        print(bids)
-        sys.exit()
-        self.log_info(bids)
         for vi in range(0, vpp_n):
-            bid = bids[np.where(bids[:, 0] == vi), :][0]
-            if len(bid) > 0:  # send bids back to the price-curve senders
-                self.set_attr(n_bids=self.get_attr('n_bids') + 1)  # counts number bids I send
-                bid_matrix = bid.tolist()
-                vpp_idx_1bid = int(bid_matrix[0][0])
-                bid_offer_message = {"message_id": message_id_bid_offer, "vpp_name": self.name, "bid": bid_matrix}
+            bid = bids[np.where(bids[:, 0] == vi), :][0]  # take bids for only one vpp (might be bids for multiple gens)
+            if len(bid) > 0:  # send bids back to the price-curve senders, but counts only bids>0
+                if sum(bid[:, 2]) > 0:
+                    self.set_attr(n_bids=self.get_attr('n_bids') + 1)  # counts number bids>0 I send
+                vpp_idx_1bid = int(bid[0][0])  # id of the vpp where I send
+                bid_offer_message = {"message_id": message_id_bid_offer, "vpp_name": self.name, "bid": bid}
                 myaddr = self.bind('PUSH', alias='bid_offer')
                 ns.proxy(data_names[vpp_idx_1bid]).connect(myaddr, handler=bid_offer_handler)
                 self.send('bid_offer', bid_offer_message)
@@ -139,70 +136,95 @@ def bid_offer_handler(self, message):
     Exc react if they receive a bid from Def (based on the price curve sent before)
     """
     self.get_attr('iteration_memory_bid').append(message)
-    self.log_info("Received bid matrix from deficit ("+str(len(self.get_attr('iteration_memory_bid')))+"/"
-                  +str(self.get_attr('n_requests'))+") - " + message['vpp_name'] + ": " + str(message['bid']))
+    if np.sum(message["bid"][:, 2]) > 0:
+        self.log_info("Received bid>0 matrix from deficit (" + str(len(self.get_attr('iteration_memory_bid')))+"/"
+                      + str(self.get_attr('n_requests'))+") - " + message['vpp_name'] + ": " + str(message['bid']))
+    else:
+        self.log_info("Received empty bid=0 from deficit (" + str(len(self.get_attr('iteration_memory_bid'))) + "/"
+                      + str(self.get_attr('n_requests')) + ") - " + message['vpp_name'] + ": " + str(message['bid']))
 
     # gather all the bids, same number as number of requests, thus number of price curves sent etc.
     if len(self.get_attr('iteration_memory_bid')) == self.get_attr('n_requests'):
-        # make the calculation or just accept in some cases
+        self.log_info("All bids offers (also empty) received from deficit agents (" + str(len(self.get_attr('iteration_memory_bid')))
+                      + "/" + str(self.get_attr('n_requests')))
+        # make the calculation or just accept in some cases:
         all_bids = []
         for bid_message in self.get_attr('iteration_memory_bid'):
             for bid_message_gen in bid_message['bid']:
                 all_bids.append(np.append(data_names_dict[bid_message['vpp_name']], bid_message_gen))
-        self.log_info("My all bids from deficit vpps: " + str(all_bids))
+        # all_bids_np = np.array(all_bids)
+        all_bids = np.matrix(all_bids)
+        c1 = np.array(all_bids[:, 3] != 0)
+        all_bids_nz = np.array(all_bids[c1[:, 0], :])
+        self.log_info("My all non-zero bids from deficit vpps: " + str(all_bids_nz))
 
-        all_bids_np = np.array(all_bids)
-        all_bids_sum = sum(all_bids_np[:, 3])  # sum all the bid power (vppidx, genidx, power, price)
+        print("compare:\n" + str(all_bids_nz) + "\n" + str(self.get_attr('iteration_memory_bid')))
 
+        all_bids_sum = sum(all_bids_nz[:, 3])  # sum all the bid power (vppidx, genidx, power, price)
         if all_bids_sum <= self.get_attr('opf1')['max_excess']:  # if sum of all is less then excess -> accept and wait for reply
             self.log_info('I have sufficient generation to accept all bids (bids total sum ('+str(all_bids_sum)+') <= ('+str(self.get_attr('opf1')['max_excess'])+
                           ') my whole excess), but I have to check according to available generators...')
             # need to share between the gens if necessary.
-
-            mypc0 = self.get_attr('iteration_memory_my_pc')
+            mypc0 = self.get_attr('iteration_memory_my_pc')  # original price curve
 
             # checking if any of bid sum / generator do not exceed available generator powers
+            count = 0
             for pc in mypc0:
                 gen_id = pc[0]
-                bid_1gen = all_bids_np[all_bids_np[:, 2] == gen_id]
+                bid_1gen = all_bids_nz[all_bids_nz[:, 2] == gen_id]
                 if sum(bid_1gen[:, 3]) > mypc0[mypc0[:, 0] == gen_id, 1]:
+                    count = count + 1
                     self.log_info("Need sharing between the gens i.e. modify the bids")
-                    break
-                # If all bid-per-gen sums are less then available gen powers then send accept
-                # but do not set consensus yet, only when final accept is received
+
+            # If all bid-per-gen sums are less then available gen powers then send accept
+            # but do not set consensus yet, only when final accept is received
+            if count == 0:
+                feasibility = self.runopf_e3(all_bids_nz, self.get_attr('agent_time'))
+                if feasibility:
+                    self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
+                                  ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
+                                  ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opf1')['objf_greentodso']) +
+                                  ' . Costs with bids revenue (opf_e3-bid revenue): ' + str(
+                        self.get_attr('opf_e3')['objf_bidsrevenue']))
+                else:
+                    self.log_info('Unfeasibility in pf_e3 (' + str(self.name) + ')! Stop.')
+                    sys.exit()
+                for vi in range(0, vpp_n):
+                    bid = all_bids_nz[np.where(all_bids_nz[:, 0] == vi), :][0]  # take bids for only one vpp (might be bids for multiple gens)
+                    if len(bid) > 0:  # send bids back to the price-curve senders, but counts only bids>0
+                        vpp_idx_1bid = int(bid[0][0])  # id of the vpp where I send
+                        bid_answer_message = {'message_id': message_id_bid_accept, 'vpp_name': self.name,
+                                              'bid': np.array(bid[:, 1:]),
+                                              'str': "That's an accept message for the bid."}
+                        self.log_info("I send bid_answer_message to "+str(data_names[vpp_idx_1bid])+":")
+                        myaddr = self.bind('PUSH', alias='bid_answer')
+                        ns.proxy(data_names[vpp_idx_1bid]).connect(myaddr, handler=bid_answer_handler)
+                        self.send('bid_answer', bid_answer_message)
+            else:  # i.e. if alignment is necessary
+                # bid modification: equal sharing (participation according to total bid value) of the bids due to limited single gen excess:
+                all_bids_mod = self.bids_alignment1(mypc0, all_bids_nz)
+                # opf should be checked if the transport of such a power is possible to the respective deficit vpps through the respective PCCs:
+                feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
+                if feasibility:
+                    self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
+                                  ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
+                                  ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opf1')['objf_greentodso']) +
+                                  ' . Costs with bids revenue (opf_e3-bid revenue): ' + str(self.get_attr('opf_e3')['objf_bidsrevenue']))
+                else:
+                    self.log_info('Unhandled unfeasibility in pf_e3! The bids are canceled and refused.')
+                    sys.exit()
+                # make the messages / modify the old ones
                 for bid_msg in self.get_attr('iteration_memory_bid'):
-                    bid_answer_message = {'message_id': message_id_bid_accept, 'vpp_name': self.name,
-                                          'bid': np.array(bid_msg['bid']), 'str': "That's an accept message for the bid."}
+                    vpp_idx = data_names_dict[bid_msg['vpp_name']]
+                    c1 = np.where(all_bids_mod[:, 0] == vpp_idx)[0]
+                    bid_mod = all_bids_mod[c1, :][:, 1:]
+
+                    bid_answer_message = {'message_id': message_id_bid_accept_modify, 'vpp_name': self.name,
+                                          'bid': bid_mod, 'str': "That's an accept-modified message for the bid."}
+                    self.log_info("I send modified bid_answer_message:")
                     myaddr = self.bind('PUSH', alias='bid_answer')
                     ns.proxy(bid_msg['vpp_name']).connect(myaddr, handler=bid_answer_handler)
                     self.send('bid_answer', bid_answer_message)
-
-            # bid modification: equal sharing (participation according to total bid value)
-            # of the bids due to limited single gen excess:
-            all_bids_mod = self.bids_alignment1(mypc0, all_bids_np)
-            # (o)pf should be checked if the transport of such a power is possible to the respective deficit vpps
-            # through the respective PCCs:
-            feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
-            if feasibility:
-                self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
-                              ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
-                              ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opf1')['objf_greentodso']) +
-                              ' . Costs with bids revenue (opf_e3-bid revenue): ' + str(self.get_attr('opf_e3')['objf_bidsrevenue']))
-            else:
-                self.log_info('Unhandled unfeasibility in pf_e3! Stop.')
-                sys.exit()
-
-            # make the messages / modify the old ones
-            for bid_msg in self.get_attr('iteration_memory_bid'):
-                vpp_idx = data_names_dict[bid_msg['vpp_name']]
-                c1 = np.where(all_bids_mod[:, 0] == vpp_idx)[0]
-                bid_mod = all_bids_mod[c1, :][:, 1:]
-
-                bid_answer_message = {'message_id': message_id_bid_accept_modify, 'vpp_name': self.name,
-                                      'bid': bid_mod, 'str': "That's an accept-modified message for the bid."}
-                myaddr = self.bind('PUSH', alias='bid_answer')
-                ns.proxy(bid_msg['vpp_name']).connect(myaddr, handler=bid_answer_handler)
-                self.send('bid_answer', bid_answer_message)
 
         else:  # send refuse and new price curve (new iteration)
             self.log_info('Need another negotiation iteration because sum of bids (' + str(all_bids_sum) + ') > excess: (' +
@@ -216,7 +238,9 @@ def bid_offer_handler(self, message):
 
 def bid_answer_handler(self, message):
     """
-    executed in Defs
+    executed in Defs. After receiving answer about the bids (accept, modified accept, refused), the opf should be done
+    in order to see of anything has improved:
+        - for example in case of modified answer, the proposed bids might be too bad...
     """
     if message['message_id'] == message_id_bid_accept:
         self.log_info("Bid answer accept received from: " + message['vpp_name'])
@@ -232,8 +256,9 @@ def bid_answer_handler(self, message):
 
     # gather all the bids accepts, same number as n_bids
     if len(self.get_attr('iteration_memory_bid_accept')) == self.get_attr('n_bids'):
-        self.log_info("All my bids with accept/mod-accept answer. I send the final confirmation (normal PUSH reply"
-                      " and set mydeals)")
+        self.log_info("All my bids with accept/mod-accept answer. First I check feasibility and if objf improved. "
+                      "Then, I send the final confirmation (normal PUSH reply and set mydeals)")
+        pp(self.get_attr('iteration_memory_bid_accept'))
 
         for bid in self.get_attr('iteration_memory_bid_accept'):
             myaddr = self.bind('PUSH', alias='bid_final_confirm')
