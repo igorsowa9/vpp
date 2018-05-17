@@ -38,6 +38,7 @@ class VPP_ext_agent(Agent):
         This should be internal PF in order to define excess/deficit.
         Updates the system ppc at time t according to data and runs opf.
         If excess, derive price curve.
+        OPF1b: Check the feasibility and profitability of selling those price curves either to other VPPs or to DSO.
         :param mpc_t:
         :param t:
         :param data:
@@ -72,15 +73,11 @@ class VPP_ext_agent(Agent):
                 objf = round(res['f'], 4)
                 objf_noslackcost = round(objf - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 4)
 
-                max_excess = False
-                pc_matrix_incr = False
-
                 self.set_attr(opf1={'power_balance': power_balance,
-                                    'max_excess': max_excess,
+                                    'max_excess': False,
                                     'objf': objf,
                                     'objf_noslackcost': objf_noslackcost,
-                                    'objf_greentodso': False,
-                                    'pc_matrix': pc_matrix_incr})
+                                    'pc_matrix': False})
 
             else:  # no need for external power - BALANCE or EXCESS
                 power_balance = -1 * round(res['gen'][slack_idx, 4])
@@ -102,49 +99,167 @@ class VPP_ext_agent(Agent):
                 # sorted_nonzero_squeezed = np.reshape(sorted_nonzero, np.squeeze(sorted_nonzero).shape)
                 # pc_matrix = np.ndarray.tolist(sorted_nonzero_squeezed)
                 # increase price by a factor
-                pc_matrix = np.matrix(sorted_nonzero)
-                if pc_matrix.shape[0] == 1:
-                    pc_matrix = pc_matrix.T
-                pc_matrix_incr = copy.deepcopy(pc_matrix)
-                pc_matrix_incr[2, :] *= pc_matrix_price_increase_factor
-                pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
-
-                self.log_info("Final pc matrix for requesters: " + str(pc_matrix_incr))
+                exc_matrix = np.matrix(sorted_nonzero)
+                if exc_matrix.shape[0] == 1:
+                    exc_matrix = exc_matrix.T
 
                 objf = round(res['f'], 4)
                 objf_noslackcost = round(objf - res['gen'][slack_idx, 1] * ppc_t['gencost'][slack_idx][4], 4)
-
-                # for balance/excess vpps: objf=objf_nonslackcost because balance_power is 0
-                # calculate prospective revenue if green energy sold to DSO
-                c1 = generation_type[pc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
-                c2 = np.isin(c1, green_sources)  # choose only green ones
-                c3 = np.reshape(c2, np.squeeze(c2).shape)
-                pc_matrix_green = pc_matrix[:, c3]
-
-                ###############################################################################
-                ## checking feasibility of selling green to DSO or/and execess to other VPPs ##
-                ###############################################################################
-
-                if pc_matrix_green.size > 0:
-                    # generation cost of green generators as for the costs in price curve
-                    generation_cost_for_dso = np.sum(np.multiply(pc_matrix_green[1, :], pc_matrix_green[2, :]))
-                    # only excess power from only green generators sold to DSO as generation_cost * e.g. 1.05 (+5%)
-                    prospective_revenue_from_dso = dso_green_price_increase_factor * \
-                                                   np.sum(np.multiply(pc_matrix_green[1, :], pc_matrix_green[2, :]))
-                    objf_greentodso = np.round(objf + generation_cost_for_dso - prospective_revenue_from_dso, 4)
-                else:
-                    objf_greentodso = np.round(objf, 4)
 
                 self.set_attr(opf1={'power_balance': power_balance,
                                     'max_excess': max_excess,
                                     'objf': objf,
                                     'objf_noslackcost': objf_noslackcost,
-                                    'objf_greentodso': objf_greentodso,
-                                    'pc_matrix': np.matrix(pc_matrix_incr)})
+                                    # 'objf_greentodso': objf_greentodso, # this comes from opf_e3 for "todso" case
+                                    # 'pc_matrix': np.matrix(pc_matrix_incr), # price curves derived in opf_e2
+                                    'exc_matrix': np.matrix(exc_matrix)})
             return True
         else:
             self.log_info("OPF1 does not converge. STOP.")
             sys.exit()
+
+    def runopf_e2(self, exc_matrix, t):
+        """
+        Excess ageents calculations, before sending the price curves.
+        This include verification of transmitting the excess to the other vpps (only to the ones that send requests),
+        but also to DSO.
+        """
+        data = self.load_data(data_paths[data_names_dict[self.name]])
+        generation_type = np.array(data['generation_type'])
+
+        # build price curve
+        pc_matrix_incr = copy.deepcopy(exc_matrix)
+        pc_matrix_incr[2, :] *= pc_matrix_price_increase_factor
+        pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
+
+        self.log_info("Final pc matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
+
+        feasibility_all = self.runopf_e2(np.array(exc_matrix.T), t)
+        if not feasibility_all:
+            self.log_info("Not feasible to export (all?) excess resources.")
+            self.set_attr(opfe2={'pc_matrix': False,
+                                 'objf_greentodso': False})
+
+        #########################
+        #########################
+        #########################
+        #########################
+        #########################
+        #########################
+        #########################
+        #########################
+
+        # calculate prospective revenue if green energy sold to DSO
+        c1 = generation_type[exc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
+        c2 = np.isin(c1, green_sources)  # choose only green ones
+        c3 = np.reshape(c2, np.squeeze(c2).shape)
+        pc_matrix_green = exc_matrix[:, c3]
+
+        if pc_matrix_green.size > 0:
+
+            feasibility_green = self.runopf_e2(np.array(pc_matrix_green.T), t)
+            if not feasibility_green:
+                self.log_info("Not feasible to export whole excess resources.")
+            sys.exit()
+
+        else:
+            self.log_info("No green excess that could be sold to DSO.")
+
+        # load, update, modify data
+        data = self.load_data(data_paths[data_names_dict[self.name]])
+        ppc0 = cases[data['case']]()
+        ppc_t = copy.deepcopy(ppc0)
+        origin_opf1_resgen = self.get_attr('opf1_resgen')
+        max_generation = data['max_generation']
+        fixed_load = data['fixed_load']
+        price = data['price']
+        slack_idx = data['slack_idx']
+        ppc_t['bus'][:, 2] = fixed_load[t]  # from data - they're not controlled
+        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1], 4)  # from OPF1, without slack
+        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1], 4)  # both bounds
+        ppc_t['gencost'][:, 4] = price[t]  # from data
+
+        for gen_idx in pc_matrix:  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
+
+            p_bid = np.round(gen_idx[1], 4)  # total value of bidded power for a generator
+            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx[0])[0]
+            ppc_t['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
+            ppc_t['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
+            c3 = np.where(ppc_t['gen'][:, 0] == gen_idx[0])[0]
+
+            ppc_t['gen'][c3, [8, 9]] += p_bid  # add value from bidding, to Pmax,Pmin
+
+        # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
+        bids_sum = np.round(np.sum(pc_matrix[:, 1]), 4)
+        ppc_t['bus'][0, 2] += bids_sum
+
+        # with bids updated, verify the power flow if feasible - must be opf in order to include e.g. thermal limits
+        res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
+        if opfe2_prinpf:
+            printpf(res)
+
+        return True
+
+    def runopf_e3(self, all_bids_mod, t):
+        """
+        After an excess agent decides about the answers for the bids (original or modified),
+        it should check feasibility of such answer through pf:
+            - added bids as more generation,
+            - added load at the pcc.
+        In case of unfeasible solution, further modification of bids has to be done.
+        Furthermore, the objective function should be compared if lower cost is reached.
+        """
+        all_bids_mod = np.array(all_bids_mod)
+        # load raw data
+        data = self.load_data(data_paths[data_names_dict[self.name]])
+        ppc0 = cases[data['case']]()
+        ppc_t = copy.deepcopy(ppc0)
+
+        # modify according to prospective accepted bids: loop through my generators (excluding slack)
+        origin_opf1_resgen = self.get_attr('opf1_resgen')
+
+        # load and modify according to current time and current OPF1 results!!
+        max_generation = data['max_generation']
+        fixed_load = data['fixed_load']
+        price = data['price']
+        slack_idx = data['slack_idx']
+        ppc_t['bus'][:, 2] = fixed_load[t]  # from data - they're not controlled
+        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1], 4)  # from OPF1, without slack
+        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1], 4)  # both bounds
+        ppc_t['gencost'][:, 4] = price[t]  # from data
+
+        for gen_idx in np.unique(all_bids_mod[:, 2]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
+
+            c1 = np.where(all_bids_mod[:, 2] == gen_idx)[0]  # rows where gen
+            p_bid = np.round(np.sum(all_bids_mod[c1, 3]), 4)  # total value of bidded power for generator
+
+            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx)[0]
+            ppc_t['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
+            ppc_t['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
+
+            c3 = np.where(ppc_t['gen'][:, 0] == gen_idx)[0]
+            ppc_t['gen'][c3, [8, 9]] += np.round(p_bid, 4)  # add value from bidding, to Pmax,Pmin
+
+        # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
+        bids_sum = np.round(np.sum(all_bids_mod[:, 3]), 4)
+        ppc_t['bus'][0, 2] += bids_sum
+
+        # with bids updated, verify the power flow if feasible - must be opf in order to include e.g. thermal limits
+        res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
+
+        if opfe3_prinpf:
+            printpf(res)
+
+        # calculation of the costs: objective function minus revenue from selling
+        bids_revenue = 0
+        for bid in all_bids_mod:
+            bids_revenue += bid[3] * bid[4]
+
+        costs = np.round(res['f'] - bids_revenue, 4)  # costs of vpp as costs of operation (slackcost for E = 0) - revenue from bids
+
+        self.set_attr(opf_e3={'objf_bidsrevenue': costs})
+
+        return res['success']
 
     def runopf_d2(self):
         """
@@ -158,11 +273,6 @@ class VPP_ext_agent(Agent):
 
         all_pc = []
         for mem in memory:
-            # if type(mem['price_curve'][0]) == float:
-            #     all_pc.append([data_names_dict[mem["vpp_name"]],
-            #                    mem["price_curve"][0],
-            #                    mem["price_curve"][1],
-            #                    mem["price_curve"][2]])
             if mem['value'] == False:
                 continue
             else:
@@ -197,67 +307,6 @@ class VPP_ext_agent(Agent):
             bids = np.concatenate((bids, empty_bid), axis=0)
         return bids  # list: [vpp_idx, gen_idx, bidgen_value, gen_price]
 
-    def runopf_e3(self, all_bids_mod, t):
-        """
-        After an excess agent decides about the answers for the bids (original or modified),
-        it should check feasibility of such answer through pf:
-            - added bids as more generation,
-            - added load at the pcc.
-        In case of unfeasible solution, further modification of bids has to be done.
-        Furthermore, the objective function should be compared if lower cost is reached.
-        """
-        print("checking feasibility")
-        pp(all_bids_mod)
-        # load raw data
-        data = self.load_data(data_paths[data_names_dict[self.name]])
-        ppc0 = cases[data['case']]()
-        ppc_t = copy.deepcopy(ppc0)
-
-        # modify according to prospective accepted bids: loop through my generators (excluding slack)
-        origin_opf1_resgen = self.get_attr('opf1_resgen')
-
-        # load and modify according to current time BUT current OPF1 results!!
-        max_generation = data['max_generation']
-        fixed_load = data['fixed_load']
-        price = data['price']
-        slack_idx = data['slack_idx']
-        ppc_t['bus'][:, 2] = fixed_load[t]  # from data - theyre not controlled
-        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1], 4)  # from OPF1, without slack
-        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1], 4)  # both bounds
-        ppc_t['gencost'][:, 4] = price[t]  # from data
-
-        for gen_idx in np.unique(all_bids_mod[:, 2]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
-
-            c1 = np.where(all_bids_mod[:, 2] == gen_idx)[0]  # rows where gen
-            p_bid = np.round(np.sum(all_bids_mod[c1, 3]), 4)  # total value of bidded power for generator
-
-            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx)[0]
-            ppc_t['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
-            ppc_t['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
-
-            c3 = np.where(ppc_t['gen'][:, 0] == gen_idx)[0]
-            ppc_t['gen'][c3, [8, 9]] += np.round(p_bid, 4)  # add value from bidding, to Pmax,Pmin
-
-        # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
-        bids_sum = np.round(np.sum(all_bids_mod[:, 3]), 4)
-        ppc_t['bus'][0, 2] += bids_sum
-
-        # with bids updated, verify the power flow if feasible - must be opf in order to include e.g. thermal limits
-        res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
-
-        # calculation of the costs: objective function minus revenue from selling
-        bids_revenue = 0
-        for bid in all_bids_mod:
-            bids_revenue += bid[3] * bid[4]
-
-        costs = np.round(res['f'] - bids_revenue, 4)  # costs of vpp as costs of operation (slackcost for E = 0) - revenue from bids
-
-        self.set_attr(opf_e3={'objf_bidsrevenue': costs})
-
-        if opfe3_prinpf:
-            printpf(res)
-        return res['success']
-
     def set_consensus_if_norequest(self):
         """
         This is called in case an excess agent does not have any requests from deficit agents in the deficit loop.
@@ -289,10 +338,6 @@ class VPP_ext_agent(Agent):
     def bids_alignment1(self, mypc0, all_bids0):
 
         all_bids = copy.deepcopy(all_bids0)
-
-        # print(all_bids0)
-        # print(mypc0)
-        # sys.exit()
 
         # fill the missing generators (0-bids)
         for vpp in np.unique(all_bids0[:, 0]):
