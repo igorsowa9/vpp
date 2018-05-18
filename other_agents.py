@@ -124,6 +124,7 @@ class VPP_ext_agent(Agent):
         This include verification of transmitting the excess to the other vpps (only to the ones that send requests),
         but also to DSO.
         """
+
         data = self.load_data(data_paths[data_names_dict[self.name]])
         generation_type = np.array(data['generation_type'])
 
@@ -133,37 +134,21 @@ class VPP_ext_agent(Agent):
         pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
 
         self.log_info("Final pc matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
-
-        feasibility_all = self.runopf_e2(np.array(exc_matrix.T), t)
-        if not feasibility_all:
-            self.log_info("Not feasible to export (all?) excess resources.")
-            self.set_attr(opfe2={'pc_matrix': False,
-                                 'objf_greentodso': False})
-
-        #########################
-        #########################
-        #########################
-        #########################
-        #########################
-        #########################
-        #########################
-        #########################
+        self.set_attr(opfe2={'pc_matrix': pc_matrix_incr})
 
         # calculate prospective revenue if green energy sold to DSO
         c1 = generation_type[exc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
         c2 = np.isin(c1, green_sources)  # choose only green ones
         c3 = np.reshape(c2, np.squeeze(c2).shape)
-        pc_matrix_green = exc_matrix[:, c3]
+        exc_matrix_green = exc_matrix[:, c3]
 
-        if pc_matrix_green.size > 0:
-
-            feasibility_green = self.runopf_e2(np.array(pc_matrix_green.T), t)
-            if not feasibility_green:
-                self.log_info("Not feasible to export whole excess resources.")
-            sys.exit()
-
+        if exc_matrix_green.size > 0:
+            self.set_attr(opfe2={'exc_matrix_green': exc_matrix_green})
         else:
             self.log_info("No green excess that could be sold to DSO.")
+            self.set_attr(opfe2={'exc_matrix_green': False})
+
+        ######### OPFs
 
         # load, update, modify data
         data = self.load_data(data_paths[data_names_dict[self.name]])
@@ -179,24 +164,50 @@ class VPP_ext_agent(Agent):
         ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1], 4)  # both bounds
         ppc_t['gencost'][:, 4] = price[t]  # from data
 
-        for gen_idx in pc_matrix:  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
+        ppc_tg = copy.deepcopy(ppc_t)
 
+        for gen_idx in exc_matrix_green:
+            p_bid = np.round(gen_idx[1], 4)  # total value of bidded power for a generator
+            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx[0])[0]
+            ppc_tg['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
+            ppc_tg['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
+            c3 = np.where(ppc_tg['gen'][:, 0] == gen_idx[0])[0]
+            ppc_tg['gen'][c3, [8, 9]] += p_bid  # add value from bidding, to Pmax,Pmin
+        # modify the load at pcc
+        bids_sum = np.round(np.sum(exc_matrix_green[:, 1]), 4)
+        ppc_tg['bus'][0, 2] += bids_sum
+
+        res_g = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
+        if opfe2_prinpf:
+            printpf(res_g)
+
+        if res_g['success']:
+            self.log_info('Feasible OPFe2 with green resources available to DSO .')
+        else:
+            self.log_info('NOT feasible OPFe2 with green resources available to DSO.')
+
+        for gen_idx in exc_matrix:
             p_bid = np.round(gen_idx[1], 4)  # total value of bidded power for a generator
             c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx[0])[0]
             ppc_t['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
             ppc_t['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
             c3 = np.where(ppc_t['gen'][:, 0] == gen_idx[0])[0]
-
             ppc_t['gen'][c3, [8, 9]] += p_bid  # add value from bidding, to Pmax,Pmin
-
-        # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
-        bids_sum = np.round(np.sum(pc_matrix[:, 1]), 4)
+        # modify the load at pcc
+        bids_sum = np.round(np.sum(exc_matrix[:, 1]), 4)
         ppc_t['bus'][0, 2] += bids_sum
 
-        # with bids updated, verify the power flow if feasible - must be opf in order to include e.g. thermal limits
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
         if opfe2_prinpf:
             printpf(res)
+
+        if res['success']:
+            self.log_info('Feasible OPFe2 with overall excess available.')
+        else:
+            self.log_info('NOT feasible OPFe2 with overall excess available.')
+
+
+
 
         return True
 
