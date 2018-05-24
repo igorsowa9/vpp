@@ -67,8 +67,11 @@ def requests_execute(self, myname, requests):
         ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
         opf1 = self.get_attr('opf1')  # download opf1 results
 
-        self.runopf_e2(opf1['exc_matrix'], global_time)  # make price curves based on the excess matrix
+        f1, f2 = self.runopf_e2(opf1['exc_matrix'], global_time)  # make price curves based on the excess matrix
+        print(f1, f2)
+
         sys.exit()
+
         if opf1['power_balance'] == 0 and opf1['max_excess'] > 0:  # max_excess > 0
             # val = float(power_value) if opf1[0] >= float(power_value) else opf1[0]
             val = float(opf1['max_excess'])  # max_excess

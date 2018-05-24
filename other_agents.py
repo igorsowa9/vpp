@@ -165,37 +165,50 @@ class VPP_ext_agent(Agent):
         ppc_t['gencost'][:, 4] = price[t]  # from data
 
         ppc_tg = copy.deepcopy(ppc_t)
+        exc_matrix_greenT = np.array(exc_matrix_green.T)
 
-        for gen_idx in exc_matrix_green:
-            p_bid = np.round(gen_idx[1], 4)  # total value of bidded power for a generator
-            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx[0])[0]
+        for gen_idx in np.unique(exc_matrix_greenT[:, 0]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
+            c1 = np.where(exc_matrix_greenT[:, 0] == gen_idx)[0]  # rows where gen
+            p_bid = np.round(np.sum(exc_matrix_greenT[c1, 1]), 4)  # total value of bidded power for generator
+            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx)[0]
             ppc_tg['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
             ppc_tg['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
-            c3 = np.where(ppc_tg['gen'][:, 0] == gen_idx[0])[0]
-            ppc_tg['gen'][c3, [8, 9]] += p_bid  # add value from bidding, to Pmax,Pmin
-        # modify the load at pcc
-        bids_sum = np.round(np.sum(exc_matrix_green[:, 1]), 4)
+            c3 = np.where(ppc_tg['gen'][:, 0] == gen_idx)[0]
+            ppc_tg['gen'][c3, [8, 9]] += np.round(p_bid, 4)  # add value from bidding, to Pmax,Pmin
+
+        # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
+        bids_sum = np.round(np.sum(exc_matrix_greenT[:, 1]), 4)
         ppc_tg['bus'][0, 2] += bids_sum
+
+        pp(ppc_tg['gen'])
+        pp(ppc_tg['gen'][:, [8,9]])
+        pp(ppc_tg['bus'][:, [1,2,3]])
+        sys.exit()
 
         res_g = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
         if opfe2_prinpf:
             printpf(res_g)
-
         if res_g['success']:
             self.log_info('Feasible OPFe2 with green resources available to DSO .')
+            f1 = True
         else:
             self.log_info('NOT feasible OPFe2 with green resources available to DSO.')
+            f1 = False
 
-        for gen_idx in exc_matrix:
-            p_bid = np.round(gen_idx[1], 4)  # total value of bidded power for a generator
-            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx[0])[0]
-            ppc_t['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
-            ppc_t['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
-            c3 = np.where(ppc_t['gen'][:, 0] == gen_idx[0])[0]
-            ppc_t['gen'][c3, [8, 9]] += p_bid  # add value from bidding, to Pmax,Pmin
-        # modify the load at pcc
-        bids_sum = np.round(np.sum(exc_matrix[:, 1]), 4)
-        ppc_t['bus'][0, 2] += bids_sum
+        exc_matrixT = np.array(exc_matrix.T)
+
+        for gen_idx in np.unique(exc_matrixT[:, 0]):
+            c1 = np.where(exc_matrixT[:, 0] == gen_idx)[0]
+            p_bid = np.round(np.sum(exc_matrixT[c1, 1]), 4)
+            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx)[0]
+            ppc_t['gen'][c2, [8, 9]] = np.array([0, 0])
+            ppc_t['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)
+            c3 = np.where(ppc_t['gen'][:, 0] == gen_idx)[0]
+            ppc_t['gen'][c3, [8, 9]] += np.round(p_bid, 4)
+
+        # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
+        bids_sum = np.round(np.sum(exc_matrixT[:, 1]), 4)
+        ppc_tg['bus'][0, 2] += bids_sum
 
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
         if opfe2_prinpf:
@@ -203,13 +216,13 @@ class VPP_ext_agent(Agent):
 
         if res['success']:
             self.log_info('Feasible OPFe2 with overall excess available.')
+            f2 = True
+
         else:
             self.log_info('NOT feasible OPFe2 with overall excess available.')
+            f2 = False
 
-
-
-
-        return True
+        return f1, f2
 
     def runopf_e3(self, all_bids_mod, t):
         """
