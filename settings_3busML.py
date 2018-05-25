@@ -2,6 +2,8 @@ import numpy as np
 from case5_vpp import case5_vpp
 from case4_vpp import case4_vpp
 
+np.set_printoptions(suppress=True)
+
 ts_n = 3  # number of timestamps of whole simulation
 
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
@@ -31,7 +33,18 @@ cases = {'case5': case5_vpp,
 opf1_verbose = 0
 opf1_prinpf = False
 opfe3_prinpf = False
-opfe2_prinpf = False
+opfe2_prinpf = True
+
+relax_e2 = 0.01  # relaxation of constraints in opf_e2
+# modification of convergence condition, check:
+# http://rwl.github.io/PYPOWER/api/pypower.dcopf_solver-pysrc.html
+#         feastol = ppopt['PDIPM_FEASTOL']
+#         gradtol = ppopt['PDIPM_GRADTOL']
+#         comptol = ppopt['PDIPM_COMPTOL']
+#         costtol = ppopt['PDIPM_COSTTOL']
+#         max_it  = ppopt['PDIPM_MAX_IT']
+#         max_red = ppopt['SCPDIPM_RED_IT']
+PDIPM_GRADTOL_mod = 5*1e-6
 
 # ASSUMPTIONS:
 # slack bus as the first one with idx 0 (some simplification, non universalities in the code, e.g. in PC building)

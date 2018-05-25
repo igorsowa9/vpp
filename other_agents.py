@@ -112,7 +112,7 @@ class VPP_ext_agent(Agent):
                                     'objf_noslackcost': objf_noslackcost,
                                     # 'objf_greentodso': objf_greentodso, # this comes from opf_e3 for "todso" case
                                     # 'pc_matrix': np.matrix(pc_matrix_incr), # price curves derived in opf_e2
-                                    'exc_matrix': np.matrix(exc_matrix)})
+                                    'exc_matrix': np.array(exc_matrix)})
             return True
         else:
             self.log_info("OPF1 does not converge. STOP.")
@@ -134,7 +134,7 @@ class VPP_ext_agent(Agent):
         pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
 
         self.log_info("Final pc matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
-        self.set_attr(opfe2={'pc_matrix': pc_matrix_incr})
+        self.set_attr(opfe2={'pc_matrix': np.array(pc_matrix_incr)})
 
         # calculate prospective revenue if green energy sold to DSO
         c1 = generation_type[exc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
@@ -148,46 +148,70 @@ class VPP_ext_agent(Agent):
             self.log_info("No green excess that could be sold to DSO.")
             self.set_attr(opfe2={'exc_matrix_green': False})
 
-        ######### OPFs
+        ######### OPFs for technical constraints of exporting power not for costs!
+        low_price = 0.1
+        high_price = 1000
 
         # load, update, modify data
         data = self.load_data(data_paths[data_names_dict[self.name]])
         ppc0 = cases[data['case']]()
         ppc_t = copy.deepcopy(ppc0)
         origin_opf1_resgen = self.get_attr('opf1_resgen')
+
+        print('bus \ value \ pmax \ pmin (original opf1)')
+        print(np.round(origin_opf1_resgen[:, [0, 1, 8, 9]], 4))
+
         max_generation = data['max_generation']
         fixed_load = data['fixed_load']
         price = data['price']
         slack_idx = data['slack_idx']
         ppc_t['bus'][:, 2] = fixed_load[t]  # from data - they're not controlled
-        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1], 4)  # from OPF1, without slack
-        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1], 4)  # both bounds
+        ppc_t['gen'][0:, 8] = 0  # virtual slack generator removed
+        ppc_t['gen'][0:, 9] = 0
+        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1] * (1+relax_e2), 4)  # from OPF1, without slack
+        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1] * (1-relax_e2), 4)  # both bounds
         ppc_t['gencost'][:, 4] = price[t]  # from data
 
+        # exporting green (feasible) energy (e.g. option of selling to DSO)
         ppc_tg = copy.deepcopy(ppc_t)
         exc_matrix_greenT = np.array(exc_matrix_green.T)
 
         for gen_idx in np.unique(exc_matrix_greenT[:, 0]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
+
             c1 = np.where(exc_matrix_greenT[:, 0] == gen_idx)[0]  # rows where gen
             p_bid = np.round(np.sum(exc_matrix_greenT[c1, 1]), 4)  # total value of bidded power for generator
-            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx)[0]
-            ppc_tg['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
-            ppc_tg['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
-            c3 = np.where(ppc_tg['gen'][:, 0] == gen_idx)[0]
-            ppc_tg['gen'][c3, [8, 9]] += np.round(p_bid, 4)  # add value from bidding, to Pmax,Pmin
 
-        # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
-        bids_sum = np.round(np.sum(exc_matrix_greenT[:, 1]), 4)
-        ppc_tg['bus'][0, 2] += bids_sum
+            exc_gen = np.array([int(gen_idx), 0, 0, 0, 0, 1, 100, 1, p_bid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            ppc_tg['gen'] = np.concatenate((ppc_tg['gen'], np.matrix(exc_gen)), axis=0)
+            gc = np.array([2, 0, 0, 2, low_price, 0])
+            ppc_tg['gencost'] = np.concatenate((ppc_tg['gencost'], np.matrix(gc)), axis=0)
 
-        pp(ppc_tg['gen'])
-        pp(ppc_tg['gen'][:, [8,9]])
-        pp(ppc_tg['bus'][:, [1,2,3]])
-        sys.exit()
+            neg_gen = [slack_idx, 0, 0, 0, 0, 1, 100, 1, 0, -p_bid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            ppc_tg['gen'] = np.concatenate((ppc_tg['gen'], np.matrix(neg_gen)), axis=0)
+            ngc = np.array([2, 0, 0, 2, high_price, 0])
+            ppc_tg['gencost'] = np.concatenate((ppc_tg['gencost'], np.matrix(ngc)), axis=0)
 
-        res_g = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
+            ppc_tg['gen'] = np.array(ppc_tg['gen'])
+            ppc_tg['gencost'] = np.array(ppc_tg['gencost'])
+
+        # relax thermal constr.
+        ppc_tg['branch'][:, [5, 6, 7]] = ppc_tg['branch'][:, [5, 6, 7]] * (1+relax_e2)
+
+        # pp(ppc_tg['gen'][:, [0, 8, 9]])
+        # pp(ppc_tg['bus'][:, [1, 2, 3]])
+        # pp(ppc_tg['gencost'][:, 4])
+        # pp(ppc_tg['branch'][:, [5, 6, 7]])
+        # pp(ppc_tg)
+
+        res_g = rundcopf(ppc_tg, ppoption(VERBOSE=opf1_verbose, PDIPM_GRADTOL=PDIPM_GRADTOL_mod))
+
         if opfe2_prinpf:
-            printpf(res_g)
+            # printpf(res_g)
+            print('bus \ value \ pmax \ pmin \ price (if whole available excess)')
+            show = np.array(
+                np.concatenate((np.matrix(res_g['gen'][:, [0, 1, 8, 9]]), np.matrix(ppc_tg['gencost'][:, 4]).T), axis=1))
+            print(np.round(show, 4))
+            print("Objective function: " + str(res_g['f']))
         if res_g['success']:
             self.log_info('Feasible OPFe2 with green resources available to DSO .')
             f1 = True
@@ -195,29 +219,40 @@ class VPP_ext_agent(Agent):
             self.log_info('NOT feasible OPFe2 with green resources available to DSO.')
             f1 = False
 
+        # exporting whole (feasible) excess through PCC
         exc_matrixT = np.array(exc_matrix.T)
 
-        for gen_idx in np.unique(exc_matrixT[:, 0]):
-            c1 = np.where(exc_matrixT[:, 0] == gen_idx)[0]
-            p_bid = np.round(np.sum(exc_matrixT[c1, 1]), 4)
-            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx)[0]
-            ppc_t['gen'][c2, [8, 9]] = np.array([0, 0])
-            ppc_t['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)
-            c3 = np.where(ppc_t['gen'][:, 0] == gen_idx)[0]
-            ppc_t['gen'][c3, [8, 9]] += np.round(p_bid, 4)
+        for gen_idx in np.unique(exc_matrixT[:, 0]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
 
-        # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
-        bids_sum = np.round(np.sum(exc_matrixT[:, 1]), 4)
-        ppc_tg['bus'][0, 2] += bids_sum
+            c1 = np.where(exc_matrixT[:, 0] == gen_idx)[0]  # rows where gen
+            p_bid = np.round(np.sum(exc_matrixT[c1, 1]), 4)  # total value of bidded power for generator
 
-        res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
+            exc_gen = np.array([int(gen_idx), 0, 0, 0, 0, 1, 100, 1, p_bid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            ppc_t['gen'] = np.concatenate((ppc_t['gen'], np.matrix(exc_gen)), axis=0)
+            gc = np.array([2, 0, 0, 2, low_price, 0])
+            ppc_t['gencost'] = np.concatenate((ppc_t['gencost'], np.matrix(gc)), axis=0)
+
+            neg_gen = [slack_idx, 0, 0, 0, 0, 1, 100, 1, 0, -p_bid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            ppc_t['gen'] = np.concatenate((ppc_t['gen'], np.matrix(neg_gen)), axis=0)
+            ngc = np.array([2, 0, 0, 2, high_price, 0])
+            ppc_t['gencost'] = np.concatenate((ppc_t['gencost'], np.matrix(ngc)), axis=0)
+
+            ppc_t['gen'] = np.array(ppc_t['gen'])
+            ppc_t['gencost'] = np.array(ppc_t['gencost'])
+
+        # relax thermal constr.
+        ppc_t['branch'][:, [5, 6, 7]] = ppc_t['branch'][:, [5, 6, 7]] * (1+relax_e2)
+
+        res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose, PDIPM_GRADTOL=PDIPM_GRADTOL_mod))
         if opfe2_prinpf:
-            printpf(res)
-
+            # printpf(res)
+            print('bus \ value \ pmax \ pmin \ price (if whole available excess)')
+            show = np.array(np.concatenate((np.matrix(res['gen'][:, [0, 1, 8, 9]]), np.matrix(ppc_t['gencost'][:, 4]).T), axis=1))
+            print(np.round(show, 4))
+            print("Objective function: "+str(res['f']))
         if res['success']:
             self.log_info('Feasible OPFe2 with overall excess available.')
             f2 = True
-
         else:
             self.log_info('NOT feasible OPFe2 with overall excess available.')
             f2 = False
