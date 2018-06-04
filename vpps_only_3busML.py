@@ -67,15 +67,13 @@ def requests_execute(self, myname, requests):
         ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
         opf1 = self.get_attr('opf1')  # download opf1 results
 
-        f1, f2 = self.runopf_e2(opf1['exc_matrix'], global_time)  # make price curves based on the excess matrix
-        print(f1, f2)
-
-        sys.exit()
+        self.runopf_e2(opf1['exc_matrix'], global_time)  # make price curves based on the excess matrix
 
         if opf1['power_balance'] == 0 and opf1['max_excess'] > 0:  # max_excess > 0
             # val = float(power_value) if opf1[0] >= float(power_value) else opf1[0]
             val = float(opf1['max_excess'])  # max_excess
-            price_curve = copy.deepcopy(opf1['pc_matrix'])
+            opfe2 = self.get_attr('opfe2')
+            price_curve = copy.deepcopy(opfe2['pc_matrix'])
 
             # increase of price due to iteration
             prices = price_curve[2, :]
@@ -189,7 +187,7 @@ def bid_offer_handler(self, message):
                 if feasibility:
                     self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
-                                  ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opf1')['objf_greentodso']) +
+                                  ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opfe2')['objf_greentodso']) +
                                   ' . Costs with bids revenue (opf_e3-bid revenue): ' + str(
                         self.get_attr('opf_e3')['objf_bidsrevenue']))
                 else:
@@ -214,7 +212,7 @@ def bid_offer_handler(self, message):
                 if feasibility:
                     self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
-                                  ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opf1')['objf_greentodso']) +
+                                  ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opfe2')['objf_greentodso']) +
                                   ' . Costs with bids revenue (opf_e3-bid revenue): ' + str(self.get_attr('opf_e3')['objf_bidsrevenue']))
                 else:
                     self.log_info('Unfeasibility in pf_e3! STOP.')

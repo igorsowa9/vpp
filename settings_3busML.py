@@ -35,7 +35,7 @@ opf1_prinpf = False
 opfe3_prinpf = False
 opfe2_prinpf = True
 
-relax_e2 = 0.01  # relaxation of constraints in opf_e2
+relax_e2 = 0.000  # relaxation of constraints in opf_e2
 # modification of convergence condition, check:
 # http://rwl.github.io/PYPOWER/api/pypower.dcopf_solver-pysrc.html
 #         feastol = ppopt['PDIPM_FEASTOL']
@@ -86,3 +86,7 @@ grey_sources = [11, 12, 13, 14, 15]
 # 12 lignite - gray, controllable
 # 13 atom - gray, controllable
 # 14 natural gas - gray, controllable
+
+######### OPFs for technical constraints of exporting power not for costs!
+low_price = 0.1
+high_price = 1000
