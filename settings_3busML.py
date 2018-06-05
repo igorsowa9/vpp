@@ -24,7 +24,6 @@ price_increase_factor = 6.0
 # the excess agents increase the original production prices when publishing the price curve, increase by 10%
 # when the excess is sold for the original prices, there is no benefit for excess agents since:
 # production_cost - bids_revenue = 0
-pc_matrix_price_increase_factor = 1.1
 dso_green_price_increase_factor = 1.05
 
 cases = {'case5': case5_vpp,
@@ -33,7 +32,7 @@ cases = {'case5': case5_vpp,
 opf1_verbose = 0
 opf1_prinpf = False
 opfe3_prinpf = False
-opfe2_prinpf = True
+opfe2_prinpf = False
 
 relax_e2 = 0.000  # relaxation of constraints in opf_e2
 # modification of convergence condition, check:

@@ -19,5 +19,10 @@
 
 	"case":	"case5",
 
-	"slack_idx": 0
+	"slack_idx": 0,
+
+	"pc_matrix_price_increase_factor": 1.1,
+
+	"dso_price": 200
+
 }

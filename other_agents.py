@@ -130,7 +130,7 @@ class VPP_ext_agent(Agent):
 
         # build price curve
         pc_matrix_incr = copy.deepcopy(exc_matrix)
-        pc_matrix_incr[2, :] *= pc_matrix_price_increase_factor
+        pc_matrix_incr[2, :] *= self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor']
         pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
 
         self.log_info("Final pc matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
@@ -154,9 +154,10 @@ class VPP_ext_agent(Agent):
         ppc_t = copy.deepcopy(ppc0)
         origin_opf1_resgen = self.get_attr('opf1_resgen')
 
-        print('bus \ value \ pmax \ pmin (original opf1)')
-        print(np.round(origin_opf1_resgen[:, [0, 1, 8, 9]], 4))
-        print('Objf_noslack: ' + str(self.get_attr('opf1')['objf_noslackcost']))
+        if opf1_prinpf:
+            print('bus \ value \ pmax \ pmin (original opf1)')
+            print(np.round(origin_opf1_resgen[:, [0, 1, 8, 9]], 4))
+            print('Objf_noslack: ' + str(self.get_attr('opf1')['objf_noslackcost']))
 
         max_generation = data['max_generation']
         fixed_load = data['fixed_load']
@@ -196,38 +197,40 @@ class VPP_ext_agent(Agent):
 
         res_g = rundcopf(ppc_tg, ppoption(VERBOSE=opf1_verbose, PDIPM_GRADTOL=PDIPM_GRADTOL_mod))
 
+        show = np.array(
+            np.concatenate((np.matrix(res_g['gen'][:, [0, 1, 8, 9]]), np.matrix(ppc_tg['gencost'][:, 4]).T), axis=1))
+        show_realcost = copy.deepcopy(show)
+        for g in range(len(show_realcost)):
+            garr = np.array(show_realcost[g, :])
+            if garr[4] == low_price:
+                g_idx = garr[0]
+                p = exc_matrix[2, exc_matrix[0, :] == g_idx]  # increased price of the resource
+                garr[4] = p
+                show_realcost[g, :] = garr
+            if garr[4] == high_price:
+                g_idx = np.array(show_realcost[g-1, 0])  # bus number from the raw above
+                garr[0] = g_idx
+                temp = np.array(pc_matrix_incr)
+                p = temp[2, temp[0, :] == g_idx]  # increased price of the resource
+                garr[4] = p
+                show_realcost[g, :] = garr
+
+        real_cost = np.round(sum(show_realcost[:, 1] * show_realcost[:, 4]), 4)
+        self.get_attr('opfe2').update({'objf_greentodso': real_cost})
+
         if opfe2_prinpf:
             print('bus \ value \ pmax \ pmin \ price (if green excess available)')
-
-            show = np.array(
-                np.concatenate((np.matrix(res_g['gen'][:, [0, 1, 8, 9]]), np.matrix(ppc_tg['gencost'][:, 4]).T), axis=1))
-            show_realcost = copy.deepcopy(show)
-            for g in range(len(show_realcost)):
-                garr = np.array(show_realcost[g, :])
-                if garr[4] == low_price:
-                    g_idx = garr[0]
-                    p = exc_matrix[2, exc_matrix[0, :] == g_idx]  # increased price of the resource
-                    garr[4] = p
-                    show_realcost[g, :] = garr
-                if garr[4] == high_price:
-                    g_idx = np.array(show_realcost[g-1, 0])  # bus number from the raw above
-                    garr[0] = g_idx
-                    temp = np.array(pc_matrix_incr)
-                    p = temp[2, temp[0, :] == g_idx]  # increased price of the resource
-                    garr[4] = p
-                    show_realcost[g, :] = garr
-
             print(np.round(show_realcost, 4))
-            real_cost = np.round(sum(show_realcost[:, 1] * show_realcost[:, 4]), 4)
             print("Real cost (objf by hand): " + str(real_cost))
-            self.get_attr('opfe2').update({'objf_greentodso': real_cost})
+
 
         if res_g['success']:
             self.log_info('Feasible OPFe2 with green resources available to DSO.')
             f1 = True
         else:
-            self.log_info('NOT feasible OPFe2 with green resources available to DSO. NOT GOOD.')
+            self.log_info('NOT feasible OPFe2 with green resources available to DSO. NOT GOOD - STOP.')
             f1 = False
+            sys.exit()
 
         # exporting whole (feasible) excess through PCC
         exc_matrixT = np.array(exc_matrix.T)
@@ -254,36 +257,40 @@ class VPP_ext_agent(Agent):
         ppc_t['branch'][:, [5, 6, 7]] = ppc_t['branch'][:, [5, 6, 7]] * (1+relax_e2)
 
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose, PDIPM_GRADTOL=PDIPM_GRADTOL_mod))
+
+        show = np.array(np.concatenate((np.matrix(res['gen'][:, [0, 1, 8, 9]]), np.matrix(ppc_t['gencost'][:, 4]).T), axis=1))
+        show_realcost = copy.deepcopy(show)
+        for g in range(len(show_realcost)):
+            garr = np.array(show_realcost[g, :])
+            if garr[4] == low_price:
+                g_idx = garr[0]
+                p = exc_matrix[2, exc_matrix[0, :] == g_idx]  # increased price of the resource
+                garr[4] = p
+                show_realcost[g, :] = garr
+            if garr[4] == high_price:
+                g_idx = np.array(show_realcost[g - 1, 0])  # bus number from the raw above
+                garr[0] = g_idx
+                temp = np.array(pc_matrix_incr)
+                p = temp[2, temp[0, :] == g_idx]  # increased price of the resource
+                garr[4] = p
+                show_realcost[g, :] = garr
+
+        real_cost = np.round(sum(show_realcost[:, 1] * show_realcost[:, 4]), 4)
+        self.get_attr('opfe2').update({'objf_exportall': real_cost})
+
         if opfe2_prinpf:
             # printpf(res)
             print('bus \ value \ pmax \ pmin \ price (if whole available excess)')
-            show = np.array(np.concatenate((np.matrix(res['gen'][:, [0, 1, 8, 9]]), np.matrix(ppc_t['gencost'][:, 4]).T), axis=1))
-            show_realcost = copy.deepcopy(show)
-            for g in range(len(show_realcost)):
-                garr = np.array(show_realcost[g, :])
-                if garr[4] == low_price:
-                    g_idx = garr[0]
-                    p = exc_matrix[2, exc_matrix[0, :] == g_idx]  # increased price of the resource
-                    garr[4] = p
-                    show_realcost[g, :] = garr
-                if garr[4] == high_price:
-                    g_idx = np.array(show_realcost[g - 1, 0])  # bus number from the raw above
-                    garr[0] = g_idx
-                    temp = np.array(pc_matrix_incr)
-                    p = temp[2, temp[0, :] == g_idx]  # increased price of the resource
-                    garr[4] = p
-                    show_realcost[g, :] = garr
-
             print(np.round(show_realcost, 4))
-            real_cost = np.round(sum(show_realcost[:, 1] * show_realcost[:, 4]), 4)
             print("Real cost (objf by hand): " + str(real_cost))
-            self.get_attr('opfe2').update({'objf_exportall': real_cost})
+
         if res['success']:
             self.log_info('Feasible OPFe2 with overall excess available.')
             f2 = True
         else:
-            self.log_info('NOT feasible OPFe2 with overall excess available. NOT GOOD!')
+            self.log_info('NOT feasible OPFe2 with overall excess available. NOT GOOD - STOP')
             f2 = False
+            sys.exit()
 
         return f1, f2
 
@@ -344,7 +351,7 @@ class VPP_ext_agent(Agent):
 
         costs = np.round(res['f'] - bids_revenue, 4)  # costs of vpp as costs of operation (slackcost for E = 0) - revenue from bids
 
-        self.set_attr(opf_e3={'objf_bidsrevenue': costs})
+        self.set_attr(opfe3={'objf_bidsrevenue': costs})
 
         return res['success']
 
@@ -401,6 +408,20 @@ class VPP_ext_agent(Agent):
         :return: //, sets opfd3 with some cost calculations
         """
 
+        mydeals = []
+        for accepted_bid in self.get_attr('iteration_memory_bid_accept'):
+            mydeals.append([accepted_bid['vpp_name'], accepted_bid['bid']])
+        self.set_attr(timestep_memory_mydeals=mydeals)
+        self.set_attr(consensus=True)
+
+        cost = 0
+        for deal_vpp in self.get_attr('timestep_memory_mydeals'):
+            cost += np.sum(deal_vpp[1][:, 2] * deal_vpp[1][:, 3])
+        cost = np.round(cost, 4)
+        self.set_attr(opfd3={'buybids_cost': cost})
+
+        return True
+
     def set_consensus_if_norequest(self):
         """
         This is called in case an excess agent does not have any requests from deficit agents in the deficit loop.
@@ -412,14 +433,6 @@ class VPP_ext_agent(Agent):
             self.log_info('I am E and I nobody wants to buy from me (n_requests=' + str(self.get_attr('n_requests')) +
                           '). I set consensus.')
             self.set_attr(consensus=True)
-
-    def deficit_opf(self, price_curves):
-        """
-        After a deficit agent receives all price curves, it should define bids through running internal opf
-        as defined in this function.
-        :param price_curves
-        :return: bids that are sent back to the excess agents of interest
-        """
 
     def sys_octave_test(self, mpc):
         res = octave.rundcopf(mpc)

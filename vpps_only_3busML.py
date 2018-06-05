@@ -83,10 +83,6 @@ def requests_execute(self, myname, requests):
                 new_prices = [x + price_increase_factor*self.get_attr("n_iteration") for x in prices]
             price_curve[2, :] = new_prices
 
-            # check feasibility of selling the excess (cost calculated with the new prices)
-
-
-
             self.log_info("I have " + str(opf1['max_excess']) + " to sell. Sending price curve... "
                                                      "(total excess=" + str(val) + ", with price curves matrix about generators)")
             price_curve_message = {"message_id": message_id_price_curve, "vpp_name": myname,
@@ -160,9 +156,13 @@ def bid_offer_handler(self, message):
         all_bids = np.matrix(all_bids)
         c1 = np.array(all_bids[:, 3] != 0)
         all_bids_nz = np.array(all_bids[c1[:, 0], :])
-        self.log_info("My all non-zero bids from deficit vpps: " + str(all_bids_nz))
+        self.log_info("My all non-zero bids from deficit vpps ("+str(len(all_bids_nz))+"): " + str(all_bids_nz))
+        self.log_info("I compare and modify if necessary the original n_request number ("+str(self.get_attr('n_requests')) +
+                      "), excluding vpps with empty bids. New n_requests="+str(len(np.unique(all_bids_nz[:, 0]))))
+        self.set_attr(n_requests=len(np.unique(all_bids_nz[:, 0])))
 
-        print("compare:\n" + str(all_bids_nz) + "\n" + str(self.get_attr('iteration_memory_bid')))
+
+        #print("compare:\n" + str(all_bids_nz) + "\n" + str(self.get_attr('iteration_memory_bid')))
 
         all_bids_sum = sum(all_bids_nz[:, 3])  # sum all the bid power (vppidx, genidx, power, price)
         if all_bids_sum <= self.get_attr('opf1')['max_excess']:  # if sum of all is less then excess -> accept and wait for reply
@@ -188,8 +188,7 @@ def bid_offer_handler(self, message):
                     self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
                                   ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opfe2')['objf_greentodso']) +
-                                  ' . Costs with bids revenue (opf_e3-bid revenue): ' + str(
-                        self.get_attr('opf_e3')['objf_bidsrevenue']))
+                                  ' . Costs with bids revenue (opfe3-bid revenue): ' + str(self.get_attr('opfe3')['objf_bidsrevenue']))
                 else:
                     self.log_info('Unfeasibility in pf_e3 (' + str(self.name) + ')! Stop.')
                     sys.exit()
@@ -213,7 +212,7 @@ def bid_offer_handler(self, message):
                     self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
                                   ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opfe2')['objf_greentodso']) +
-                                  ' . Costs with bids revenue (opf_e3-bid revenue): ' + str(self.get_attr('opf_e3')['objf_bidsrevenue']))
+                                  ' . Costs with bids revenue (opfe3-bid revenue): ' + str(self.get_attr('opfe3')['objf_bidsrevenue']))
                 else:
                     self.log_info('Unfeasibility in pf_e3! STOP.')
                     sys.exit()
@@ -271,11 +270,7 @@ def bid_answer_handler(self, message):
             ns.proxy(bid["vpp_name"]).connect(myaddr, handler=bid_final_confirm_handler)
             self.send('bid_final_confirm', bid_final_accept_message)
 
-        mydeals = []
-        for accepted_bid in self.get_attr('iteration_memory_bid_accept'):
-            mydeals.append([accepted_bid['vpp_name'], accepted_bid['bid']])
-        self.set_attr(timestep_memory_mydeals=mydeals)
-        self.set_attr(consensus=True)
+        self.runopf_d3()  # sets mydeals for DEFs and calculates the costs After for Deficit agents
 
 
 def bid_final_confirm_handler(self, message):

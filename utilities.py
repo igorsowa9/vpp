@@ -76,21 +76,31 @@ def system_consensus_check(ns, global_time):
 
     if n_consensus == vpp_n:
         print("- Multi-consensus reached (" + str(n_consensus) + "/" + str(vpp_n) + ") for time: ", global_time)
+        print("##################")
+        print("##################")
         print("----- Deals: -----")
+        print("##################")
+        print("##################")
         for alias in ns.agents():
             a = ns.proxy(alias)
-            print("\n>>>>>>>>" + alias + " deals (tobalance, excess): (" + str(a.get_attr('opf1')['power_balance']) + " "
+            print("\n\n\n>>>>>>>>" + alias + " deals (tobalance, excess): (" + str(a.get_attr('opf1')['power_balance']) + " "
                   + str(a.get_attr('opf1')['max_excess']) + ")")
-            print('Before negotiation (opf1, opfe2):'
-                  '\nobjf: ' + str(a.get_attr('opf1')['objf']) +
-                  '\nobjf_noslackcost (opf1): ' + str(a.get_attr('opf1')['objf_noslackcost']))
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+            print('Before negotiation (opf1, opfe2-for Exc):'
+                  '\n\tobjf: ' + str(a.get_attr('opf1')['objf']) +
+                  '\n\tobjf_noslackcost (opf1): ' + str(a.get_attr('opf1')['objf_noslackcost']))
             if a.get_attr('opfe2'):  # for excess agents
-                print('objf_greentodso (opfe2): ' + str(a.get_attr('opfe2')['objf_greentodso']) +
-                      '\nobjf_exportall (opfe2): ' + str(a.get_attr('opfe2')['objf_exportall']))
-            if a.get_attr('opf_e3'):  # for excess agents
-                print('After: ' + str(a.get_attr('opf_e3')['objf_bidsrevenue']))
-            else:
-                print('After: ' + 'NEED TO CALCULATE FOR DEFICIT AGENTS')
+                incr_factor = a.load_data(data_paths[data_names_dict[alias]])['pc_matrix_price_increase_factor']
+                print('\tMy price curve for other VPPs (gen_id/max.exc./price): (prices incr. factor: '+str(incr_factor)+')')
+                print('\t' + str(a.get_attr('opfe2')['pc_matrix']))
+                print('\t'+'objf_greentodso (opfe2): ' + str(a.get_attr('opfe2')['objf_greentodso']) +
+                      '\n\tobjf_exportall (opfe2): ' + str(a.get_attr('opfe2')['objf_exportall']))
+
+            if a.get_attr('opfe3'):  # for excess agents
+                print('After: ' + str(a.get_attr('opfe3')['objf_bidsrevenue']))
+            elif a.get_attr('opfd3'):  # for def agents
+                print('After. Cost of buying bids: ' + str(a.get_attr('opfd3')['buybids_cost']))
 
             for deal_vpp in a.get_attr('timestep_memory_mydeals'):
                 print("\tWith: " + str(deal_vpp[0]))
@@ -113,7 +123,7 @@ def erase_iteration_memory(ns):
         a.set_attr(iteration_memory_bid_accept=[])
         a.set_attr(iteration_memory_bid_finalanswer=[])
         a.set_attr(n_bids=0)
-        a.set_attr(opf_e3=0)
+        a.set_attr(opfe3=0)
         a.set_attr(opfe2=0)
 
 
