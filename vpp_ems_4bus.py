@@ -400,11 +400,11 @@ if __name__ == '__main__':
     # ##### RUN the simulation
 
     ## TEST for one time only ###
-    # global_time_set(0)          #
-    # runOneTimestep()            #
-    # time.sleep(1)               #
-    # ns.shutdown()               #
-    # sys.exit()                  #
+    global_time_set(0)          #
+    runOneTimestep()            #
+    time.sleep(1)               #
+    ns.shutdown()               #
+    sys.exit()                  #
     #############################
 
     for t in range(10):

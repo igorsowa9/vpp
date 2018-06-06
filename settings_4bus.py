@@ -101,4 +101,4 @@ MEASURED = 2
 
 # offset for all loads and max generations from json files
 gen_mod_offset = 0
-load_mod_offset = 0.2
+load_mod_offset = 0

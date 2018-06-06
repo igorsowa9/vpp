@@ -3,6 +3,18 @@
 
 	"description":"data for the case5_vpp from matpower, 3 time stamps",
 
+	"max_generation": 	[[1e4, 90, 60, 40, 30],
+						[1e4, 5, 60, 40, 30],
+						[1e4, 2, 61, 46, 36]],
+
+	"fixed_load": 	[[0, 25, 30, 40, 65],
+					[0, 25, 30, 40, 65],
+					[0, 27, 32, 42, 67]],
+
+	"price": 	[[200, 4, 21, 32, 103],
+				[200, 4, 21, 32, 103],
+				[200, 5, 21, 33, 90]],
+
 	"generation_type":	[0, 1, 2, 2, 14],
 
 	"case":	"case5_vpp1",
