@@ -1,5 +1,5 @@
 from pypower.api import *
-from case5_vpp import case5_vpp
+from data.vpp4bus.case5_vpp1 import case5_vpp
 from pypower_mod.rundcopf_noprint import rundcopf
 import copy, json
 import numpy as np

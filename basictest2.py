@@ -1,5 +1,5 @@
 from pypower.api import *
-from case4_vpp import case4_vpp
+from data.vpp4bus.case4_vpp3 import case4_vpp
 from pypower_mod.rundcopf_noprint import rundcopf
 
 ppc = case4_vpp()

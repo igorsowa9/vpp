@@ -1,4 +1,4 @@
-from settings_3busML import *
+from settings_4bus import *
 import matplotlib.pyplot as plt
 import json
 import copy
@@ -101,6 +101,8 @@ def system_consensus_check(ns, global_time):
                 print('After: ' + str(a.get_attr('opfe3')['objf_bidsrevenue']))
             elif a.get_attr('opfd3'):  # for def agents
                 print('After. Cost of buying bids: ' + str(a.get_attr('opfd3')['buybids_cost']))
+            else:
+                a.log_info('I did not run opfe3 / opfd3.')
 
             for deal_vpp in a.get_attr('timestep_memory_mydeals'):
                 print("\tWith: " + str(deal_vpp[0]))
@@ -124,7 +126,9 @@ def erase_iteration_memory(ns):
         a.set_attr(iteration_memory_bid_finalanswer=[])
         a.set_attr(n_bids=0)
         a.set_attr(opfe3=0)
+        a.set_attr(opfd3=0)
         a.set_attr(opfe2=0)
+        a.set_attr(opfd2=0)
 
 
 def erase_timestep_memory(ns):

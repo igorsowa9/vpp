@@ -1,22 +1,8 @@
-from osbrain import Agent
-import json
-from settings import *
-import time
-from pprint import pprint as pp
-from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix
-
-import time
 import sys
 from osbrain import run_agent
 from osbrain import run_nameserver
-from pprint import pprint as pp
-import copy
 
-from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix, system_status, \
-    small_wait, price_increase_factor, cases
 from other_agents import VPP_ext_agent
-from utilities import system_consensus_check, erase_iteration_memory, erase_timestep_memory
-
 
 from oct2py import octave
 
@@ -24,7 +10,7 @@ octave.addpath('/home/iso/PycharmProjects/vpp/matpow_cases')
 octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0')
 octave.addpath('/home/iso/PycharmProjects/vpp/matpower6.0/t')
 
-from case5_vpp import case5_vpp
+from data.vpp4bus.case5_vpp1 import case5_vpp
 
 
 # - load basic topology

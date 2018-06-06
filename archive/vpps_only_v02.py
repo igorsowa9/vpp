@@ -1,22 +1,12 @@
 import time
-import json
 #import numpy as npsettings
 import sys
-import numpy
 from osbrain import run_agent
 from osbrain import run_nameserver
-from pprint import pprint as pp
-from osbrain import Agent
-import Pyro4
-import array
 
-import numpy
-import zmq
-
-from settings import data_names, data_names_dict, data_paths, vpp_n, ts_n, adj_matrix, print_data
+from archive.settings import data_names, data_names_dict, vpp_n, adj_matrix
 from other_agents import VPP_ext_agent
 
-import osbrain
 serializer_name = 'pickle'
 #osbrain.config['SERIALIZER'] = serializer_name
 

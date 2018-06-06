@@ -1,0 +1,53 @@
+{
+	"name":"name of vpp1 in 3busML case",
+
+	"description":"data for the case5_vpp from matpower, 3 time stamps",
+
+	"max_generation": 	[[1e4, 90, 60, 40, 30],
+						[1e4, 5, 60, 40, 30],
+						[1e4, 2, 61, 46, 36]],
+
+	"fixed_load": 	[[0, 25, 30, 40, 65],
+					[0, 25, 30, 40, 65],
+					[0, 27, 32, 42, 67]],
+
+	"price": 	[[200, 4, 21, 32, 103],
+				[200, 4, 21, 32, 103],
+				[200, 5, 21, 33, 90]],
+
+	"generation_type":	[0, 1, 2, 2, 14],
+
+	"case":	"case5_vpp1",
+
+	"slack_idx": 0,
+	"bus_n": 5,
+
+	"pc_matrix_price_increase_factor": 1.1,
+
+	"dso_price": 200,
+
+	"generation_profiles_paths": [
+		"",
+		"/home/iso/PycharmProjects/vpp/data/original_elia/in_use/PV_ReW_7_25.json",
+		"/home/iso/PycharmProjects/vpp/data/original_elia/in_use/wind_offshore_Elia_877.json",
+		"/home/iso/PycharmProjects/vpp/data/original_elia/in_use/wind_onshore_elia_158.json",
+		""
+	],
+
+	"fixed_load_profiles_paths": [
+		"",
+		"/home/iso/PycharmProjects/vpp/data/german_load_profiles/g1_sept17.json",
+		"/home/iso/PycharmProjects/vpp/data/german_load_profiles/g4_sept17.json",
+		"/home/iso/PycharmProjects/vpp/data/german_load_profiles/h0_sept17.json",
+		"/home/iso/PycharmProjects/vpp/data/german_load_profiles/l1_sept17.json"
+	],
+
+	"price_profiles_paths": [
+		"",
+		"",
+		"",
+		"",
+		""
+	]
+
+}

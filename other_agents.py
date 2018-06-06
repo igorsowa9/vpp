@@ -1,6 +1,6 @@
 from osbrain import Agent
 import json
-from settings_3busML import *
+from settings_4bus import *
 #from utilities import system_state_update_and_balance
 import time
 from pprint import pprint as pp
@@ -47,13 +47,10 @@ class VPP_ext_agent(Agent):
         ppc0 = cases[data['case']]()
         ppc_t = copy.deepcopy(ppc0)
 
-        max_generation = data['max_generation']
-        fixed_load = data['fixed_load']
-        price = data['price']
         slack_idx = data['slack_idx']
 
-        max_generation0 = copy.deepcopy(ppc0['bus'][:, 2])
-        fixed_load0 = copy.deepcopy(ppc0['gen'][:, 8])
+        fixed_load0 = copy.deepcopy(ppc0['bus'][:, 2])
+        max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])
         price0 = copy.deepcopy(ppc0['gencost'][:, 4])
 
         vpp_file = self.load_data(data_paths[data_names_dict[self.name]])
@@ -67,8 +64,7 @@ class VPP_ext_agent(Agent):
             if not gen_path == "":  # no modification of the original value
                 d = self.load_data(gen_path)
                 mod = d[t][MEASURED]
-                max_generation_t[idx] = mod * max_generation0[idx]
-                print(max_generation_t)
+                max_generation_t[idx] = (mod + gen_mod_offset) * max_generation0[idx]
 
             # fixed loads values modification
             fixed_load_t = fixed_load0
@@ -76,7 +72,7 @@ class VPP_ext_agent(Agent):
             if not fload_path == "":
                 d = self.load_data(fload_path)
                 mod = d[t]
-                fixed_load_t[idx] = mod * fixed_load0[idx]
+                fixed_load_t[idx] = (mod + load_mod_offset) * fixed_load0[idx]
 
             # prices modification (values directly from the file)
             price_t = copy.deepcopy(price0)
@@ -88,8 +84,6 @@ class VPP_ext_agent(Agent):
         ppc_t['bus'][:, 2] = fixed_load_t
         ppc_t['gen'][:, 8] = max_generation_t
         ppc_t['gencost'][:, 4] = price_t
-
-        sys.exit()
 
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
         if opf1_prinpf == True: printpf(res)

@@ -1,0 +1,49 @@
+{
+	"name":"name of vpp3 in 3busML case",
+
+	"description":"data for the case4_vpp, 3 time stamps",
+
+	"max_generation": 	[[1e4, 120, 0, 200],
+						[1e4, 150, 0, 420],
+						[1e4, 150, 0, 420]],
+
+	"fixed_load": 	[[0, 170, 125, 80],
+					[0, 170, 200, 80],
+					[0, 170, 200, 80]],
+
+	"price": 	[[200, 2, 0, 24],
+				[200, 2, 0, 24],
+				[200, 2, 0, 24]],
+
+	"generation_type":	[0, 1, 2, 11],
+
+	"case":	"case4_vpp3",
+
+	"slack_idx": 0,
+	"bus_n": 4,
+
+	"pc_matrix_price_increase_factor": 1.1,
+
+	"dso_price": 200,
+
+	"generation_profiles_paths": [
+		"",
+		"",
+		"",
+		""
+	],
+
+	"fixed_load_profiles_paths": [
+		"",
+		"",
+		"",
+		""
+	],
+
+	"price_profiles_paths": [
+		"",
+		"",
+		"",
+		""
+	]
+}
