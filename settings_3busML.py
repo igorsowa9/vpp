@@ -89,3 +89,8 @@ grey_sources = [11, 12, 13, 14, 15]
 ######### OPFs for technical constraints of exporting power not for costs!
 low_price = 0.1
 high_price = 1000
+
+# Loading data from the files - the paths defined in the VPP files
+TIMESTAMP = 0
+FORECASTED = 1
+MEASURED = 2

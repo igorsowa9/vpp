@@ -35,10 +35,9 @@ class VPP_ext_agent(Agent):
 
     def runopf1(self, t):
         """
-        This should be internal PF in order to define excess/deficit.
+        This should be internal OPF in order to define excess/deficit.
         Updates the system ppc at time t according to data and runs opf.
-        If excess, derive price curve.
-        OPF1b: Check the feasibility and profitability of selling those price curves either to other VPPs or to DSO.
+        If excess, derive exces curve matrix (with generation prices).
         :param mpc_t:
         :param t:
         :param data:
@@ -52,11 +51,45 @@ class VPP_ext_agent(Agent):
         fixed_load = data['fixed_load']
         price = data['price']
         slack_idx = data['slack_idx']
-        generation_type = np.array(data['generation_type'])
 
-        ppc_t['bus'][:, 2] = fixed_load[t]
-        ppc_t['gen'][:, 8] = max_generation[t]
-        ppc_t['gencost'][:, 4] = price[t]
+        max_generation0 = copy.deepcopy(ppc0['bus'][:, 2])
+        fixed_load0 = copy.deepcopy(ppc0['gen'][:, 8])
+        price0 = copy.deepcopy(ppc0['gencost'][:, 4])
+
+        vpp_file = self.load_data(data_paths[data_names_dict[self.name]])
+
+        for idx in range(vpp_file['bus_n']):
+            if idx == slack_idx:
+                continue
+            # max generation constraints modification
+            max_generation_t = max_generation0
+            gen_path = vpp_file['generation_profiles_paths'][idx]
+            if not gen_path == "":  # no modification of the original value
+                d = self.load_data(gen_path)
+                mod = d[t][MEASURED]
+                max_generation_t[idx] = mod * max_generation0[idx]
+                print(max_generation_t)
+
+            # fixed loads values modification
+            fixed_load_t = fixed_load0
+            fload_path = vpp_file['fixed_load_profiles_paths'][idx]
+            if not fload_path == "":
+                d = self.load_data(fload_path)
+                mod = d[t]
+                fixed_load_t[idx] = mod * fixed_load0[idx]
+
+            # prices modification (values directly from the file)
+            price_t = copy.deepcopy(price0)
+            price_path = vpp_file['price_profiles_paths'][idx]
+            if not price_path == "":
+                d = self.load_data(price_path)
+                price_t[idx] = d[t]
+
+        ppc_t['bus'][:, 2] = fixed_load_t
+        ppc_t['gen'][:, 8] = max_generation_t
+        ppc_t['gencost'][:, 4] = price_t
+
+        sys.exit()
 
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
         if opf1_prinpf == True: printpf(res)
@@ -159,7 +192,7 @@ class VPP_ext_agent(Agent):
             print(np.round(origin_opf1_resgen[:, [0, 1, 8, 9]], 4))
             print('Objf_noslack: ' + str(self.get_attr('opf1')['objf_noslackcost']))
 
-        max_generation = data['max_generation']
+        # max_generation from results of opf1, not from data['max_generation']
         fixed_load = data['fixed_load']
         price = data['price']
         slack_idx = data['slack_idx']
@@ -313,7 +346,7 @@ class VPP_ext_agent(Agent):
         origin_opf1_resgen = self.get_attr('opf1_resgen')
 
         # load and modify according to current time and current OPF1 results!!
-        max_generation = data['max_generation']
+        # max_generation from results of opf1, not from data['max_generation']
         fixed_load = data['fixed_load']
         price = data['price']
         slack_idx = data['slack_idx']
@@ -427,7 +460,6 @@ class VPP_ext_agent(Agent):
         This is called in case an excess agent does not have any requests from deficit agents in the deficit loop.
         :return:
         """
-
         time.sleep(0.1)
         if self.get_attr('n_requests') == 0:
             self.log_info('I am E and I nobody wants to buy from me (n_requests=' + str(self.get_attr('n_requests')) +

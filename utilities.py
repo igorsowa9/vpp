@@ -138,3 +138,9 @@ def erase_timestep_memory(ns):
         a.set_attr(requests=[])
         a.set_attr(opf1=[])
         a.set_attr(opf1_resgen=[])
+
+
+def load_jsonfile(path):
+    with open(path, 'r') as f:
+        arr = json.load(f)
+    return arr

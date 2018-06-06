@@ -20,9 +20,34 @@
 	"case":	"case5",
 
 	"slack_idx": 0,
+	"bus_n": 5,
 
 	"pc_matrix_price_increase_factor": 1.1,
 
-	"dso_price": 200
+	"dso_price": 200,
+
+	"generation_profiles_paths": [
+		"",
+		"/home/iso/PycharmProjects/vpp/data/original_elia/in_use/PV_ReW_7_25.json",
+		"",
+		"",
+		""
+	],
+
+	"fixed_load_profiles_paths": [
+		"",
+		"",
+		"",
+		"",
+		"/home/iso/PycharmProjects/vpp/data/german_load_profiles/g1_sept17.csv"
+	],
+
+	"price_profiles_paths": [
+		"",
+		"",
+		"",
+		"",
+		""
+	]
 
 }
