@@ -6,7 +6,7 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_n = 3  # number of timestamps of whole simulation
+ts_n = 4*24  # number of timestamps of whole simulation
 
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}
@@ -20,7 +20,7 @@ adj_matrix = [[True, True, True, True],
               [True, True, True, False],
               [True, True, False, True]]
 
-small_wait = 0.3  # waiting time to separate some steps, for testing
+small_wait = 0.1  # waiting time to separate some steps, for testing
 price_increase_factor = 6.0
 
 # the excess agents increase the original production prices when publishing the price curve, increase by 10%
@@ -39,6 +39,7 @@ opfe3_prinpf = False
 opfe2_prinpf = False
 
 relax_e2 = 0.000  # relaxation of constraints in opf_e2
+relax_e3 = 0.000  # relaxation of constraints in opf_e3
 # modification of convergence condition, check:
 # http://rwl.github.io/PYPOWER/api/pypower.dcopf_solver-pysrc.html
 #         feastol = ppopt['PDIPM_FEASTOL']

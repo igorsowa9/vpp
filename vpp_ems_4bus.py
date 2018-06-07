@@ -6,7 +6,7 @@ from pprint import pprint as pp
 import copy
 from settings_4bus import *
 from other_agents import VPP_ext_agent
-from utilities import system_consensus_check, erase_iteration_memory, erase_timestep_memory, print_data
+from utilities import system_consensus_check, erase_iteration_memory, erase_timestep_memory, print_data, show_results_history
 
 global_time = 0
 
@@ -61,15 +61,17 @@ def requests_execute(self, myname, requests):
     :param requests: e.g. {'message_id': 1, 'vpp_name': 'vpp1', 'value': 25.0}
     :return:
     """
+
     for req in requests:
         from_vpp = req["vpp_name"]
         myaddr = self.bind('PUSH', alias='price_curve_reply')
         ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
         opf1 = self.get_attr('opf1')  # download opf1 results
 
-        self.runopf_e2(opf1['exc_matrix'], global_time)  # make price curves based on the excess matrix
-
         if opf1['power_balance'] == 0 and opf1['max_excess'] > 0:  # max_excess > 0
+
+            self.runopf_e2(opf1['exc_matrix'], global_time)  # make price curves based on the excess matrix
+
             # val = float(power_value) if opf1[0] >= float(power_value) else opf1[0]
             val = float(opf1['max_excess'])  # max_excess
             opfe2 = self.get_attr('opfe2')
@@ -152,6 +154,7 @@ def bid_offer_handler(self, message):
         for bid_message in self.get_attr('iteration_memory_bid'):
             for bid_message_gen in bid_message['bid']:
                 all_bids.append(np.append(data_names_dict[bid_message['vpp_name']], bid_message_gen))
+
         # all_bids_np = np.array(all_bids)
         all_bids = np.matrix(all_bids)
         c1 = np.array(all_bids[:, 3] != 0)
@@ -188,7 +191,7 @@ def bid_offer_handler(self, message):
                     self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
                                   ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opfe2')['objf_greentodso']) +
-                                  ' . Costs with bids revenue (opfe3-bid revenue): ' + str(self.get_attr('opfe3')['objf_bidsrevenue']))
+                                  ' . Costs with bids revenue (opfe3-bid revenue): ' + str(self.get_attr('opfe3')['objf_inclbidsrevenue']))
                 else:
                     self.log_info('Unfeasibility in pf_e3 (' + str(self.name) + ')! Stop.')
                     sys.exit()
@@ -206,13 +209,14 @@ def bid_offer_handler(self, message):
             else:  # i.e. if alignment is necessary
                 # bid modification: equal sharing (participation according to total bid value) of the bids due to limited single gen excess:
                 all_bids_mod = self.bids_alignment1(mypc0, all_bids_nz)
+
                 # opf should be checked if the transport of such a power is possible to the respective deficit vpps through the respective PCCs:
                 feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
                 if feasibility:
                     self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
                                   ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opfe2')['objf_greentodso']) +
-                                  ' . Costs with bids revenue (opfe3-bid revenue): ' + str(self.get_attr('opfe3')['objf_bidsrevenue']))
+                                  ' . Costs with bids revenue (opfe3-bid revenue): ' + str(self.get_attr('opfe3')['objf_inclbidsrevenue']))
                 else:
                     self.log_info('Unfeasibility in pf_e3! STOP.')
                     sys.exit()
@@ -324,7 +328,9 @@ def runOneTimestep():
 
     time.sleep(small_wait)  # show gathered requests
     print('Adjacency matrix: ' + str(adj_matrix))
-    print("- Resulting requests: -")
+    print("\n\n#######################")
+    print("# Resulting requests: #")
+    print("#######################")
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
         print(str(data_names[vpp_idx]) + ":\n(to balance, max exc, objf noslack: " + str(agent.get_attr('opf1')) +
@@ -400,19 +406,21 @@ if __name__ == '__main__':
     # ##### RUN the simulation
 
     ## TEST for one time only ###
-    global_time_set(0)          #
-    runOneTimestep()            #
-    time.sleep(1)               #
-    ns.shutdown()               #
-    sys.exit()                  #
+    # global_time_set(31)          #
+    # runOneTimestep()            #
+    # time.sleep(1)               #
+    # ns.shutdown()               #
+    # sys.exit()                  #
     #############################
 
-    for t in range(10):
+    for t in range(ts_n):
 
-        time.sleep(1)
+        time.sleep(small_wait)
         global_time_set(t)
         runOneTimestep()
 
-    time.sleep(1)
+    time.sleep(small_wait)
     ns.shutdown()
+
+    show_results_history()
 

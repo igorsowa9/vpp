@@ -2,6 +2,7 @@ from settings_4bus import *
 import matplotlib.pyplot as plt
 import json
 import copy
+import sys
 from pypower.api import *
 from pypower_mod.rundcopf_noprint import rundcopf
 
@@ -87,28 +88,72 @@ def system_consensus_check(ns, global_time):
                   + str(a.get_attr('opf1')['max_excess']) + ")")
             print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
-            print('Before negotiation (opf1, opfe2-for Exc):'
-                  '\n\tobjf: ' + str(a.get_attr('opf1')['objf']) +
-                  '\n\tobjf_noslackcost (opf1): ' + str(a.get_attr('opf1')['objf_noslackcost']))
+            print('Before negotiation (opf1, opfe2, no opfd2 so far):'
+                  '\n\tobjf (opf1): ' + str(a.get_attr('opf1')['objf']) +
+                  '\n\tobjf_noslackcost (i.e. dso) (opf1): ' + str(a.get_attr('opf1')['objf_noslackcost']))
             if a.get_attr('opfe2'):  # for excess agents
                 incr_factor = a.load_data(data_paths[data_names_dict[alias]])['pc_matrix_price_increase_factor']
-                print('\tMy price curve for other VPPs (gen_id/max.exc./price): (prices incr. factor: '+str(incr_factor)+')')
-                print('\t' + str(a.get_attr('opfe2')['pc_matrix']))
+                print('\tMy price curve for other VPPs (opfe2): (prices incr. factor: '+str(incr_factor)+')')
+                print('\t| gen_id | max.exc. | price |')
+                print('\t' + str(np.array(a.get_attr('opfe2')['pc_matrix']).T))
                 print('\t'+'objf_greentodso (opfe2): ' + str(a.get_attr('opfe2')['objf_greentodso']) +
                       '\n\tobjf_exportall (opfe2): ' + str(a.get_attr('opfe2')['objf_exportall']))
 
+            print('After:')
             if a.get_attr('opfe3'):  # for excess agents
-                print('After: ' + str(a.get_attr('opfe3')['objf_bidsrevenue']))
+                bid_rev = a.get_attr('opfe3')['objf_inclbidsrevenue']
+                print('\tExcess VPP. Final cost after subtracting bids revenue objf_inclbidsrevenue (opfe3): ' + str(bid_rev))
             elif a.get_attr('opfd3'):  # for def agents
-                print('After. Cost of buying bids: ' + str(a.get_attr('opfd3')['buybids_cost']))
+                print('\tDeficit VPP. Cost of buying from VPPs: ' + str(a.get_attr('opfd3')['buybids_cost']))
+                total_withdso = a.get_attr('opf1')['objf']
+                total_withbids = round(a.get_attr('opfd3')['buybids_cost'] + a.get_attr('opf1')['objf_noslackcost'], 4)
+                print('\tTotal cost buying DSO (opf1) vs total cost with bids (opf1 and opf3): ' +
+                      str(total_withdso) + " vs. " + str(total_withbids))
             else:
-                a.log_info('I did not run opfe3 / opfd3.')
+                print('\tI did not run opfe3 / opfd3.')
 
             for deal_vpp in a.get_attr('timestep_memory_mydeals'):
+                print("Contracts/deals:")
                 print("\tWith: " + str(deal_vpp[0]))
                 print("\t\tBid values [vpp_idx (where selling generator is), gen_idx, value, price]: ")
                 for bid in deal_vpp[1]:
                     print("\t\t" + str(bid))
+
+        # saving into results_history:
+        # before negotiation: excess/deficit value, objf, objf_noslackcost,
+        # after: objf_inclbidsrevenue (excess), cost of buying bids + final cost (deficit)
+        vpp_result = np.zeros((vpp_n, 4))
+        VPP_VALUE = 0
+        OBJF1 = 1
+        OBJF1_NODSO = 2
+        OBJF_AFTER = 3
+
+        # global results for example number of iterations
+        global_result = np.zeros(1)
+
+        for alias in ns.agents():
+            a = ns.proxy(alias)
+            if not a.get_attr('opf1')['max_excess']:
+                save = a.get_attr('opf1')['power_balance']
+            else:
+                save = a.get_attr('opf1')['max_excess']
+            vpp_result[data_names_dict[alias], VPP_VALUE] = save
+
+            vpp_result[data_names_dict[alias], OBJF1] = a.get_attr('opf1')['objf']
+            vpp_result[data_names_dict[alias], OBJF1_NODSO] = a.get_attr('opf1')['objf_noslackcost']
+
+            if a.get_attr('opfe3'):
+                after = a.get_attr('opfe3')['objf_inclbidsrevenue']
+            elif a.get_attr('opfd3'):
+                after = round(a.get_attr('opfd3')['buybids_cost'] + a.get_attr('opf1')['objf_noslackcost'], 4)
+            else:
+                after = False
+            vpp_result[data_names_dict[alias], OBJF_AFTER] = after
+
+            global_result[0] = a.get_attr('n_iteration')  # should be out of the loop
+
+        save_results_history(global_time, global_result, vpp_result)
+
         return True
     else:
         print("- Multi-consensus NOT reached (" + str(n_consensus) + "/" + str(vpp_n) + ") for time: ", global_time)
@@ -143,8 +188,48 @@ def erase_timestep_memory(ns):
         a.set_attr(opf1=[])
         a.set_attr(opf1_resgen=[])
 
+#
+# def erase_persistent_memory(ns):
+#     print('--- persistent M erase ---')
+#     for vpp_idx in range(vpp_n):
+#         a = ns.proxy(data_names[vpp_idx])
+#         a.set_attr(results_history=[])
+
 
 def load_jsonfile(path):
     with open(path, 'r') as f:
         arr = json.load(f)
     return arr
+
+
+vpp_results = np.zeros((ts_n, vpp_n, 4))
+global_results = np.zeros((ts_n, 1))
+
+
+def save_results_history(global_time, global_result, vpp_result):
+    vpp_results[global_time, :, :] = vpp_result
+    global_results[global_time, :] = global_result
+    return 1
+
+
+def show_results_history():
+
+    VPP_VALUE = 0
+    OBJF1 = 1
+    OBJF1_NODSO = 2
+    OBJF_AFTER = 3
+
+    print("###################")
+    print("### PRINTING ######")
+    print("###################")
+    vpp_idx = 0
+
+    plt.figure(1)
+    # plt.subplot(311)
+    pb = plt.plot(vpp_results[:, :, VPP_VALUE])
+    plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
+
+    plt.ylabel('value for vpp1')
+    plt.axhline(0, color='black')
+
+    plt.show()

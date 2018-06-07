@@ -33,6 +33,58 @@ class VPP_ext_agent(Agent):
         json_data = self.load_data(data_paths[data_names_dict[self.name]])
         return json_data["price"][time]
 
+    def modify_fromfile(self, t, if_fload=True, if_gen=True, if_price=True):
+
+        vpp_file = self.load_data(data_paths[data_names_dict[self.name]])
+        ppc0 = cases[vpp_file['case']]()
+        ppc_t = copy.deepcopy(ppc0)
+
+        fixed_load0 = copy.deepcopy(ppc0['bus'][:, 2])
+        max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])
+        price0 = copy.deepcopy(ppc0['gencost'][:, 4])
+
+        slack_idx = vpp_file['slack_idx']
+
+        if if_fload:
+            for idx in range(vpp_file['bus_n']):
+                if idx == slack_idx:
+                    continue
+                # fixed loads values modification
+                fixed_load_t = fixed_load0
+                fload_path = vpp_file['fixed_load_profiles_paths'][idx]
+                if not fload_path == "":
+                    d = self.load_data(fload_path)
+                    mod = d[t]
+                    fixed_load_t[idx] = (mod + load_mod_offset) * fixed_load0[idx]
+            ppc_t['bus'][:, 2] = fixed_load_t
+
+        if if_gen:
+            for idx in range(vpp_file['bus_n']):
+                if idx == slack_idx:
+                    continue
+                # max generation constraints modification
+                max_generation_t = max_generation0
+                gen_path = vpp_file['generation_profiles_paths'][idx]
+                if not gen_path == "":  # no modification of the original value
+                    d = self.load_data(gen_path)
+                    mod = d[t][MEASURED]
+                    max_generation_t[idx] = (mod + gen_mod_offset) * max_generation0[idx]
+            ppc_t['gen'][:, 8] = max_generation_t
+
+        if if_price:
+            for idx in range(vpp_file['bus_n']):
+                if idx == slack_idx:
+                    continue
+                # prices modification (values directly from the file)
+                price_t = copy.deepcopy(price0)
+                price_path = vpp_file['price_profiles_paths'][idx]
+                if not price_path == "":
+                    d = self.load_data(price_path)
+                    price_t[idx] = d[t]
+            ppc_t['gencost'][:, 4] = price_t
+
+        return ppc_t
+
     def runopf1(self, t):
         """
         This should be internal OPF in order to define excess/deficit.
@@ -43,54 +95,17 @@ class VPP_ext_agent(Agent):
         :param data:
         :return: balance needed at PCC, max possible excess, objf with subtracted virtual slack cost
         """
-        data = self.load_data(data_paths[data_names_dict[self.name]])
-        ppc0 = cases[data['case']]()
-        ppc_t = copy.deepcopy(ppc0)
-
-        slack_idx = data['slack_idx']
-
-        fixed_load0 = copy.deepcopy(ppc0['bus'][:, 2])
-        max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])
-        price0 = copy.deepcopy(ppc0['gencost'][:, 4])
-
-        vpp_file = self.load_data(data_paths[data_names_dict[self.name]])
-
-        for idx in range(vpp_file['bus_n']):
-            if idx == slack_idx:
-                continue
-            # max generation constraints modification
-            max_generation_t = max_generation0
-            gen_path = vpp_file['generation_profiles_paths'][idx]
-            if not gen_path == "":  # no modification of the original value
-                d = self.load_data(gen_path)
-                mod = d[t][MEASURED]
-                max_generation_t[idx] = (mod + gen_mod_offset) * max_generation0[idx]
-
-            # fixed loads values modification
-            fixed_load_t = fixed_load0
-            fload_path = vpp_file['fixed_load_profiles_paths'][idx]
-            if not fload_path == "":
-                d = self.load_data(fload_path)
-                mod = d[t]
-                fixed_load_t[idx] = (mod + load_mod_offset) * fixed_load0[idx]
-
-            # prices modification (values directly from the file)
-            price_t = copy.deepcopy(price0)
-            price_path = vpp_file['price_profiles_paths'][idx]
-            if not price_path == "":
-                d = self.load_data(price_path)
-                price_t[idx] = d[t]
-
-        ppc_t['bus'][:, 2] = fixed_load_t
-        ppc_t['gen'][:, 8] = max_generation_t
-        ppc_t['gencost'][:, 4] = price_t
-
+        ppc_t = self.modify_fromfile(t)
+        slack_idx = self.load_data(data_paths[data_names_dict[self.name]])['slack_idx']
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
-        if opf1_prinpf == True: printpf(res)
+        if opf1_prinpf:
+            printpf(res)
 
         if res['success'] == 1:
             self.log_info("I have successfully run the OPF1.")
             self.set_attr(opf1_resgen=res['gen'])
+
+            print("TEST000: " + str(round(res['gen'][slack_idx, 1], 4)))
 
             if round(res['gen'][slack_idx, 1], 4) > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
                 self.set_attr(current_status='D')
@@ -104,7 +119,7 @@ class VPP_ext_agent(Agent):
                                     'max_excess': False,
                                     'objf': objf,
                                     'objf_noslackcost': objf_noslackcost,
-                                    'pc_matrix': False})
+                                    'exc_matrix': False})
 
             else:  # no need for external power - BALANCE or EXCESS
                 power_balance = -1 * round(res['gen'][slack_idx, 4])
@@ -151,17 +166,30 @@ class VPP_ext_agent(Agent):
         This include verification of transmitting the excess to the other vpps (only to the ones that send requests),
         but also to DSO.
         """
+        generation_type = np.array(self.load_data(data_paths[data_names_dict[self.name]])['generation_type'])
 
-        data = self.load_data(data_paths[data_names_dict[self.name]])
-        generation_type = np.array(data['generation_type'])
-
-        # build price curve
+        # build price curve according to pc_matrix_price_increase_factor
         pc_matrix_incr = copy.deepcopy(exc_matrix)
-        pc_matrix_incr[2, :] *= self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor']
+        pc_matrix_incr[2, :] = pc_matrix_incr[2, :] * \
+                               self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor']
         pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
-
         self.log_info("Final pc matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
         self.set_attr(opfe2={'pc_matrix': np.array(pc_matrix_incr)})
+
+        # load, update, modify data according to files and opf1
+        origin_opf1_resgen = self.get_attr('opf1_resgen')
+        if opf1_prinpf:
+            print('bus \ value \ pmax \ pmin (original opf1)')
+            print(np.round(origin_opf1_resgen[:, [0, 1, 8, 9]], 4))
+            print('Objf_noslack: ' + str(self.get_attr('opf1')['objf_noslackcost']))
+
+        # max_generation from results of opf1, not from files
+        ppc_t = self.modify_fromfile(t, True, False, True)
+        slack_idx = self.load_data(data_paths[data_names_dict[self.name]])['slack_idx']
+        ppc_t['gen'][0:, 8] = 0  # virtual slack generator removed
+        ppc_t['gen'][0:, 9] = 0
+        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1] * (1 + relax_e2), 4)  # from OPF1, without slack
+        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1] * (1 - relax_e2), 4)  # both bounds
 
         # calculate prospective revenue if green energy sold to DSO
         c1 = generation_type[exc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
@@ -171,95 +199,77 @@ class VPP_ext_agent(Agent):
 
         if exc_matrix_green.size > 0:
             self.get_attr('opfe2').update({'exc_matrix_green': exc_matrix_green})
+
+            ####### exporting green (feasible) energy (e.g. option of selling to DSO)
+            ppc_tg = copy.deepcopy(ppc_t)
+            exc_matrix_greenT = np.array(exc_matrix_green.T)
+
+            for gen_idx in np.unique(exc_matrix_greenT[:,
+                                     0]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
+
+                c1 = np.where(exc_matrix_greenT[:, 0] == gen_idx)[0]  # rows where gen
+                p_bid = np.round(np.sum(exc_matrix_greenT[c1, 1]), 4)  # total value of bidded power for generator
+
+                exc_gen = np.array([int(gen_idx), 0, 0, 0, 0, 1, 100, 1, p_bid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+                ppc_tg['gen'] = np.concatenate((ppc_tg['gen'], np.matrix(exc_gen)), axis=0)
+                gc = np.array([2, 0, 0, 2, low_price, 0])
+                ppc_tg['gencost'] = np.concatenate((ppc_tg['gencost'], np.matrix(gc)), axis=0)
+
+                neg_gen = [slack_idx, 0, 0, 0, 0, 1, 100, 1, 0, -p_bid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                ppc_tg['gen'] = np.concatenate((ppc_tg['gen'], np.matrix(neg_gen)), axis=0)
+                ngc = np.array([2, 0, 0, 2, high_price, 0])
+                ppc_tg['gencost'] = np.concatenate((ppc_tg['gencost'], np.matrix(ngc)), axis=0)
+
+                ppc_tg['gen'] = np.array(ppc_tg['gen'])
+                ppc_tg['gencost'] = np.array(ppc_tg['gencost'])
+
+            # relax thermal constr.
+            ppc_tg['branch'][:, [5, 6, 7]] = ppc_tg['branch'][:, [5, 6, 7]] * (1 + relax_e2)
+
+            res_g = rundcopf(ppc_tg, ppoption(VERBOSE=opf1_verbose, PDIPM_GRADTOL=PDIPM_GRADTOL_mod))
+
+            show = np.array(
+                np.concatenate((np.matrix(res_g['gen'][:, [0, 1, 8, 9]]), np.matrix(ppc_tg['gencost'][:, 4]).T),
+                               axis=1))
+            show_realcost = copy.deepcopy(show)
+            for g in range(len(show_realcost)):
+                garr = np.array(show_realcost[g, :])
+                if garr[4] == low_price:
+                    g_idx = garr[0]
+                    p = exc_matrix[2, exc_matrix[0, :] == g_idx]  # increased price of the resource
+                    garr[4] = p
+                    show_realcost[g, :] = garr
+                if garr[4] == high_price:
+                    g_idx = np.array(show_realcost[g - 1, 0])  # bus number from the raw above
+                    garr[0] = g_idx
+                    temp = np.array(pc_matrix_incr)
+                    p = temp[2, temp[0, :] == g_idx]  # increased price of the resource
+                    garr[4] = p
+                    show_realcost[g, :] = garr
+
+            real_cost = np.round(sum(show_realcost[:, 1] * show_realcost[:, 4]), 4)
+            self.get_attr('opfe2').update({'objf_greentodso': real_cost})
+
+            if opfe2_prinpf:
+                print('bus \ value \ pmax \ pmin \ price (if green excess available)')
+                print(np.round(show_realcost, 4))
+                print("Real cost (objf by hand): " + str(real_cost))
+
+            if res_g['success']:
+                self.log_info('Feasible OPFe2 with green resources available to DSO.')
+                f1 = True
+            else:
+                self.log_info('NOT feasible OPFe2 with green resources available to DSO. NOT GOOD - STOP.')
+                f1 = False
+                sys.exit()
+
         else:
             self.log_info("No green excess that could be sold to DSO.")
             self.get_attr('opfe2').update({'exc_matrix_green': False})
-
-        # load, update, modify data
-        data = self.load_data(data_paths[data_names_dict[self.name]])
-        ppc0 = cases[data['case']]()
-        ppc_t = copy.deepcopy(ppc0)
-        origin_opf1_resgen = self.get_attr('opf1_resgen')
-
-        if opf1_prinpf:
-            print('bus \ value \ pmax \ pmin (original opf1)')
-            print(np.round(origin_opf1_resgen[:, [0, 1, 8, 9]], 4))
-            print('Objf_noslack: ' + str(self.get_attr('opf1')['objf_noslackcost']))
-
-        # max_generation from results of opf1, not from data['max_generation']
-        fixed_load = data['fixed_load']
-        price = data['price']
-        slack_idx = data['slack_idx']
-        ppc_t['bus'][:, 2] = fixed_load[t]  # from data - they're not controlled
-        ppc_t['gen'][0:, 8] = 0  # virtual slack generator removed
-        ppc_t['gen'][0:, 9] = 0
-        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1] * (1+relax_e2), 4)  # from OPF1, without slack
-        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1] * (1-relax_e2), 4)  # both bounds
-        ppc_t['gencost'][:, 4] = price[t]  # from data
-
-        # exporting green (feasible) energy (e.g. option of selling to DSO)
-        ppc_tg = copy.deepcopy(ppc_t)
-        exc_matrix_greenT = np.array(exc_matrix_green.T)
-
-        for gen_idx in np.unique(exc_matrix_greenT[:, 0]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
-
-            c1 = np.where(exc_matrix_greenT[:, 0] == gen_idx)[0]  # rows where gen
-            p_bid = np.round(np.sum(exc_matrix_greenT[c1, 1]), 4)  # total value of bidded power for generator
-
-            exc_gen = np.array([int(gen_idx), 0, 0, 0, 0, 1, 100, 1, p_bid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-            ppc_tg['gen'] = np.concatenate((ppc_tg['gen'], np.matrix(exc_gen)), axis=0)
-            gc = np.array([2, 0, 0, 2, low_price, 0])
-            ppc_tg['gencost'] = np.concatenate((ppc_tg['gencost'], np.matrix(gc)), axis=0)
-
-            neg_gen = [slack_idx, 0, 0, 0, 0, 1, 100, 1, 0, -p_bid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            ppc_tg['gen'] = np.concatenate((ppc_tg['gen'], np.matrix(neg_gen)), axis=0)
-            ngc = np.array([2, 0, 0, 2, high_price, 0])
-            ppc_tg['gencost'] = np.concatenate((ppc_tg['gencost'], np.matrix(ngc)), axis=0)
-
-            ppc_tg['gen'] = np.array(ppc_tg['gen'])
-            ppc_tg['gencost'] = np.array(ppc_tg['gencost'])
-
-        # relax thermal constr.
-        ppc_tg['branch'][:, [5, 6, 7]] = ppc_tg['branch'][:, [5, 6, 7]] * (1+relax_e2)
-
-        res_g = rundcopf(ppc_tg, ppoption(VERBOSE=opf1_verbose, PDIPM_GRADTOL=PDIPM_GRADTOL_mod))
-
-        show = np.array(
-            np.concatenate((np.matrix(res_g['gen'][:, [0, 1, 8, 9]]), np.matrix(ppc_tg['gencost'][:, 4]).T), axis=1))
-        show_realcost = copy.deepcopy(show)
-        for g in range(len(show_realcost)):
-            garr = np.array(show_realcost[g, :])
-            if garr[4] == low_price:
-                g_idx = garr[0]
-                p = exc_matrix[2, exc_matrix[0, :] == g_idx]  # increased price of the resource
-                garr[4] = p
-                show_realcost[g, :] = garr
-            if garr[4] == high_price:
-                g_idx = np.array(show_realcost[g-1, 0])  # bus number from the raw above
-                garr[0] = g_idx
-                temp = np.array(pc_matrix_incr)
-                p = temp[2, temp[0, :] == g_idx]  # increased price of the resource
-                garr[4] = p
-                show_realcost[g, :] = garr
-
-        real_cost = np.round(sum(show_realcost[:, 1] * show_realcost[:, 4]), 4)
-        self.get_attr('opfe2').update({'objf_greentodso': real_cost})
-
-        if opfe2_prinpf:
-            print('bus \ value \ pmax \ pmin \ price (if green excess available)')
-            print(np.round(show_realcost, 4))
-            print("Real cost (objf by hand): " + str(real_cost))
-
-
-        if res_g['success']:
-            self.log_info('Feasible OPFe2 with green resources available to DSO.')
-            f1 = True
-        else:
-            self.log_info('NOT feasible OPFe2 with green resources available to DSO. NOT GOOD - STOP.')
+            self.get_attr('opfe2').update({'objf_greentodso': False})
             f1 = False
-            sys.exit()
 
-        # exporting whole (feasible) excess through PCC
+        ######## exporting whole (feasible) excess through PCC
         exc_matrixT = np.array(exc_matrix.T)
 
         for gen_idx in np.unique(exc_matrixT[:, 0]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
@@ -331,23 +341,19 @@ class VPP_ext_agent(Agent):
         Furthermore, the objective function should be compared if lower cost is reached.
         """
         all_bids_mod = np.array(all_bids_mod)
-        # load raw data
-        data = self.load_data(data_paths[data_names_dict[self.name]])
-        ppc0 = cases[data['case']]()
-        ppc_t = copy.deepcopy(ppc0)
 
         # modify according to prospective accepted bids: loop through my generators (excluding slack)
         origin_opf1_resgen = self.get_attr('opf1_resgen')
 
-        # load and modify according to current time and current OPF1 results!!
-        # max_generation from results of opf1, not from data['max_generation']
-        fixed_load = data['fixed_load']
-        price = data['price']
-        slack_idx = data['slack_idx']
-        ppc_t['bus'][:, 2] = fixed_load[t]  # from data - they're not controlled
-        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1], 4)  # from OPF1, without slack
-        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1], 4)  # both bounds
-        ppc_t['gencost'][:, 4] = price[t]  # from data
+        # max_generation from results of opf1, not from files
+        ppc_t = self.modify_fromfile(t, True, False, True)
+        slack_idx = self.load_data(data_paths[data_names_dict[self.name]])['slack_idx']
+        # ppc_t['gen'][0:, 8] = 0  # virtual slack generator removed
+        # ppc_t['gen'][0:, 9] = 0
+        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1] * (1 + relax_e3), 4)  # from OPF1, without slack
+        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1] * (1 - relax_e3), 4)  # both bounds
+
+        self.log_info("TEST1 " + str(ppc_t['gen'][:, [8, 9]]))
 
         for gen_idx in np.unique(all_bids_mod[:, 2]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
 
@@ -360,6 +366,9 @@ class VPP_ext_agent(Agent):
 
             c3 = np.where(ppc_t['gen'][:, 0] == gen_idx)[0]
             ppc_t['gen'][c3, [8, 9]] += np.round(p_bid, 4)  # add value from bidding, to Pmax,Pmin
+
+
+        self.log_info("TEST2" + str(ppc_t['gen'][:, [8, 9]]))
 
         # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
         bids_sum = np.round(np.sum(all_bids_mod[:, 3]), 4)
@@ -378,7 +387,7 @@ class VPP_ext_agent(Agent):
 
         costs = np.round(res['f'] - bids_revenue, 4)  # costs of vpp as costs of operation (slackcost for E = 0) - revenue from bids
 
-        self.set_attr(opfe3={'objf_bidsrevenue': costs})
+        self.set_attr(opfe3={'objf_inclbidsrevenue': costs})
 
         return res['success']
 
@@ -454,7 +463,7 @@ class VPP_ext_agent(Agent):
         This is called in case an excess agent does not have any requests from deficit agents in the deficit loop.
         :return:
         """
-        time.sleep(0.1)
+        time.sleep(small_wait)
         if self.get_attr('n_requests') == 0:
             self.log_info('I am E and I nobody wants to buy from me (n_requests=' + str(self.get_attr('n_requests')) +
                           '). I set consensus.')
@@ -470,6 +479,7 @@ class VPP_ext_agent(Agent):
 
     def bids_alignment1(self, mypc0, all_bids0):
 
+        mypc0 = mypc0[mypc0[:, 2].argsort()]  # make the pc in merit order in case it is not
         all_bids = copy.deepcopy(all_bids0)
 
         # fill the missing generators (0-bids)
@@ -488,52 +498,38 @@ class VPP_ext_agent(Agent):
                                           mypc0[mypc0[:, 0] == mis, 2]])
 
                     all_bids = np.append(all_bids, [to_append], axis=0)
-
         all_bids_sum = sum(all_bids0[:, 3])
-        # print(all_bids)
         all_bids_mod = copy.deepcopy(all_bids)
-        all_bids_mod[:, 3] = 0  # all bids values set to 0
 
-        for pc in mypc0:
-
+        for pc_i in range(0, len(mypc0)):
+            pc = mypc0[pc_i, :]
             gen_id = pc[0]
             gen_pmax = pc[1]
-            bid_1gen = all_bids0[all_bids0[:, 2] == gen_id]
+            bid_1gen = all_bids_mod[all_bids_mod[:, 2] == gen_id]
             sum_bids_1gen = sum(bid_1gen[:, 3])
 
-            if gen_pmax < sum_bids_1gen:  # if resource exceeded for 1 generator, then share the exces
+            if gen_pmax < sum_bids_1gen:  # if resource exceeded for 1 generator, then share the excess
                 self.log_info("Modification of bids of over-bidded gens... ")
-                for bid_msg in self.get_attr('iteration_memory_bid'):
-                    vpp_idx = data_names_dict[bid_msg['vpp_name']]
-                    bid0 = np.array(bid_msg['bid'])
-                    bids_sum = sum(bid0[:, 2])  # =request value in other words. =25
 
-                    mod = bids_sum / all_bids_sum  # 25/55 - waga tej vpp
+                for vpp_idx in np.unique(all_bids_mod[:, 0]):
 
                     c1 = np.where(all_bids_mod[:, 0] == vpp_idx)[0]  # raws where vpp
                     c2 = np.where(all_bids_mod[:, 2] == gen_id)[0]  # raws where gens
                     c3 = np.intersect1d(c1, c2)
 
-                    all_bids_mod[c3, 3] = np.round(mod * gen_pmax, 4)  # 25/55 * 20 = 9.1
+                    last_bid = all_bids_mod[c3, 3]
 
-            else:
-                self.log_info("Filling bids with the other generators' excess... ")
-                for bid_msg in self.get_attr('iteration_memory_bid'):
-                    vpp_idx = data_names_dict[bid_msg['vpp_name']]
-                    bid0 = np.array(bid_msg['bid'])
-                    bids_sum = sum(bid0[:, 2])  # =request value in other words. =25
+                    vpp_bids_sum = np.sum(all_bids_mod[c1, 3])
+                    vpp_waga = vpp_bids_sum / all_bids_sum  # 55/65
+                    vpp_assigned = vpp_waga * gen_pmax
 
-                    c1 = np.where(all_bids_mod[:, 0] == vpp_idx)[0]
-                    bidded_sofar = sum(all_bids_mod[c1, 3])  # = 9.1
-                    c2 = np.where(all_bids_mod[:, 2] == gen_id)[0]
-                    c3 = np.intersect1d(c1, c2)
-                    #if not c3:  # i.e. there was no original bid for that generator (e.g. the first one was sufficient)
-                    all_bids_mod[c3, 3] = round(bids_sum - bidded_sofar, 4)
+                    all_bids_mod[c3, 3] = np.round(vpp_assigned, 4)  # 55/65 * 20
 
-            # final check if the bids does not exceed excess
-            c2 = np.where(all_bids_mod[:, 2] == gen_id)[0]
-            if all_bids_mod[c2, 3].any() > gen_pmax:
-                self.log_info("Wrong bid modification: some gen bids exceed the available excess!! STOP")
-                sys.exit()
+                    rest = last_bid - vpp_assigned
+
+                    k1 = mypc0[pc_i+1, 0]  # id of next gen in merit order
+                    k2 = np.where(all_bids_mod[:, 2] == k1)[0]
+                    k3 = np.intersect1d(c1, k2)
+                    all_bids_mod[k3, 3] += np.round(rest, 4)
 
         return all_bids_mod
