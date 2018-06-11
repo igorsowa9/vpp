@@ -6,6 +6,7 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
+ts_0 = 0
 ts_n = 4*24  # number of timestamps of whole simulation
 
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]

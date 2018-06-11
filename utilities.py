@@ -207,8 +207,8 @@ global_results = np.zeros((ts_n, 1))
 
 
 def save_results_history(global_time, global_result, vpp_result):
-    vpp_results[global_time, :, :] = vpp_result
-    global_results[global_time, :] = global_result
+    vpp_results[global_time-ts_0, :, :] = vpp_result
+    global_results[global_time-ts_0, :] = global_result
     return 1
 
 
@@ -228,8 +228,19 @@ def show_results_history():
     # plt.subplot(311)
     pb = plt.plot(vpp_results[:, :, VPP_VALUE])
     plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
-
     plt.ylabel('value for vpp1')
     plt.axhline(0, color='black')
+
+    plt.figure(2)
+    for ch in range(vpp_n):
+        plt.subplot(411+ch)
+        pb = plt.plot(vpp_results[:, ch, OBJF1])
+        plt.setp(pb, color='r', linewidth=2.0)
+        pb = plt.plot(vpp_results[:, ch, OBJF1_NODSO])
+        plt.setp(pb, color='b', linewidth=2.0)
+        pb = plt.plot(vpp_results[:, ch, OBJF_AFTER])
+        plt.setp(pb, color='g', linewidth=2.0)
+        plt.ylabel('objf-red, nodso-blue, after-green')
+        plt.axhline(0, color='black')
 
     plt.show()

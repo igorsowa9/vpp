@@ -8,7 +8,7 @@ from settings_4bus import *
 from other_agents import VPP_ext_agent
 from utilities import system_consensus_check, erase_iteration_memory, erase_timestep_memory, print_data, show_results_history
 
-global_time = 0
+global_time = ts_0
 
 message_id_request = 1
 message_id_price_curve = 2
@@ -413,7 +413,7 @@ if __name__ == '__main__':
     # sys.exit()                  #
     #############################
 
-    for t in range(ts_n):
+    for t in range(ts_0, ts_0+ts_n):
 
         time.sleep(small_wait)
         global_time_set(t)
