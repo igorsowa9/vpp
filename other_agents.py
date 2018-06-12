@@ -353,8 +353,6 @@ class VPP_ext_agent(Agent):
         ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1] * (1 + relax_e3), 4)  # from OPF1, without slack
         ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1] * (1 - relax_e3), 4)  # both bounds
 
-        self.log_info("TEST1 " + str(ppc_t['gen'][:, [8, 9]]))
-
         for gen_idx in np.unique(all_bids_mod[:, 2]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
 
             c1 = np.where(all_bids_mod[:, 2] == gen_idx)[0]  # rows where gen
@@ -366,9 +364,6 @@ class VPP_ext_agent(Agent):
 
             c3 = np.where(ppc_t['gen'][:, 0] == gen_idx)[0]
             ppc_t['gen'][c3, [8, 9]] += np.round(p_bid, 4)  # add value from bidding, to Pmax,Pmin
-
-
-        self.log_info("TEST2" + str(ppc_t['gen'][:, [8, 9]]))
 
         # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
         bids_sum = np.round(np.sum(all_bids_mod[:, 3]), 4)
@@ -401,6 +396,8 @@ class VPP_ext_agent(Agent):
         memory = self.get_attr('iteration_memory_received_pc')
         need = abs(self.get_attr('opf1')['power_balance'])
 
+        self.log_info("I run runopf_d2 for iteration number: " + str(self.get_attr("n_iteration")))
+
         all_pc = []
         for mem in memory:
             if mem['value'] == False:
@@ -412,6 +409,7 @@ class VPP_ext_agent(Agent):
                                    mem["price_curve"][1, gn],
                                    mem["price_curve"][2, gn]])
         sorted_pc = sorted(all_pc, key=lambda price: price[3])
+        self.log_info("All current price curves together: " + "\n" + str(np.array(sorted_pc)))
         bids = []
         for pc in sorted_pc:
             pc_vpp_idx = pc[0]
@@ -435,7 +433,12 @@ class VPP_ext_agent(Agent):
         for m in missing:
             empty_bid = np.array([[m, 0, 0, 0]])
             bids = np.concatenate((bids, empty_bid), axis=0)
-        return bids  # list: [vpp_idx, gen_idx, bidgen_value, gen_price]
+
+        self.log_info("All chosen price curves to be sent as bids (during n_iteration = " +
+                      str(self.get_attr("n_iteration")) +
+                      "): " + "\n" + str(np.array(bids)))
+        self.set_attr(opfd2={"bids": bids})  # set attribute instead of return
+        return
 
     def runopf_d3(self):
         """
@@ -532,4 +535,16 @@ class VPP_ext_agent(Agent):
                     k3 = np.intersect1d(c1, k2)
                     all_bids_mod[k3, 3] += np.round(rest, 4)
 
-        return all_bids_mod
+        # new pc curves for particular vpps:
+        pc_msg = np.array([])
+
+        for v in np.unique(all_bids_mod[:, 0]):
+            pc = np.array(all_bids_mod[all_bids_mod[:, 0] == v, :][:, 2:]).T
+            np.concatenate((pc_msg, np.array([1])))
+            # np.append(pc_msg, [{"vpp_idx": v, "pc_curve": pc}])
+
+        print(pc_msg)
+
+        sys.exit()
+
+        return all_bids_mod, pc_msg

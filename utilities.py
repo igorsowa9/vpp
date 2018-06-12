@@ -94,8 +94,11 @@ def system_consensus_check(ns, global_time):
             if a.get_attr('opfe2'):  # for excess agents
                 incr_factor = a.load_data(data_paths[data_names_dict[alias]])['pc_matrix_price_increase_factor']
                 print('\tMy price curve for other VPPs (opfe2): (prices incr. factor: '+str(incr_factor)+')')
-                print('\t| gen_id | max.exc. | price |')
-                print('\t' + str(np.array(a.get_attr('opfe2')['pc_matrix']).T))
+                print('\t| gen_id\t| max.exc.\t | price\t |')
+                for pp in np.array(a.get_attr('opfe2')['pc_matrix'].T):
+                    strin = "\t| " + str(pp[0]) + "\t\t| " + str(pp[1]) + "\t\t| " + str(pp[2]) + "\t\t|"
+                    print(strin)
+                # print('\t' + str(np.array(a.get_attr('opfe2')['pc_matrix']).T))
                 print('\t'+'objf_greentodso (opfe2): ' + str(a.get_attr('opfe2')['objf_greentodso']) +
                       '\n\tobjf_exportall (opfe2): ' + str(a.get_attr('opfe2')['objf_exportall']))
 
@@ -115,9 +118,11 @@ def system_consensus_check(ns, global_time):
             for deal_vpp in a.get_attr('timestep_memory_mydeals'):
                 print("Contracts/deals:")
                 print("\tWith: " + str(deal_vpp[0]))
-                print("\t\tBid values [vpp_idx (where selling generator is), gen_idx, value, price]: ")
+                print("\t\tBid values:")
+                print("\t\t| vpp_idx (where selling generator is) "
+                      "\n\t\t\t\t| gen_idx | value | price | ")
                 for bid in deal_vpp[1]:
-                    print("\t\t" + str(bid))
+                    print("\t\t| " + str(bid[0]) + "\t| " +  str(bid[1]) + "\t| " + str(bid[2]) + "\t| " + str(bid[3]) + "\t| ")
 
         # saving into results_history:
         # before negotiation: excess/deficit value, objf, objf_noslackcost,
