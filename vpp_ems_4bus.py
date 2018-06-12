@@ -28,15 +28,15 @@ def global_time_set(new_time):
     print("--- all time variables set to: " + str(new_time) + " ---")
 
 
-def forall_iteration_set(value, vpp_exclude):
-
-    for alias in ns.agents():
-        if alias == vpp_exclude:
-            pass
-        else:
-            a = ns.proxy(alias)
-            a.set_attr(n_iteration=value)
-    print("--- all agents set new iteration value: " + str(value) + " ---")
+# def forall_iteration_set(value, vpp_exclude):
+#
+#     for alias in ns.agents():
+#         if alias == vpp_exclude:
+#             pass
+#         else:
+#             a = ns.proxy(alias)
+#             a.set_attr(n_iteration=value)
+#     print("--- all agents set new iteration value: " + str(value) + " ---")
 
 
 def request_handler(self, message):
@@ -210,8 +210,6 @@ def bid_offer_handler(self, message):
 
                 all_bids_mod, new_pc = self.bids_alignment1(mypc0, all_bids_nz)
 
-                self.log_info("NEWPC: " + str(new_pc))
-                sys.exit()
                 # opf should be checked if the transport of such a power is possible to the respective deficit vpps through the respective PCCs:
                 feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
                 if feasibility:
@@ -222,18 +220,23 @@ def bid_offer_handler(self, message):
                 else:
                     self.log_info('Unfeasibility in opf_e3! STOP.')
                     sys.exit()
-                # make the messages / modify the old ones
-                for bid_msg in self.get_attr('iteration_memory_bid'):
-                    vpp_idx = data_names_dict[bid_msg['vpp_name']]
-                    c1 = np.where(all_bids_mod[:, 0] == vpp_idx)[0]
-                    bid_mod = all_bids_mod[c1, :][:, 1:]
+                # # make the messages / modify the old ones
+                # for bid_msg in self.get_attr('iteration_memory_bid'):
+                #     vpp_idx = data_names_dict[bid_msg['vpp_name']]
+                #     c1 = np.where(all_bids_mod[:, 0] == vpp_idx)[0]
+                #     bid_mod = all_bids_mod[c1, :][:, 1:]
+                #
+                #     bid_answer_message = {'message_id': message_id_bid_accept_modify, 'vpp_name': self.name,
+                #                           'bid': bid_mod, 'str': "That's an accept-modified message for the bid."}
+                #     self.log_info("I send modified bid_answer_message:")
+                #     myaddr = self.bind('PUSH', alias='bid_answer')
+                #     ns.proxy(bid_msg['vpp_name']).connect(myaddr, handler=bid_answer_handler)
+                #     self.send('bid_answer', bid_answer_message)
 
-                    bid_answer_message = {'message_id': message_id_bid_accept_modify, 'vpp_name': self.name,
-                                          'bid': bid_mod, 'str': "That's an accept-modified message for the bid."}
-                    self.log_info("I send modified bid_answer_message:")
-                    myaddr = self.bind('PUSH', alias='bid_answer')
-                    ns.proxy(bid_msg['vpp_name']).connect(myaddr, handler=bid_answer_handler)
-                    self.send('bid_answer', bid_answer_message)
+                # break the iteration with saving new price curves:
+                self.log_info('Need another negotiation with new, modified price curves (tailored for each vpp).')
+
+
 
         else:  # increase n_iteration and return to new iteration
             self.log_info('Need another negotiation iteration because sum of bids (' + str(all_bids_sum) + ') > excess: (' +
@@ -242,6 +245,18 @@ def bid_offer_handler(self, message):
             n_i = copy.deepcopy(self.get_attr("n_iteration"))
             n_i = n_i + 1  # increase iteration (based on local value)
             self.set_attr(n_iteration=n_i)  # setting higher iteration value for the price increase only to this agent
+
+            carry_forward = {'pc_curves'}
+            self.set_attr
+
+            #####
+            #####
+            #####
+            #####
+            #####
+            #####
+            #####
+
             return  # break to start from the PC curve with increased iteration step
 
 

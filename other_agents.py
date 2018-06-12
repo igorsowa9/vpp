@@ -540,11 +540,6 @@ class VPP_ext_agent(Agent):
 
         for v in np.unique(all_bids_mod[:, 0]):
             pc = np.array(all_bids_mod[all_bids_mod[:, 0] == v, :][:, 2:]).T
-            np.concatenate((pc_msg, np.array([1])))
-            # np.append(pc_msg, [{"vpp_idx": v, "pc_curve": pc}])
-
-        print(pc_msg)
-
-        sys.exit()
+            pc_msg = np.append(pc_msg, [{"vpp_idx": int(v), "pc_curve": pc}])
 
         return all_bids_mod, pc_msg
