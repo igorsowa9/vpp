@@ -9,6 +9,8 @@ np.set_printoptions(suppress=True)
 ts_0 = 25
 ts_n = 15  # number of timestamps of whole simulation
 
+max_iteration = 10
+
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}
 data_paths = ["data/vpp4bus/vpp1-case5.json", "data/vpp4bus/vpp2-case4.json", "data/vpp4bus/vpp3-case4.json", "data/vpp4bus/vpp4-case4.json"]

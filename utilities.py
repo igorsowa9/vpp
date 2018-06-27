@@ -192,6 +192,7 @@ def erase_timestep_memory(ns):
         a.set_attr(requests=[])
         a.set_attr(opf1=[])
         a.set_attr(opf1_resgen=[])
+        a.set_attr(pc_memory=np.array([{} for _ in range(max_iteration)]))
 
 #
 # def erase_persistent_memory(ns):

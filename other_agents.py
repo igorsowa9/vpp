@@ -139,7 +139,7 @@ class VPP_ext_agent(Agent):
                 sorted_m = gens_exc_price[:, gens_exc_price[2, :].argsort()]
                 sorted_nonzero = sorted_m[:, np.nonzero(sorted_m[1, :])]
                 # sorted_nonzero_squeezed = np.reshape(sorted_nonzero, np.squeeze(sorted_nonzero).shape)
-                # pc_matrix = np.ndarray.tolist(sorted_nonzero_squeezed)
+
                 # increase price by a factor
                 exc_matrix = np.matrix(sorted_nonzero)
                 if exc_matrix.shape[0] == 1:
@@ -152,31 +152,34 @@ class VPP_ext_agent(Agent):
                                     'max_excess': max_excess,
                                     'objf': objf,
                                     'objf_noslackcost': objf_noslackcost,
-                                    # 'objf_greentodso': objf_greentodso, # this comes from opf_e3 for "todso" case
-                                    # 'pc_matrix': np.matrix(pc_matrix_incr), # price curves derived in opf_e2
                                     'exc_matrix': np.array(exc_matrix)})
             return True
         else:
             self.log_info("OPF1 does not converge. STOP.")
             sys.exit()
 
-    def runopf_e2(self, exc_matrix, t):
+    def runopf_e2(self, t):
         """
         Excess ageents calculations, before sending the price curves.
         This include verification of transmitting the excess to the other vpps (only to the ones that send requests),
         but also to DSO.
         """
+        exc_matrix = self.get_attr('opf1')['exc_matrix']
         generation_type = np.array(self.load_data(data_paths[data_names_dict[self.name]])['generation_type'])
 
-        # build price curve according to pc_matrix_price_increase_factor
-        pc_matrix_incr = copy.deepcopy(exc_matrix)
-        pc_matrix_incr[2, :] = pc_matrix_incr[2, :] * \
+        ######## build price curve according to pc_matrix_price_increase_factor
+        pc_matrix_incr = copy.deepcopy(exc_matrix.T)
+        pc_matrix_incr[:, 2] = pc_matrix_incr[:, 2] * \
                                self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor']
         pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
-        self.log_info("Final pc matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
+        self.log_info("OPFe2: PC matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
         self.set_attr(opfe2={'pc_matrix': np.array(pc_matrix_incr)})
 
-        # load, update, modify data according to files and opf1
+        # make a memory of price curves along all the iterations up to maximum one
+        n_iteration = self.get_attr("n_iteration")
+        self.get_attr('pc_memory')[n_iteration].update({'all': np.array(pc_matrix_incr)})
+
+        ######### load, update, modify data according to files and opf1
         origin_opf1_resgen = self.get_attr('opf1_resgen')
         if opf1_prinpf:
             print('bus \ value \ pmax \ pmin (original opf1)')
@@ -242,7 +245,7 @@ class VPP_ext_agent(Agent):
                 if garr[4] == high_price:
                     g_idx = np.array(show_realcost[g - 1, 0])  # bus number from the raw above
                     garr[0] = g_idx
-                    temp = np.array(pc_matrix_incr)
+                    temp = np.array(pc_matrix_incr.T)
                     p = temp[2, temp[0, :] == g_idx]  # increased price of the resource
                     garr[4] = p
                     show_realcost[g, :] = garr
@@ -307,7 +310,7 @@ class VPP_ext_agent(Agent):
             if garr[4] == high_price:
                 g_idx = np.array(show_realcost[g - 1, 0])  # bus number from the raw above
                 garr[0] = g_idx
-                temp = np.array(pc_matrix_incr)
+                temp = np.array(pc_matrix_incr.T)
                 p = temp[2, temp[0, :] == g_idx]  # increased price of the resource
                 garr[4] = p
                 show_realcost[g, :] = garr
@@ -403,11 +406,11 @@ class VPP_ext_agent(Agent):
             if mem['value'] == False:
                 continue
             else:
-                for gn in range(0, mem['price_curve'].shape[1]):
+                for gn in range(0, mem['price_curve'].shape[0]):
                     all_pc.append([data_names_dict[mem["vpp_name"]],
-                                   mem["price_curve"][0, gn],
-                                   mem["price_curve"][1, gn],
-                                   mem["price_curve"][2, gn]])
+                                   mem["price_curve"][gn, 0],
+                                   mem["price_curve"][gn, 1],
+                                   mem["price_curve"][gn, 2]])
         sorted_pc = sorted(all_pc, key=lambda price: price[3])
         self.log_info("All current price curves together: " + "\n" + str(np.array(sorted_pc)))
         bids = []
