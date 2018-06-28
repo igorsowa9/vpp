@@ -105,8 +105,6 @@ class VPP_ext_agent(Agent):
             self.log_info("I have successfully run the OPF1.")
             self.set_attr(opf1_resgen=res['gen'])
 
-            print("TEST000: " + str(round(res['gen'][slack_idx, 1], 4)))
-
             if round(res['gen'][slack_idx, 1], 4) > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
                 self.set_attr(current_status='D')
                 power_balance = round(-1 * res['gen'][slack_idx, 1], 4)  # from vpp perspective i.e. negative if deficit
@@ -161,23 +159,42 @@ class VPP_ext_agent(Agent):
     def runopf_e2(self, t):
         """
         Excess ageents calculations, before sending the price curves.
+        Derivation of the PC for this iteration step. From excess directly, or from memory.
         This include verification of transmitting the excess to the other vpps (only to the ones that send requests),
         but also to DSO.
         """
         exc_matrix = self.get_attr('opf1')['exc_matrix']
         generation_type = np.array(self.load_data(data_paths[data_names_dict[self.name]])['generation_type'])
 
-        ######## build price curve according to pc_matrix_price_increase_factor
-        pc_matrix_incr = copy.deepcopy(exc_matrix.T)
-        pc_matrix_incr[:, 2] = pc_matrix_incr[:, 2] * \
-                               self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor']
-        pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
-        self.log_info("OPFe2: PC matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
-        self.set_attr(opfe2={'pc_matrix': np.array(pc_matrix_incr)})
-
-        # make a memory of price curves along all the iterations up to maximum one
         n_iteration = self.get_attr("n_iteration")
-        self.get_attr('pc_memory')[n_iteration].update({'all': np.array(pc_matrix_incr)})
+        ######## build price curve according to pc_matrix_price_increase_factor (gen prices * increase factor)
+
+        if n_iteration == 0:  # if its 0 iteration, make according to pr_matrix_price_increase_factor (each vpp has own)
+            pc_matrix_incr = copy.deepcopy(exc_matrix.T)
+            pc_matrix_incr[:, 2] = pc_matrix_incr[:, 2] * self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor']
+            pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
+
+            self.log_info("OPFe2: PC matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
+            self.set_attr(opfe2={'pc_matrix': np.array(pc_matrix_incr)})
+            self.get_attr('pc_memory')[n_iteration].update({'all': np.array(pc_matrix_incr)})
+        elif n_iteration > 0:
+            if self.get_attr('pc_memory')[n_iteration] == {}: # this should make PC for ALL if there is no particular PCs
+                price_curve = copy.deepcopy(self.get_attr('pc_memory')[0]['all'])
+                price_increase_factor = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor']
+                # make a new pc according to "price increase policy" for now just linear increase for each vpp:
+                prices = price_curve[:, 2]
+                if type(prices) == np.float64:  # i.e. if there is only one excess generator, there is no list but float
+                    new_prices = prices + price_increase_factor*self.get_attr("n_iteration")
+                else:
+                    new_prices = [x + price_increase_factor*self.get_attr("n_iteration") for x in prices]
+                price_curve[:, 2] = new_prices
+
+                pc_matrix_incr = copy.deepcopy(price_curve)
+                self.get_attr('pc_memory')[n_iteration].update({'all': np.array(pc_matrix_incr)})
+
+            else:  # if it exists already (i.e. the particular PCs exist)
+                pass
+
 
         ######### load, update, modify data according to files and opf1
         origin_opf1_resgen = self.get_attr('opf1_resgen')
@@ -194,7 +211,8 @@ class VPP_ext_agent(Agent):
         ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1] * (1 + relax_e2), 4)  # from OPF1, without slack
         ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1] * (1 - relax_e2), 4)  # both bounds
 
-        # calculate prospective revenue if green energy sold to DSO
+        ###### calculate prospective revenue if green energy sold to DSO
+        self.log_info("I calculate prospective revenue if green energy sold to DSO or all energy to DSO (in OPFe2)")
         c1 = generation_type[exc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
         c2 = np.isin(c1, green_sources)  # choose only green ones
         c3 = np.reshape(c2, np.squeeze(c2).shape)
@@ -207,8 +225,7 @@ class VPP_ext_agent(Agent):
             ppc_tg = copy.deepcopy(ppc_t)
             exc_matrix_greenT = np.array(exc_matrix_green.T)
 
-            for gen_idx in np.unique(exc_matrix_greenT[:,
-                                     0]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
+            for gen_idx in np.unique(exc_matrix_greenT[:, 0]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
 
                 c1 = np.where(exc_matrix_greenT[:, 0] == gen_idx)[0]  # rows where gen
                 p_bid = np.round(np.sum(exc_matrix_greenT[c1, 1]), 4)  # total value of bidded power for generator
@@ -412,14 +429,14 @@ class VPP_ext_agent(Agent):
                                    mem["price_curve"][gn, 1],
                                    mem["price_curve"][gn, 2]])
         sorted_pc = sorted(all_pc, key=lambda price: price[3])
-        self.log_info("All current price curves together: " + "\n" + str(np.array(sorted_pc)))
+        self.log_info("All current price curves together: " + "\n" + str(np.array(sorted_pc)) + " I need: " + str(need))
         bids = []
         for pc in sorted_pc:
             pc_vpp_idx = pc[0]
             pc_gen_idx = pc[1]
             pc_maxval = float(pc[2])
             pc_price = float(pc[3])
-            if need != 0 and need > pc_maxval:
+            if need != 0 and need >= pc_maxval:
                 bids.append([pc_vpp_idx, pc_gen_idx, pc_maxval, pc_price])
                 need = need - pc_maxval
             elif need != 0 and need < pc_maxval:

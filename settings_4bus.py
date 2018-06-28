@@ -25,7 +25,6 @@ adj_matrix = [[True, True, True, True],
 
 small_wait = 0.1  # waiting time to separate some steps, for testing
 iteration_wait = 0.1
-price_increase_factor = 6.0
 
 # the excess agents increase the original production prices when publishing the price curve, increase by 10%
 # when the excess is sold for the original prices, there is no benefit for excess agents since:

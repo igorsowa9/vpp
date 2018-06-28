@@ -11,6 +11,7 @@
 	"bus_n": 5,
 
 	"pc_matrix_price_increase_factor": 1.1,
+	"linear_price_increase_value": 2.0,
 
 	"dso_price": 200,
 

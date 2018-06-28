@@ -77,7 +77,10 @@ def system_consensus_check(ns, global_time):
 
     if n_consensus == vpp_n:
         print("- Multi-consensus reached (" + str(n_consensus) + "/" + str(vpp_n) + ") for time: ", global_time)
-        print("##################")
+        print("- n_iteration values: ")
+        for alias in ns.agents():
+            print(str(alias) + ": " + str(ns.proxy(alias).get_attr('n_iteration')))
+        print("\n\n##################")
         print("##################")
         print("----- Deals: -----")
         print("##################")
@@ -95,7 +98,7 @@ def system_consensus_check(ns, global_time):
                 incr_factor = a.load_data(data_paths[data_names_dict[alias]])['pc_matrix_price_increase_factor']
                 print('\tMy price curve for other VPPs (opfe2): (prices incr. factor: '+str(incr_factor)+')')
                 print('\t| gen_id\t| max.exc.\t | price\t |')
-                for pp in np.array(a.get_attr('opfe2')['pc_matrix'].T):
+                for pp in np.array(a.get_attr('opfe2')['pc_matrix']):
                     strin = "\t| " + str(pp[0]) + "\t\t| " + str(pp[1]) + "\t\t| " + str(pp[2]) + "\t\t|"
                     print(strin)
                 # print('\t' + str(np.array(a.get_attr('opfe2')['pc_matrix']).T))
@@ -115,8 +118,8 @@ def system_consensus_check(ns, global_time):
             else:
                 print('\tI did not run opfe3 / opfd3.')
 
+            print("Contracts/deals:")
             for deal_vpp in a.get_attr('timestep_memory_mydeals'):
-                print("Contracts/deals:")
                 print("\tWith: " + str(deal_vpp[0]))
                 print("\t\tBid values:")
                 print("\t\t| vpp_idx (where selling generator is) "
@@ -177,7 +180,6 @@ def erase_iteration_memory(ns):
         a.set_attr(n_bids=0)
         a.set_attr(opfe3=0)
         a.set_attr(opfd3=0)
-        a.set_attr(opfe2=0)
         a.set_attr(opfd2=0)
 
 
@@ -193,6 +195,7 @@ def erase_timestep_memory(ns):
         a.set_attr(opf1=[])
         a.set_attr(opf1_resgen=[])
         a.set_attr(pc_memory=np.array([{} for _ in range(max_iteration)]))
+        a.set_attr(opfe2=0)  # this is set only once, refers to pc_memory, that's why it's here for now
 
 #
 # def erase_persistent_memory(ns):

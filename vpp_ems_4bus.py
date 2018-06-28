@@ -42,12 +42,12 @@ def request_handler(self, message):
 
 def requests_execute(self, myname, requests):
     """
-    The Excess agents that receive some requests answer either NO or with price curves.
+    An Excess agent that receive some requests answer either NO or with price curves.
     This includes running opf1.
     Additionally the opf1 is extended to check the feasibility of price curves (and profitability)
     :param self:
     :param myname:
-    :param requests: e.g. {'message_id': 1, 'vpp_name': 'vpp1', 'value': 25.0}
+    :param requests: e.g. {'from_vpp': 'vpp1', 'power_value': 25.0}
     :return:
     """
 
@@ -55,32 +55,62 @@ def requests_execute(self, myname, requests):
         from_vpp = req["vpp_name"]
         myaddr = self.bind('PUSH', alias='price_curve_reply')
         ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
-        opf1 = self.get_attr('opf1')  # download opf1 results
 
-        if opf1['power_balance'] == 0 and opf1['max_excess'] > 0:  # max_excess > 0
+    opf1 = self.get_attr('opf1')  # download opf1 results
 
+    if opf1['power_balance'] == 0 and opf1['max_excess'] > 0:  # max_excess > 0 i.e. if excess agent
+
+        val = float(opf1['max_excess'])  # max_excess
+        if not self.get_attr('opfe2'):
             self.runopf_e2(global_time)  # make price curves based on the excess matrix
-            val = float(opf1['max_excess'])  # max_excess
 
-            opfe2 = self.get_attr('opfe2')
-            price_curve = copy.deepcopy(opfe2['pc_matrix'])
+        self.log_info("Request execution. My current iteration number for request execution: " + str(self.get_attr("n_iteration")))
+        self.log_info("I have " + str(opf1['max_excess']) + " to sell. Sending price curve... (total excess="
+                      + str(val) + ", with price curves matrix about generators)")
 
-            # increase of price due to iteration - it should be downloaded from memory
-            prices = price_curve[:, 2]
-            if type(prices) == np.float64:  # i.e. if there is only one excess generator, there is no list but float
-                new_prices = prices + price_increase_factor*self.get_attr("n_iteration")
-            else:
-                new_prices = [x + price_increase_factor*self.get_attr("n_iteration") for x in prices]
-            price_curve[:, 2] = new_prices
+        # price_curve should be for current iteration
+        price_curves_dict = copy.deepcopy(self.get_attr("pc_memory")[self.get_attr("n_iteration")])
+        self.log_info("price_curves_dict: " + str(price_curves_dict))
 
-            self.log_info("I have " + str(opf1['max_excess']) + " to sell. Sending price curve... "
-                                                     "(total excess=" + str(val) + ", with price curves matrix about generators)")
+        if 'all' in price_curves_dict.keys():  # single price curve
+            price_curve = price_curves_dict["all"]
+            self.set_attr(iteration_memory_my_pc=np.array(price_curve))
+
             price_curve_message = {"message_id": message_id_price_curve, "vpp_name": myname,
                                    "value": val, "price_curve": price_curve}
+            for req in requests:
+                from_vpp = req["vpp_name"]
+                myaddr = self.bind('PUSH', alias='price_curve_reply')
+                ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
+                self.send('price_curve_reply', price_curve_message)
+
+        elif price_curves_dict == {}:
+            self.log_info("No PCs for current iteration. STOP.")
+            sys.exit()
+
+        else:  # particular price curves
+            price_curve = np.array([]).reshape(0, 3)
+            for vpp_name, pc in price_curves_dict.items():  # make all PCs together
+                price_curve = np.concatenate((price_curve, pc))
             self.set_attr(iteration_memory_my_pc=np.array(price_curve))
-            self.send('price_curve_reply', price_curve_message)
-        else:
-            self.log_info("I cannot sell (I am D or B). Sending rejection...")
+
+            for req in requests:
+                from_vpp = req["vpp_name"]
+                myaddr = self.bind('PUSH', alias='price_curve_reply')
+                ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
+
+                pc = price_curves_dict[from_vpp]
+                val = np.round(np.sum(pc[:, 1]), 4)
+                price_curve_message = {"message_id": message_id_price_curve, "vpp_name": myname,
+                                       "value": val, "price_curve": pc}
+                self.send('price_curve_reply', price_curve_message)
+
+    else:
+        self.log_info("I cannot sell (I am D or B). Sending rejections...")
+        for req in requests:
+            from_vpp = req["vpp_name"]
+            myaddr = self.bind('PUSH', alias='price_curve_reply')
+            ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
             price_curve_message = {"message_id": message_id_price_curve, "vpp_name": myname,
                                    "value": False, "price_curve": False}
             self.send('price_curve_reply', price_curve_message)
@@ -90,12 +120,11 @@ def price_curve_handler(self, message):
     """
     Deficit reaction for the received price curve from Excess. Bids creation and sending to the Exc (also empty bids)
     """
-
     from_vpp = message["vpp_name"]
     possible_quantity = message["value"]
     price_curve = message["price_curve"]
 
-    self.log_info('Price curve received from: ' + from_vpp +
+    self.log_info('Price curve received from (my n_iter='+str(self.get_attr('n_iteration'))+'): ' + from_vpp +
                   ' Possible total quantity: ' + str(possible_quantity) +
                   ' Price curve matrix: ' + str(price_curve))
     # save all the curves
@@ -103,13 +132,15 @@ def price_curve_handler(self, message):
 
     # after receiving all the curves&rejections, need to run my own opf (OPF2) now, implement to own system,
     # create the bids...
+
     if len(self.get_attr('iteration_memory_received_pc')) == sum(self.get_attr('adj'))-1:
-        self.log_info('All price curves received (from all neigh.) (' + str(len(self.get_attr('iteration_memory_received_pc'))) +
+        self.log_info('All price curves/or empty received (from all neigh.) (' + str(len(self.get_attr('iteration_memory_received_pc'))) +
                       '), need to run new opf, derive bids etc...')
         self.runopf_d2()  # bids come as multi-list: [vpp_idx, gen_idx, bidgen_value, gen_price],[...]
         bids = self.get_attr("opfd2")['bids']
         self.log_info("I am gonna send those bids (n_iteration=" + str(self.get_attr("n_iteration")) + "): " + str(bids))
         # bids = sorted(bids, key=lambda vpp: vpp[0])
+
         for vi in range(0, vpp_n):
             bid = bids[np.where(bids[:, 0] == vi), :][0]  # take bids for only one vpp (might be bids for multiple gens)
             if len(bid) > 0:  # send bids back to the price-curve senders, but counts only bids>0
@@ -153,21 +184,20 @@ def bid_offer_handler(self, message):
                       "), excluding vpps with empty bids. New n_requests="+str(len(np.unique(all_bids_nz[:, 0]))))
         self.set_attr(n_requests=len(np.unique(all_bids_nz[:, 0])))
 
-        all_bids_sum = sum(all_bids_nz[:, 3])  # sum all the bid power (vppidx, genidx, power, price)
+        all_bids_sum = np.round(sum(all_bids_nz[:, 3]), 4)  # sum all the bid power (vppidx, genidx, power, price)
 
 
         if all_bids_sum <= self.get_attr('opf1')['max_excess']:  # if sum of all is less then excess
             self.log_info('I have sufficient generation to accept all bids (bids total sum ('+str(all_bids_sum)+') <= ('+str(self.get_attr('opf1')['max_excess'])+
                           ') my whole excess), but I have to check according to available generators...')
             # need to share between the gens if necessary.
-            mypc0 = self.get_attr('iteration_memory_my_pc')  # original price curve
-
+            mypc0 = self.get_attr('iteration_memory_my_pc')  # current price curves
             # checking if any of bid sum / generator do not exceed available generator powers
             count = 0
             for pc in mypc0:
                 gen_id = pc[0]
                 bid_1gen = all_bids_nz[all_bids_nz[:, 2] == gen_id]
-                if sum(bid_1gen[:, 3]) > mypc0[mypc0[:, 0] == gen_id, 1]:
+                if np.sum(bid_1gen[:, 3]) > np.sum(mypc0[mypc0[:, 0] == gen_id, 1]):
                     count = count + 1
                     self.log_info("Need sharing between the gens i.e. modify the bids")
 
@@ -217,13 +247,13 @@ def bid_offer_handler(self, message):
 
                     for vpp_idx in np.unique(all_bids_mod[:, 0]):
                         pc = all_bids_mod[all_bids_mod[:, 0] == vpp_idx, :]
-                        self.get_attr('pc_memory')[int(n_i)].update({data_names[int(vpp_idx)]: np.array(pc)})
+                        self.get_attr('pc_memory')[int(n_i)].update({data_names[int(vpp_idx)]: np.array(pc[:, 2:])})
 
-                    self.log_info("Alignment: PC matrix for requesters according to alignment (new n_iteration = " +
-                                  str(n_i) + "): " + str(self.get_attr('pc_memory')[n_i]) + ". BREAK iteration" +
-                                  '\nNeed another negotiation with those new, modified price curves (tailored for each vpp)')
+                    self.log_info("Alignment: PC matrix for requesters according to alignment: "
+                                  + str(self.get_attr('pc_memory')[n_i]) + '\nNeed another negotiation with those new, '
+                                  'modified price curves (tailored for each vpp)')
+                    self.log_info("I BREAK iteration. My n_iteration becomes: " + str(self.get_attr('n_iteration')))
                     return
-
                 else:
                     self.log_info('Unfeasibility in opf_e3! STOP.')
                     sys.exit()
@@ -235,7 +265,7 @@ def bid_offer_handler(self, message):
             n_i = copy.deepcopy(self.get_attr("n_iteration"))
             n_i = n_i + 1  # increase iteration (based on local value)
             self.set_attr(n_iteration=n_i)  # setting higher iteration value for the price increase only to this agent
-
+            self.log_info("I BREAK iteration. My n_iteration becomes: " + str(self.get_attr('n_iteration')))
             return  # break to start from the PC curve with increased iteration step
 
 
@@ -328,6 +358,9 @@ def runOneTimestep():
         agent = ns.proxy(data_names[vpp_idx])
         print(str(data_names[vpp_idx]) + ":\n(to balance, max exc, objf noslack: " + str(agent.get_attr('opf1')) +
               ") \n(no. of received requests: " + str(agent.get_attr('n_requests')) + ") : \n" + str(agent.get_attr('requests')) + "\n")
+    print("#######################")
+    print("#######################")
+    print("#######################\n\n")
 
     while not multi_consensus:
 
