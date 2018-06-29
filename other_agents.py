@@ -176,10 +176,10 @@ class VPP_ext_agent(Agent):
 
             self.log_info("OPFe2: PC matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
             self.set_attr(opfe2={'pc_matrix': np.array(pc_matrix_incr)})
-            self.get_attr('pc_memory')[n_iteration].update({'all': np.array(pc_matrix_incr)})
+            self.get_attr('pc_memory_exc')[n_iteration].update({'all': np.array(pc_matrix_incr)})
         elif n_iteration > 0:
-            if self.get_attr('pc_memory')[n_iteration] == {}: # this should make PC for ALL if there is no particular PCs
-                price_curve = copy.deepcopy(self.get_attr('pc_memory')[0]['all'])
+            if self.get_attr('pc_memory_exc')[n_iteration] == {}: # this should make PC for ALL if there is no particular PCs
+                price_curve = copy.deepcopy(self.get_attr('pc_memory_exc')[0]['all'])
                 price_increase_factor = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor']
                 # make a new pc according to "price increase policy" for now just linear increase for each vpp:
                 prices = price_curve[:, 2]
@@ -190,7 +190,7 @@ class VPP_ext_agent(Agent):
                 price_curve[:, 2] = new_prices
 
                 pc_matrix_incr = copy.deepcopy(price_curve)
-                self.get_attr('pc_memory')[n_iteration].update({'all': np.array(pc_matrix_incr)})
+                self.get_attr('pc_memory_exc')[n_iteration].update({'all': np.array(pc_matrix_incr)})
 
             else:  # if it exists already (i.e. the particular PCs exist)
                 pass
@@ -472,6 +472,7 @@ class VPP_ext_agent(Agent):
             mydeals.append([accepted_bid['vpp_name'], accepted_bid['bid']])
         self.set_attr(timestep_memory_mydeals=mydeals)
         self.set_attr(consensus=True)
+        self.log_info("I set consensus in runopf_d3.")
 
         cost = 0
         for deal_vpp in self.get_attr('timestep_memory_mydeals'):

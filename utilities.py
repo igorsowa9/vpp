@@ -96,7 +96,7 @@ def system_consensus_check(ns, global_time):
                   '\n\tobjf_noslackcost (i.e. dso) (opf1): ' + str(a.get_attr('opf1')['objf_noslackcost']))
             if a.get_attr('opfe2'):  # for excess agents
                 incr_factor = a.load_data(data_paths[data_names_dict[alias]])['pc_matrix_price_increase_factor']
-                print('\tMy price curve for other VPPs (opfe2): (prices incr. factor: '+str(incr_factor)+')')
+                print('\tMy initial price curve for other VPPs (opfe2): (prices incr. factor: '+str(incr_factor)+')')
                 print('\t| gen_id\t| max.exc.\t | price\t |')
                 for pp in np.array(a.get_attr('opfe2')['pc_matrix']):
                     strin = "\t| " + str(pp[0]) + "\t\t| " + str(pp[1]) + "\t\t| " + str(pp[2]) + "\t\t|"
@@ -104,6 +104,9 @@ def system_consensus_check(ns, global_time):
                 # print('\t' + str(np.array(a.get_attr('opfe2')['pc_matrix']).T))
                 print('\t'+'objf_greentodso (opfe2): ' + str(a.get_attr('opfe2')['objf_greentodso']) +
                       '\n\tobjf_exportall (opfe2): ' + str(a.get_attr('opfe2')['objf_exportall']))
+            else:
+                print(
+                    '\tI did not run opfe2 (i did not have requests), therefore no price curve available)')
 
             print('After:')
             if a.get_attr('opfe3'):  # for excess agents
@@ -126,6 +129,7 @@ def system_consensus_check(ns, global_time):
                       "\n\t\t\t\t| gen_idx | value | price | ")
                 for bid in deal_vpp[1]:
                     print("\t\t| " + str(bid[0]) + "\t| " +  str(bid[1]) + "\t| " + str(bid[2]) + "\t| " + str(bid[3]) + "\t| ")
+                print("\n")
 
         # saving into results_history:
         # before negotiation: excess/deficit value, objf, objf_noslackcost,
@@ -181,6 +185,7 @@ def erase_iteration_memory(ns):
         a.set_attr(opfe3=0)
         a.set_attr(opfd3=0)
         a.set_attr(opfd2=0)
+        a.set_attr(consensus=False)
 
 
 def erase_timestep_memory(ns):
@@ -190,12 +195,13 @@ def erase_timestep_memory(ns):
         a.set_attr(timestep_memory_mydeals=[])
         a.set_attr(n_iteration=0)
         a.set_attr(n_requests=0)
-        a.set_attr(consensus=False)
+        a.set_attr(n_bidoffers=0)
         a.set_attr(requests=[])
         a.set_attr(opf1=[])
         a.set_attr(opf1_resgen=[])
-        a.set_attr(pc_memory=np.array([{} for _ in range(max_iteration)]))
-        a.set_attr(opfe2=0)  # this is set only once, refers to pc_memory, that's why it's here for now
+        a.set_attr(pc_memory_exc=np.array([{} for _ in range(max_iteration)]))
+        a.set_attr(opfe2=0)  # this is set only once, refers to pc_memory_exc, that's why it's here for now
+        a.set_attr(pc_memory_def=np.array([{} for _ in range(max_iteration)]))
 
 #
 # def erase_persistent_memory(ns):

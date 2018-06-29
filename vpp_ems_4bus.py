@@ -28,6 +28,15 @@ def global_time_set(new_time):
     print("--- all time variables set to: " + str(new_time) + " ---")
 
 
+def each_iteration_set(agent_name, it):
+    for alias in ns.agents():
+        if alias == agent_name:
+            continue
+        a = ns.proxy(alias)
+        a.set_attr(n_iteration=int(it))
+    print("--- all n_iterations set to: " + str(it) + " ---")
+
+
 def request_handler(self, message):
     """
     Excesses' gathering of requests
@@ -64,13 +73,23 @@ def requests_execute(self, myname, requests):
         if not self.get_attr('opfe2'):
             self.runopf_e2(global_time)  # make price curves based on the excess matrix
 
-        self.log_info("Request execution. My current iteration number for request execution: " + str(self.get_attr("n_iteration")))
+        self.log_info("Excess agent request execution. My current iteration number for request execution: " + str(self.get_attr("n_iteration")))
         self.log_info("I have " + str(opf1['max_excess']) + " to sell. Sending price curve... (total excess="
                       + str(val) + ", with price curves matrix about generators)")
 
         # price_curve should be for current iteration
-        price_curves_dict = copy.deepcopy(self.get_attr("pc_memory")[self.get_attr("n_iteration")])
-        self.log_info("price_curves_dict: " + str(price_curves_dict))
+        n_iteration = self.get_attr("n_iteration")
+        price_curves_dict = copy.deepcopy(self.get_attr("pc_memory_exc")[n_iteration])
+
+        if price_curves_dict == {}:
+            self.log_info(
+                "No my excess PCs for current iteration. I copy the previous iteration step and execute requests.")
+            price_curves_dict = copy.deepcopy(self.get_attr("pc_memory_exc")[n_iteration - 1])
+            temp = copy.deepcopy(self.get_attr("pc_memory_exc"))
+            temp[n_iteration] = temp[n_iteration-1]
+            self.set_attr(pc_memory_exc=temp)
+
+        self.log_info("price_curves_dict for this iteration: " + str(self.get_attr('pc_memory_exc')[n_iteration]))
 
         if 'all' in price_curves_dict.keys():  # single price curve
             price_curve = price_curves_dict["all"]
@@ -83,10 +102,6 @@ def requests_execute(self, myname, requests):
                 myaddr = self.bind('PUSH', alias='price_curve_reply')
                 ns.proxy(from_vpp).connect(myaddr, handler=price_curve_handler)
                 self.send('price_curve_reply', price_curve_message)
-
-        elif price_curves_dict == {}:
-            self.log_info("No PCs for current iteration. STOP.")
-            sys.exit()
 
         else:  # particular price curves
             price_curve = np.array([]).reshape(0, 3)
@@ -106,6 +121,8 @@ def requests_execute(self, myname, requests):
                 self.send('price_curve_reply', price_curve_message)
 
     else:
+        self.log_info("Deficit agent request execution. My current iteration number for request execution: " + str(
+            self.get_attr("n_iteration")))
         self.log_info("I cannot sell (I am D or B). Sending rejections...")
         for req in requests:
             from_vpp = req["vpp_name"]
@@ -124,22 +141,30 @@ def price_curve_handler(self, message):
     possible_quantity = message["value"]
     price_curve = message["price_curve"]
 
-    self.log_info('Price curve received from (my n_iter='+str(self.get_attr('n_iteration'))+'): ' + from_vpp +
-                  ' Possible total quantity: ' + str(possible_quantity) +
-                  ' Price curve matrix: ' + str(price_curve))
     # save all the curves
     self.get_attr('iteration_memory_received_pc').append(message)
+
+    # save nonzero curves to pc memory def for this iteration
+    n_iteration = self.get_attr("n_iteration")
+    if message['price_curve'] is not False:
+        self.get_attr('pc_memory_def')[n_iteration].update({message['vpp_name']: np.array(message['price_curve'])})
+
+    self.log_info('Price curve received from (my n_iter='+str(self.get_attr('n_iteration'))+'): ' + from_vpp +
+                  ' Possible total quantity: ' + str(possible_quantity) +
+                  ' Price curve matrix: ' + str(price_curve) + '\nSo far received: ' +
+                  str(len(self.get_attr('iteration_memory_received_pc'))) + '/' + str(sum(self.get_attr('adj'))-1))
 
     # after receiving all the curves&rejections, need to run my own opf (OPF2) now, implement to own system,
     # create the bids...
 
     if len(self.get_attr('iteration_memory_received_pc')) == sum(self.get_attr('adj'))-1:
+        # print("test004:" + str(self.get_attr('pc_memory_def')))
         self.log_info('All price curves/or empty received (from all neigh.) (' + str(len(self.get_attr('iteration_memory_received_pc'))) +
                       '), need to run new opf, derive bids etc...')
+        # pp(self.get_attr('iteration_memory_received_pc'))
+        # pp(self.get_attr('pc_memory_def'))
         self.runopf_d2()  # bids come as multi-list: [vpp_idx, gen_idx, bidgen_value, gen_price],[...]
         bids = self.get_attr("opfd2")['bids']
-        self.log_info("I am gonna send those bids (n_iteration=" + str(self.get_attr("n_iteration")) + "): " + str(bids))
-        # bids = sorted(bids, key=lambda vpp: vpp[0])
 
         for vi in range(0, vpp_n):
             bid = bids[np.where(bids[:, 0] == vi), :][0]  # take bids for only one vpp (might be bids for multiple gens)
@@ -180,12 +205,15 @@ def bid_offer_handler(self, message):
         c1 = np.array(all_bids[:, 3] != 0)
         all_bids_nz = np.array(all_bids[c1[:, 0], :])
         self.log_info("My all non-zero bids from deficit vpps ("+str(len(all_bids_nz))+"): " + str(all_bids_nz))
-        self.log_info("I compare and modify if necessary the original n_request number ("+str(self.get_attr('n_requests')) +
-                      "), excluding vpps with empty bids. New n_requests="+str(len(np.unique(all_bids_nz[:, 0]))))
-        self.set_attr(n_requests=len(np.unique(all_bids_nz[:, 0])))
+        self.log_info("I compare with n_request ("+str(self.get_attr('n_requests')) +
+                      ") and introduce n_bidoffers number, excluding vpps with empty bids. n_bidoffers="+str(len(np.unique(all_bids_nz[:, 0]))))
+        self.set_attr(n_bidoffers=len(np.unique(all_bids_nz[:, 0])))
+        if self.get_attr('n_bidoffers') == 0:
+            self.log_info("There are no bids for me now. I set consensus")
+            self.set_attr(consensus=True)
+            return
 
         all_bids_sum = np.round(sum(all_bids_nz[:, 3]), 4)  # sum all the bid power (vppidx, genidx, power, price)
-
 
         if all_bids_sum <= self.get_attr('opf1')['max_excess']:  # if sum of all is less then excess
             self.log_info('I have sufficient generation to accept all bids (bids total sum ('+str(all_bids_sum)+') <= ('+str(self.get_attr('opf1')['max_excess'])+
@@ -206,13 +234,14 @@ def bid_offer_handler(self, message):
             if count == 0:
                 feasibility = self.runopf_e3(all_bids_nz, self.get_attr('agent_time'))
                 if feasibility:
-                    self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
+                    self.log_info('pf_e3 (1): feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
                                   ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opfe2')['objf_greentodso']) +
                                   ' . Costs with bids revenue (opfe3-bid revenue): ' + str(self.get_attr('opfe3')['objf_inclbidsrevenue']))
                 else:
                     self.log_info('Unfeasibility in opf_e3 (' + str(self.name) + ')! Stop.')
                     sys.exit()
+
                 for vi in range(0, vpp_n):
                     bid = all_bids_nz[np.where(all_bids_nz[:, 0] == vi), :][0]  # take bids for only one vpp (might be bids for multiple gens)
                     if len(bid) > 0:  # send bids back to the price-curve senders, but counts only bids>0
@@ -232,7 +261,7 @@ def bid_offer_handler(self, message):
                 # opf should be checked if the transport of such a power is possible to the respective deficit vpps through the respective PCCs:
                 feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
                 if feasibility:
-                    self.log_info('pf_e3: feasibility check with the prepared bids: ' + str(feasibility) +
+                    self.log_info('pf_e3 (2): feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
                                   ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opfe2')['objf_greentodso']) +
                                   ' . Costs with bids revenue (opfe3-bid revenue): ' + str(self.get_attr('opfe3')['objf_inclbidsrevenue']))
@@ -247,12 +276,14 @@ def bid_offer_handler(self, message):
 
                     for vpp_idx in np.unique(all_bids_mod[:, 0]):
                         pc = all_bids_mod[all_bids_mod[:, 0] == vpp_idx, :]
-                        self.get_attr('pc_memory')[int(n_i)].update({data_names[int(vpp_idx)]: np.array(pc[:, 2:])})
+                        self.get_attr('pc_memory_exc')[int(n_i)].update({data_names[int(vpp_idx)]: np.array(pc[:, 2:])})
 
                     self.log_info("Alignment: PC matrix for requesters according to alignment: "
-                                  + str(self.get_attr('pc_memory')[n_i]) + '\nNeed another negotiation with those new, '
+                                  + str(self.get_attr('pc_memory_exc')[n_i]) + '\nNeed another negotiation with those new, '
                                   'modified price curves (tailored for each vpp)')
-                    self.log_info("I BREAK iteration. My n_iteration becomes: " + str(self.get_attr('n_iteration')))
+                    self.log_info("I BREAK iteration and increase for the other. My n_iteration becomes: " + str(self.get_attr('n_iteration')))
+                    # increase the iteration for all
+                    each_iteration_set(self.myname, self.get_attr("n_iteration"))
                     return
                 else:
                     self.log_info('Unfeasibility in opf_e3! STOP.')
@@ -262,10 +293,14 @@ def bid_offer_handler(self, message):
             self.log_info('Need another negotiation iteration because sum of bids (' + str(all_bids_sum) + ') > excess: (' +
                           str(self.get_attr('opf1')['max_excess']) + ') - I increase the price and send new price curves '
                                                                 '(return)...')
+
             n_i = copy.deepcopy(self.get_attr("n_iteration"))
             n_i = n_i + 1  # increase iteration (based on local value)
             self.set_attr(n_iteration=n_i)  # setting higher iteration value for the price increase only to this agent
-            self.log_info("I BREAK iteration. My n_iteration becomes: " + str(self.get_attr('n_iteration')))
+            self.log_info("I BREAK iteration and increase for the other. My n_iteration becomes: " + str(self.get_attr('n_iteration')))
+
+            # increase the iteration for all
+            each_iteration_set(self.myname, self.get_attr("n_iteration"))
             return  # break to start from the PC curve with increased iteration step
 
 
@@ -288,7 +323,6 @@ def bid_answer_handler(self, message):
     if len(self.get_attr('iteration_memory_bid_accept')) == self.get_attr('n_bids'):
         self.log_info("All my bids with accept answer. First I should check feasibility and if objf improved. "
                       "Then, I send the final confirmation (normal PUSH reply) and set mydeals")
-        pp(self.get_attr('iteration_memory_bid_accept'))
 
         for bid in self.get_attr('iteration_memory_bid_accept'):
             myaddr = self.bind('PUSH', alias='bid_final_confirm')
@@ -304,13 +338,16 @@ def bid_final_confirm_handler(self, message):
     """
     executed in Exc
     """
-    self.log_info("Final bid accept received from: " + message['vpp_name'])
+
     if message['message_id'] == message_id_final_answer:
         to_save = message['bid']
         to_save['vpp_name_buyer'] = message['vpp_name']
         self.get_attr('iteration_memory_bid_finalanswer').append(to_save)
 
-    if len(self.get_attr('iteration_memory_bid_finalanswer')) == self.get_attr('n_requests'):
+    self.log_info("Final bid accept received from: " + message['vpp_name'] + ". So far: " +
+                  str(len(self.get_attr('iteration_memory_bid_finalanswer'))) + "/" + str(self.get_attr('n_bidoffers')))
+
+    if len(self.get_attr('iteration_memory_bid_finalanswer')) == self.get_attr('n_bidoffers'):
         mydeals = []
         for bid in self.get_attr('iteration_memory_bid_finalanswer'):
             bid['bid'][:, 2] = -1 * bid['bid'][:, 2]  # change value to negative ("I SELL...") for clarity
@@ -364,6 +401,8 @@ def runOneTimestep():
 
     while not multi_consensus:
 
+        print('\n\n\n\nNEW ITERATION LOOP')
+
         erase_iteration_memory(ns)
 
         time.sleep(iteration_wait)
@@ -391,14 +430,16 @@ def runOneTimestep():
                     opf1 = agent.get_attr('opf1')
                 else:
                     agent.runopf1(agent.get_attr('agent_time'))
-                if opf1['power_balance'] > 0:
+                    opf1 = agent.get_attr('opf1')
+
+                if opf1['power_balance'] == 0 and opf1['max_excess'] > 0:
                     agent.log_info("I am excess")
                     agent.set_consensus_if_norequest()
-                elif opf1['power_balance'] == 0:
+                elif opf1['power_balance'] == 0 and opf1['max_excess'] == 0:
                     agent.log_info("I am balanced")
                     agent.set_attr(timestep_memory_mydeals=[])
                     agent.set_attr(consensus=True)
-                elif opf1['power_balance'] < 0:
+                elif opf1['power_balance'] < 0 and opf1['max_excess'] == False:
                     agent.log_info("I'm a deficit agent, shouldn't I be handled earlier...")
 
         time.sleep(small_wait)
@@ -432,7 +473,7 @@ if __name__ == '__main__':
     # ##### RUN the simulation
 
     ## TEST for one time only ###
-    global_time_set(35)          #
+    global_time_set(35)         #
     runOneTimestep()            #
     time.sleep(1)               #
     ns.shutdown()               #
