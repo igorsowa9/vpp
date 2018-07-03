@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/html_parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,11 +17,11 @@
       <content type="file-editors">
         <state>
           <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-            <file leaf-file-name="vpp_ems_4bus.py" pinned="false" current-in-tab="true">
+            <file leaf-file-name="vpp_ems_4bus.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="564">
-                    <caret line="479" column="33" lean-forward="true" selection-start-line="479" selection-start-column="33" selection-end-line="479" selection-end-column="33" />
+                  <state relative-caret-position="304">
+                    <caret line="465" column="28" selection-start-line="465" selection-start-column="28" selection-end-line="465" selection-end-column="28" />
                     <folding>
                       <element signature="e#0#11#0" expanded="true" />
                     </folding>
@@ -31,17 +32,17 @@
             <file leaf-file-name="other_agents.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/other_agents.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="401">
-                    <caret line="489" column="29" selection-start-line="489" selection-start-column="29" selection-end-line="489" selection-end-column="29" />
+                  <state relative-caret-position="914">
+                    <caret line="69" column="39" selection-start-line="69" selection-start-column="31" selection-end-line="69" selection-end-column="39" />
                   </state>
                 </provider>
               </entry>
             </file>
-            <file leaf-file-name="settings_4bus.py" pinned="false" current-in-tab="false">
+            <file leaf-file-name="settings_4bus.py" pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/settings_4bus.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="399">
-                    <caret line="25" column="5" selection-start-line="25" selection-end-line="25" selection-end-column="5" />
+                  <state relative-caret-position="635">
+                    <caret line="99" lean-forward="true" selection-start-line="99" selection-end-line="99" />
                   </state>
                 </provider>
               </entry>
@@ -49,8 +50,8 @@
             <file leaf-file-name="utilities.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/utilities.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="743">
-                    <caret line="131" column="25" selection-start-line="131" selection-start-column="25" selection-end-line="131" selection-end-column="25" />
+                  <state relative-caret-position="336">
+                    <caret line="97" column="39" selection-start-line="97" selection-start-column="39" selection-end-line="97" selection-end-column="39" />
                   </state>
                 </provider>
               </entry>
@@ -60,6 +61,18 @@
                 <provider selected="true" editor-type-id="text-editor">
                   <state relative-caret-position="912">
                     <caret line="158" column="13" selection-start-line="158" selection-start-column="13" selection-end-line="158" selection-end-column="13" />
+                  </state>
+                </provider>
+              </entry>
+            </file>
+            <file leaf-file-name="html_parser.py" pinned="false" current-in-tab="false">
+              <entry file="file://$PROJECT_DIR$/html_parser.py">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="380">
+                    <caret line="92" lean-forward="true" selection-start-line="92" selection-end-line="92" />
+                    <folding>
+                      <element signature="e#0#34#0" expanded="true" />
+                    </folding>
                   </state>
                 </provider>
               </entry>
@@ -74,8 +87,8 @@
       <file leaf-file-name="vpp1-case5.json" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="28">
-              <caret line="22" column="10" lean-forward="true" selection-start-line="22" selection-start-column="10" selection-end-line="22" selection-end-column="10" />
+            <state relative-caret-position="228">
+              <caret line="18" column="11" lean-forward="true" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -84,7 +97,7 @@
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="76">
-              <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+              <caret line="4" selection-start-line="4" selection-end-line="4" />
             </state>
           </provider>
         </entry>
@@ -155,26 +168,8 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>_dict</find>
-      <find>No my ex</find>
-      <find>no my exce</find>
-      <find>no my</find>
-      <find>self.get_attr('pc_memory_exc')[</find>
-      <find>no my e</find>
-      <find>temp:</find>
-      <find>no my exc</find>
-      <find>no</find>
-      <find>no my ex</find>
-      <find>all n_iter</find>
-      <find>update</find>
-      <find>excess</find>
-      <find>I am exce</find>
-      <find>final b</find>
-      <find>final bid acc</find>
-      <find>final bid accep</find>
       <find>all my bids with</find>
       <find>I run runopf_d3</find>
-      <find>i am gonna</find>
       <find>i am gonna</find>
       <find>erase</find>
       <find>there are no</find>
@@ -185,6 +180,24 @@
       <find>system_consensus_check</find>
       <find>set_consensus_if_norequest</find>
       <find>my initial</find>
+      <find>a start tag: table</find>
+      <find>start tag: tab</find>
+      <find>a start tag: tab</find>
+      <find>a start tag: ta</find>
+      <find>some data</find>
+      <find>an end tag : tab</find>
+      <find>&lt;table&gt;</find>
+      <find>&lt;/table&gt;</find>
+      <find>div id=&quot;con</find>
+      <find>table</find>
+      <find>&lt;div id='content</find>
+      <find>&lt;/div&gt;</find>
+      <find>/table</find>
+      <find>&lt;div id='content'&gt;</find>
+      <find>load_da</find>
+      <find>path</find>
+      <find>load_data</find>
+      <find>measured</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -202,7 +215,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/vpps_only.py" />
         <option value="$PROJECT_DIR$/serialsocket.py" />
         <option value="$PROJECT_DIR$/vpps_only_v02.py" />
         <option value="$PROJECT_DIR$/vpps_only_v03.py" />
@@ -253,6 +265,7 @@
         <option value="$PROJECT_DIR$/other_agents.py" />
         <option value="$PROJECT_DIR$/utilities.py" />
         <option value="$PROJECT_DIR$/vpp_ems_4bus.py" />
+        <option value="$PROJECT_DIR$/html_parser.py" />
       </list>
     </option>
   </component>
@@ -281,6 +294,49 @@
               <item name="vpp" type="cbb8eebc:String" user="vpp" />
               <item name="data" type="cbb8eebc:String" user="data" />
             </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="vpp" type="cbb8eebc:String" user="vpp" />
+              <item name="data" type="cbb8eebc:String" user="data" />
+              <item name="original_elia" type="cbb8eebc:String" user="original_elia" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="vpp" type="cbb8eebc:String" user="vpp" />
+              <item name="data" type="cbb8eebc:String" user="data" />
+              <item name="original_elia" type="cbb8eebc:String" user="original_elia" />
+              <item name="pvoutput_org" type="cbb8eebc:String" user="pvoutput_org" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="vpp" type="cbb8eebc:String" user="vpp" />
+              <item name="data" type="cbb8eebc:String" user="data" />
+              <item name="original_elia" type="cbb8eebc:String" user="original_elia" />
+              <item name="pvoutput_org" type="cbb8eebc:String" user="pvoutput_org" />
+              <item name="min5" type="cbb8eebc:String" user="min5" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="venv" type="cbb8eebc:String" user="venv" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="venv" type="cbb8eebc:String" user="venv" />
+              <item name="lib" type="cbb8eebc:String" user="lib" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="venv" type="cbb8eebc:String" user="venv" />
+              <item name="lib" type="cbb8eebc:String" user="lib" />
+              <item name="python3.6" type="cbb8eebc:String" user="python3.6" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="venv" type="cbb8eebc:String" user="venv" />
+              <item name="lib" type="cbb8eebc:String" user="lib" />
+              <item name="python3.6" type="cbb8eebc:String" user="python3.6" />
+              <item name="site-packages" type="cbb8eebc:String" user="site-packages" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -304,7 +360,7 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="456" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="457" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="456" />
-    <property name="SearchEverywhereHistoryKey" value="setting&#9;ACTION&#9;ShowSettings&#10;settings&#9;ACTION&#9;ShowSettings&#10;sett&#9;ACTION&#9;ShowSettings&#10;settin&#9;FILE&#9;file:///home/iso/PycharmProjects/vpp/settings.py&#10;setti&#9;ACTION&#9;ShowSettings&#10;import library&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="settings&#9;ACTION&#9;WelcomeScreen.Settings&#10;sett&#9;ACTION&#9;ShowSettings&#10;setting&#9;ACTION&#9;ShowSettings&#10;settin&#9;FILE&#9;file:///home/iso/PycharmProjects/vpp/settings.py&#10;setti&#9;ACTION&#9;ShowSettings&#10;import library&#9;null&#9;null" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$2/Languages" value="Python" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/data/vpp4bus" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -337,8 +393,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.vpps_only_3busML">
-    <configuration name="example_oct2py" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.html_parser">
+    <configuration name="html_parser" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="vpp" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -346,11 +402,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/archive" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/archive/example_oct2py.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/html_parser.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -444,17 +500,17 @@
     <list>
       <item itemvalue="Python.vpps_only_3busML" />
       <item itemvalue="Python.other_agents" />
-      <item itemvalue="Python.example_oct2py" />
       <item itemvalue="Python.settings_3busML" />
       <item itemvalue="Python.runML" />
+      <item itemvalue="Python.html_parser" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.html_parser" />
         <item itemvalue="Python.vpps_only_3busML" />
         <item itemvalue="Python.runML" />
         <item itemvalue="Python.other_agents" />
         <item itemvalue="Python.settings_3busML" />
-        <item itemvalue="Python.example_oct2py" />
       </list>
     </recent_temporary>
   </component>
@@ -784,7 +840,14 @@
       <option name="project" value="LOCAL" />
       <updated>1530283439752</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <created>1530517961082</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1530517961082</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -821,11 +884,12 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="69" y="-4" width="1851" height="1084" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18962723" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.271745" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.83094263" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5002701" side_tool="true" weight="0.7038934" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49972987" visible="true" weight="0.37090164" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.32889345" />
       <window_info anchor="bottom" id="Python Console" order="8" weight="0.32889345" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -908,27 +972,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/archive/example_oct2py.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pypower_mod/rundcpf_noprint.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="10" column="8" lean-forward="true" selection-start-line="10" selection-start-column="8" selection-end-line="10" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pypower_mod/rundcopf_noprint.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="10" column="19" selection-start-line="10" selection-start-column="5" selection-end-line="10" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pypower_mod/runpf_noprint.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="266">
@@ -999,20 +1042,10 @@
     <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/PV_AIESH_9_13.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/PV_ReW_7_25.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="3" column="12" lean-forward="true" selection-start-line="3" selection-start-column="12" selection-end-line="3" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/original_elia/PV_AIEG_9_97_Sept17.csv">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/data/original_elia/wind_onshore.json">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/original_elia/PV_AIEG_9_97.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/data/original_elia/PV_AIESH.json">
@@ -1057,13 +1090,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/archive/vpp4-case4.json">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="5" column="38" selection-start-line="5" selection-start-column="38" selection-end-line="5" selection-end-column="38" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -1114,10 +1140,60 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="465" column="28" selection-start-line="465" selection-start-column="28" selection-end-line="465" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/other_agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="914">
+          <caret line="69" column="39" selection-start-line="69" selection-start-column="31" selection-end-line="69" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="76">
-          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="5" column="38" selection-start-line="5" selection-start-column="38" selection-end-line="5" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/PV_AIEG_9_97.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW_29_06_18">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW_29_06_18.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/PV_ReW_7_25.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="9" column="12" lean-forward="true" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/html_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="380">
+          <caret line="92" lean-forward="true" selection-start-line="92" selection-end-line="92" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1128,41 +1204,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="97" column="39" selection-start-line="97" selection-start-column="39" selection-end-line="97" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/settings_4bus.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="25" column="5" selection-start-line="25" selection-end-line="25" selection-end-column="5" />
+        <state relative-caret-position="635">
+          <caret line="99" lean-forward="true" selection-start-line="99" selection-end-line="99" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="28">
-          <caret line="22" column="10" lean-forward="true" selection-start-line="22" selection-start-column="10" selection-end-line="22" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/other_agents.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="489" column="29" selection-start-line="489" selection-start-column="29" selection-end-line="489" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utilities.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="743">
-          <caret line="131" column="25" selection-start-line="131" selection-start-column="25" selection-end-line="131" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="564">
-          <caret line="479" column="33" lean-forward="true" selection-start-line="479" selection-start-column="33" selection-end-line="479" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="228">
+          <caret line="18" column="11" lean-forward="true" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
         </state>
       </provider>
     </entry>
