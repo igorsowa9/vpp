@@ -38,6 +38,7 @@ class VPP_ext_agent(Agent):
         vpp_file = self.load_data(data_paths[data_names_dict[self.name]])
         ppc0 = cases[vpp_file['case']]()
         ppc_t = copy.deepcopy(ppc0)
+        ppc_t = copy.deepcopy(ppc0)
 
         fixed_load0 = copy.deepcopy(ppc0['bus'][:, 2])
         max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])

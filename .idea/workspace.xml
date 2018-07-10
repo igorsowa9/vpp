@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/html_parser.py" line="112" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/html_parser.py" afterDir="false" />
+    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <change afterPath="$PROJECT_DIR$/data/original_elia/in_use/mod_json.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/html_parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/other_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/other_agents.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/pip-selfcheck.json" beforeDir="false" afterPath="$PROJECT_DIR$/venv/pip-selfcheck.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,14 +24,11 @@
       <content type="file-editors">
         <state>
           <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-            <file leaf-file-name="vpp_ems_4bus.py" pinned="false" current-in-tab="false">
+            <file leaf-file-name="vpp_ems_4bus.py" pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="304">
-                    <caret line="465" column="28" selection-start-line="465" selection-start-column="28" selection-end-line="465" selection-end-column="28" />
-                    <folding>
-                      <element signature="e#0#11#0" expanded="true" />
-                    </folding>
+                  <state relative-caret-position="551">
+                    <caret line="478" column="33" lean-forward="true" selection-start-line="478" selection-start-column="33" selection-end-line="478" selection-end-column="33" />
                   </state>
                 </provider>
               </entry>
@@ -32,17 +36,17 @@
             <file leaf-file-name="other_agents.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/other_agents.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="914">
-                    <caret line="69" column="39" selection-start-line="69" selection-start-column="31" selection-end-line="69" selection-end-column="39" />
+                  <state relative-caret-position="798">
+                    <caret line="53" column="27" selection-start-line="53" selection-start-column="27" selection-end-line="53" selection-end-column="27" />
                   </state>
                 </provider>
               </entry>
             </file>
-            <file leaf-file-name="settings_4bus.py" pinned="false" current-in-tab="true">
+            <file leaf-file-name="settings_4bus.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/settings_4bus.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="635">
-                    <caret line="99" lean-forward="true" selection-start-line="99" selection-end-line="99" />
+                  <state relative-caret-position="1805">
+                    <caret line="99" selection-start-line="99" selection-end-line="99" />
                   </state>
                 </provider>
               </entry>
@@ -50,8 +54,8 @@
             <file leaf-file-name="utilities.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/utilities.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="336">
-                    <caret line="97" column="39" selection-start-line="97" selection-start-column="39" selection-end-line="97" selection-end-column="39" />
+                  <state relative-caret-position="3933">
+                    <caret line="213" selection-start-line="213" selection-end-line="216" selection-end-column="14" />
                   </state>
                 </provider>
               </entry>
@@ -59,8 +63,8 @@
             <file leaf-file-name="runML.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/runML.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="912">
-                    <caret line="158" column="13" selection-start-line="158" selection-start-column="13" selection-end-line="158" selection-end-column="13" />
+                  <state relative-caret-position="2451">
+                    <caret line="134" column="32" lean-forward="true" selection-start-line="134" selection-start-column="32" selection-end-line="134" selection-end-column="32" />
                   </state>
                 </provider>
               </entry>
@@ -68,8 +72,8 @@
             <file leaf-file-name="html_parser.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/html_parser.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="380">
-                    <caret line="92" lean-forward="true" selection-start-line="92" selection-end-line="92" />
+                  <state relative-caret-position="722">
+                    <caret line="112" column="36" selection-start-line="112" selection-start-column="36" selection-end-line="112" selection-end-column="36" />
                     <folding>
                       <element signature="e#0#34#0" expanded="true" />
                     </folding>
@@ -87,8 +91,8 @@
       <file leaf-file-name="vpp1-case5.json" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="228">
-              <caret line="18" column="11" lean-forward="true" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
+            <state relative-caret-position="399">
+              <caret line="21" column="29" lean-forward="true" selection-start-line="21" selection-start-column="29" selection-end-line="21" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -96,26 +100,8 @@
       <file leaf-file-name="vpp2-case4.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="76">
-              <caret line="4" selection-start-line="4" selection-end-line="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="vpp3-case4.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="95">
-              <caret line="5" column="38" selection-start-line="5" selection-start-column="38" selection-end-line="5" selection-end-column="38" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="vpp4-case4.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="133">
-              <caret line="7" column="25" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
+            <state relative-caret-position="380">
+              <caret line="20" column="122" selection-start-line="20" selection-start-column="122" selection-end-line="20" selection-end-column="122" />
             </state>
           </provider>
         </entry>
@@ -138,24 +124,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="case4_vpp3.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp3.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="15" selection-start-line="15" selection-end-line="15" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="case4_vpp4.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp4.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="817">
-              <caret line="43" column="29" selection-start-line="43" selection-start-column="29" selection-end-line="43" selection-end-column="29" />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -168,8 +136,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>all my bids with</find>
-      <find>I run runopf_d3</find>
       <find>i am gonna</find>
       <find>erase</find>
       <find>there are no</find>
@@ -198,6 +164,8 @@
       <find>path</find>
       <find>load_data</find>
       <find>measured</find>
+      <find>load</find>
+      <find>load_fil</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -215,7 +183,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/serialsocket.py" />
         <option value="$PROJECT_DIR$/vpps_only_v02.py" />
         <option value="$PROJECT_DIR$/vpps_only_v03.py" />
         <option value="$PROJECT_DIR$/vpps_only_v04.py" />
@@ -254,7 +221,6 @@
         <option value="$PROJECT_DIR$/data/vpp4bus/__init__.py" />
         <option value="$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py" />
         <option value="$PROJECT_DIR$/settings_3busML.py" />
-        <option value="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" />
         <option value="$PROJECT_DIR$/data/vpp4bus/case4_vpp3.py" />
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" />
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json" />
@@ -262,10 +228,12 @@
         <option value="$PROJECT_DIR$/data/vpp4bus/case4_vpp4.py" />
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json" />
         <option value="$PROJECT_DIR$/settings_4bus.py" />
-        <option value="$PROJECT_DIR$/other_agents.py" />
         <option value="$PROJECT_DIR$/utilities.py" />
         <option value="$PROJECT_DIR$/vpp_ems_4bus.py" />
         <option value="$PROJECT_DIR$/html_parser.py" />
+        <option value="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" />
+        <option value="$PROJECT_DIR$/other_agents.py" />
+        <option value="$PROJECT_DIR$/data/original_elia/in_use/mod_json.py" />
       </list>
     </option>
   </component>
@@ -281,7 +249,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -305,7 +272,7 @@
               <item name="vpp" type="cbb8eebc:String" user="vpp" />
               <item name="data" type="cbb8eebc:String" user="data" />
               <item name="original_elia" type="cbb8eebc:String" user="original_elia" />
-              <item name="pvoutput_org" type="cbb8eebc:String" user="pvoutput_org" />
+              <item name="in_use" type="cbb8eebc:String" user="in_use" />
             </path>
             <path>
               <item name="Root" type="cbb8eebc:String" user="Root" />
@@ -313,34 +280,12 @@
               <item name="data" type="cbb8eebc:String" user="data" />
               <item name="original_elia" type="cbb8eebc:String" user="original_elia" />
               <item name="pvoutput_org" type="cbb8eebc:String" user="pvoutput_org" />
-              <item name="min5" type="cbb8eebc:String" user="min5" />
-            </path>
-            <path>
-              <item name="Root" type="cbb8eebc:String" user="Root" />
-              <item name="venv" type="cbb8eebc:String" user="venv" />
-            </path>
-            <path>
-              <item name="Root" type="cbb8eebc:String" user="Root" />
-              <item name="venv" type="cbb8eebc:String" user="venv" />
-              <item name="lib" type="cbb8eebc:String" user="lib" />
-            </path>
-            <path>
-              <item name="Root" type="cbb8eebc:String" user="Root" />
-              <item name="venv" type="cbb8eebc:String" user="venv" />
-              <item name="lib" type="cbb8eebc:String" user="lib" />
-              <item name="python3.6" type="cbb8eebc:String" user="python3.6" />
-            </path>
-            <path>
-              <item name="Root" type="cbb8eebc:String" user="Root" />
-              <item name="venv" type="cbb8eebc:String" user="venv" />
-              <item name="lib" type="cbb8eebc:String" user="lib" />
-              <item name="python3.6" type="cbb8eebc:String" user="python3.6" />
-              <item name="site-packages" type="cbb8eebc:String" user="site-packages" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -393,7 +338,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.html_parser">
+  <component name="RunManager" selected="Python.mod_json">
     <configuration name="html_parser" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="vpp" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -407,6 +352,24 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/html_parser.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="mod_json" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="vpp" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data/original_elia/in_use" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data/original_elia/in_use/mod_json.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -448,24 +411,6 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
-    <configuration name="settings_3busML" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="vpp" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/settings_4bus.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
     <configuration name="vpps_only_3busML" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="vpp" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -500,17 +445,17 @@
     <list>
       <item itemvalue="Python.vpps_only_3busML" />
       <item itemvalue="Python.other_agents" />
-      <item itemvalue="Python.settings_3busML" />
       <item itemvalue="Python.runML" />
       <item itemvalue="Python.html_parser" />
+      <item itemvalue="Python.mod_json" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.html_parser" />
+        <item itemvalue="Python.mod_json" />
         <item itemvalue="Python.vpps_only_3busML" />
+        <item itemvalue="Python.html_parser" />
         <item itemvalue="Python.runML" />
         <item itemvalue="Python.other_agents" />
-        <item itemvalue="Python.settings_3busML" />
       </list>
     </recent_temporary>
   </component>
@@ -847,7 +792,14 @@
       <option name="project" value="LOCAL" />
       <updated>1530517961082</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <created>1530636030372</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1530636030372</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -883,13 +835,13 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="69" y="-4" width="1851" height="1084" extended-state="6" />
+    <frame x="68" y="-11" width="1853" height="1092" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.271745" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5002701" side_tool="true" weight="0.7038934" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49972987" visible="true" weight="0.37090164" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49972987" weight="0.59733605" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.32889345" />
       <window_info anchor="bottom" id="Python Console" order="8" weight="0.32889345" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -939,7 +891,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/Notebooks/MachineLearningWithPython" />
     </ignored-roots>
-    <MESSAGE value="Next steps:&#10;- integrate the OPF into some timesteps as initially described in basictest.py" />
     <MESSAGE value="next step:&#10;&#10;integrate power balance calculation based on mpc and new data file into the negotiation file,&#10;integrate with next step i.e. requests making." />
     <MESSAGE value="octave/oct2py does not work in the remote agents, need to convert to the pypower..." />
     <MESSAGE value="next step:&#10;finish making requests with opf - missing excess values&#10;then,&#10;make price curves derivation functions based on system (by Exc)&#10;make bids derivation (by Def)&#10;make bids acceptance evaluation (by Exc)&#10;final acceptance (by Def)&#10;&#10;make other scenarios" />
@@ -964,7 +915,8 @@
     <MESSAGE value="next steps:&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;!!! thermal limits were removed!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;deficita agents should recoll previous PC in case of modified bids! see the chart!&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;!!! thermal limits were removed!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
-    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <MESSAGE value="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -972,13 +924,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/pypower_mod/runpf_noprint.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="304" column="12" lean-forward="true" selection-start-line="304" selection-start-column="12" selection-end-line="304" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/numpy/matrixlib/defmatrix.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="117">
@@ -1037,9 +982,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/german_load_profiles/g1_sept17.json">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/PV_AIESH_9_13.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/data/original_elia/PV_AIEG_9_97_Sept17.csv">
@@ -1126,41 +1068,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="12" column="22" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/osbrain/proxy.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="378">
           <caret line="215" selection-start-line="215" selection-end-line="215" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="465" column="28" selection-start-line="465" selection-start-column="28" selection-end-line="465" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/other_agents.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="914">
-          <caret line="69" column="39" selection-start-line="69" selection-start-column="31" selection-end-line="69" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="4" selection-start-line="4" selection-end-line="4" />
         </state>
       </provider>
     </entry>
@@ -1174,12 +1085,7 @@
     <entry file="file://$PROJECT_DIR$/data/original_elia/PV_AIEG_9_97.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW_29_06_18">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW_29_06_18.json">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW_29_06_18" />
     <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/PV_ReW_7_25.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="171">
@@ -1187,41 +1093,86 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/html_parser.py">
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="12" column="22" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="380">
-          <caret line="92" lean-forward="true" selection-start-line="92" selection-end-line="92" />
+          <caret line="20" column="122" selection-start-line="20" selection-start-column="122" selection-end-line="20" selection-end-column="122" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW_29_06_18.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/mod_json.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="607">
+          <caret line="49" column="28" selection-start-line="49" selection-start-column="28" selection-end-line="49" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/PV_AIESH_9_13.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-9690">
+          <caret line="6" column="12" lean-forward="true" selection-start-line="6" selection-start-column="12" selection-end-line="6" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/other_agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="798">
+          <caret line="53" column="27" selection-start-line="53" selection-start-column="27" selection-end-line="53" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/settings_4bus.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1805">
+          <caret line="99" selection-start-line="99" selection-end-line="99" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3933">
+          <caret line="213" selection-start-line="213" selection-end-line="216" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/runML.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2451">
+          <caret line="134" column="32" lean-forward="true" selection-start-line="134" selection-start-column="32" selection-end-line="134" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/html_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="722">
+          <caret line="112" column="36" selection-start-line="112" selection-start-column="36" selection-end-line="112" selection-end-column="36" />
           <folding>
             <element signature="e#0#34#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/runML.py">
+    <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="912">
-          <caret line="158" column="13" selection-start-line="158" selection-start-column="13" selection-end-line="158" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utilities.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="97" column="39" selection-start-line="97" selection-start-column="39" selection-end-line="97" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/settings_4bus.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="635">
-          <caret line="99" lean-forward="true" selection-start-line="99" selection-end-line="99" />
+        <state relative-caret-position="551">
+          <caret line="478" column="33" lean-forward="true" selection-start-line="478" selection-start-column="33" selection-end-line="478" selection-end-column="33" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="18" column="11" lean-forward="true" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
+        <state relative-caret-position="399">
+          <caret line="21" column="29" lean-forward="true" selection-start-line="21" selection-start-column="29" selection-end-line="21" selection-end-column="29" />
         </state>
       </provider>
     </entry>

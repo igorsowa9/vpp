@@ -50,11 +50,7 @@ def convert_normalised(str):
 
 def time_extend(pd, tcolname, tval):
 
-
-    full_time = np.arange(0, 24*60+1, 5, dtype=float)
-
-    # print(pd.loc[pd[tcolname] == 0].empty)
-    # print(type(pd.loc[pd[tcolname] == 0]))
+    full_time = np.arange(0, 24*60, tval, dtype=float)
 
     full_list = []
 
@@ -108,12 +104,15 @@ def pvoutput_org(url):
     mod3['Forecast'] = 0
     final = mod3.drop(['Time', 'Normalised'], axis=1)
 
-    full_list_sorted = time_extend(final, 'TimeSeconds', 5)
-    print(full_list_sorted)
+    tval = 5
+    full_list_sorted = time_extend(final, 'TimeSeconds', tval)
+    sh = len(full_list_sorted)
 
     path = "/home/iso/PycharmProjects/vpp/data/original_elia/pvoutput_org/min5/" + str(file_nane) + '.json'
     with open(path, 'w') as outfile:
         json.dump(full_list_sorted, outfile)
+
+    print("Saving list to json (length: " + str(sh) + ", period: "+str(tval)+" min) to the file: \n" + path)
 
 
 url = "https://pvoutput.org/intraday.jsp?id=33196&sid=30411&dt=20180629"
