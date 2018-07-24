@@ -1,5 +1,7 @@
 from html.parser import HTMLParser
 import urllib.request
+import requests
+from bs4 import BeautifulSoup
 from pprint import pprint as pp
 import pandas as pd
 import sys
@@ -74,11 +76,26 @@ def time_extend(pd, tcolname, tval):
 
 def pvoutput_org(url):
 
+    login = ""
+    password = ""
+    sess = requests.Session()
+    sauce = sess.get(url)
+    soup = BeautifulSoup(sauce.text, "html.parser")
+
+    # page = requests.get(url)
+    # soup = BeautifulSoup(page.text, 'html.parser')
+    print(soup.prettify())
+    only_table = soup.find("table", {"id": "tb"})
+    print(only_table)
+
+    sys.exit()
+
     opener = urllib.request.urlopen(url)
     mybytes = opener.read()
     mystr = mybytes.decode("utf8")
     opener.close()
     only_table = find_between(mystr, "<div id='content'>", "</div>")
+    print(only_table)
     listof_frames = pd.read_html(only_table)
     frame = listof_frames[0]
 
