@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/data/original_elia/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/original_elia/pvoutput_org/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/pvoutput_org/login_page.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/html_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/original_elia/pvoutput_org/html_parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/venv/pip-selfcheck.json" beforeDir="false" afterPath="$PROJECT_DIR$/venv/pip-selfcheck.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/original_elia/in_use/mod_json.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/original_elia/in_use/mod_json.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/original_elia/pvoutput_org/html_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/original_elia/pvoutput_org/html_parser.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -38,13 +37,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="html_parser.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="html_parser.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/html_parser.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="79" column="16" selection-start-line="79" selection-start-column="16" selection-end-line="79" selection-end-column="16" />
+            <state relative-caret-position="76">
+              <caret line="4" column="3" lean-forward="true" selection-start-line="4" selection-start-column="3" selection-end-line="4" selection-end-column="3" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mod_json.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/mod_json.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="399">
+              <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -89,12 +100,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>small</find>
-      <find>consensus=</find>
-      <find>there</find>
-      <find>system_consensus_check</find>
-      <find>set_consensus_if_norequest</find>
-      <find>my initial</find>
       <find>a start tag: table</find>
       <find>start tag: tab</find>
       <find>a start tag: tab</find>
@@ -119,6 +124,12 @@
       <find>igorso</find>
       <find>log</find>
       <find>logi</find>
+      <find>post</find>
+      <find>password</find>
+      <find>login</find>
+      <find>form</find>
+      <find>id</find>
+      <find>dir</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -136,7 +147,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/vpps_only_v03.py" />
         <option value="$PROJECT_DIR$/vpps_only_v04.py" />
         <option value="$PROJECT_DIR$/data/vpp3.json" />
         <option value="$PROJECT_DIR$/data/vpp2.json" />
@@ -184,14 +194,15 @@
         <option value="$PROJECT_DIR$/html_parser.py" />
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" />
         <option value="$PROJECT_DIR$/other_agents.py" />
-        <option value="$PROJECT_DIR$/data/original_elia/in_use/mod_json.py" />
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json" />
+        <option value="$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/login_page.py" />
+        <option value="$PROJECT_DIR$/data/original_elia/in_use/mod_json.py" />
         <option value="$PROJECT_DIR$/data/original_elia/pvoutput_org/html_parser.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2169" />
+    <option name="x" value="1989" />
     <option name="y" value="-4" />
     <option name="width" value="1851" />
     <option name="height" value="1084" />
@@ -226,7 +237,7 @@
               <item name="vpp" type="cbb8eebc:String" user="vpp" />
               <item name="data" type="cbb8eebc:String" user="data" />
               <item name="original_elia" type="cbb8eebc:String" user="original_elia" />
-              <item name="pvoutput_org" type="cbb8eebc:String" user="pvoutput_org" />
+              <item name="in_use" type="cbb8eebc:String" user="in_use" />
             </path>
             <path>
               <item name="Root" type="cbb8eebc:String" user="Root" />
@@ -234,7 +245,6 @@
               <item name="data" type="cbb8eebc:String" user="data" />
               <item name="original_elia" type="cbb8eebc:String" user="original_elia" />
               <item name="pvoutput_org" type="cbb8eebc:String" user="pvoutput_org" />
-              <item name="min5" type="cbb8eebc:String" user="min5" />
             </path>
             <path>
               <item name="Root" type="cbb8eebc:String" user="Root" />
@@ -281,7 +291,7 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="456" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="457" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="456" />
-    <property name="SearchEverywhereHistoryKey" value="settin&#9;ACTION&#9;ShowSettings&#10;sett&#9;ACTION&#9;WelcomeScreen.Settings&#10;settings&#9;ACTION&#9;WelcomeScreen.Settings&#10;setting&#9;ACTION&#9;ShowSettings&#10;setti&#9;ACTION&#9;ShowSettings&#10;import library&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="setting&#9;ACTION&#9;ShowSettings&#10;settin&#9;ACTION&#9;ShowSettings&#10;sett&#9;ACTION&#9;WelcomeScreen.Settings&#10;settings&#9;ACTION&#9;WelcomeScreen.Settings&#10;setti&#9;ACTION&#9;ShowSettings&#10;import library&#9;null&#9;null" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$2/Languages" value="Python" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../git_trialsites" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -314,7 +324,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.html_parser">
+  <component name="RunManager" selected="Python.mod_json">
     <configuration name="html_parser" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="vpp" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -333,6 +343,24 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
+    <configuration name="login_page" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="vpp" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data/original_elia/pvoutput_org/min5" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data/original_elia/pvoutput_org/login_page.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
     <configuration name="mod_json" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="vpp" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -346,24 +374,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data/original_elia/in_use/mod_json.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
-    <configuration name="other_agents" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="vpp" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/other_agents.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -420,18 +430,18 @@
     </configuration>
     <list>
       <item itemvalue="Python.vpps_only_3busML" />
-      <item itemvalue="Python.other_agents" />
       <item itemvalue="Python.runML" />
       <item itemvalue="Python.html_parser" />
       <item itemvalue="Python.mod_json" />
+      <item itemvalue="Python.login_page" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.html_parser" />
         <item itemvalue="Python.mod_json" />
+        <item itemvalue="Python.html_parser" />
+        <item itemvalue="Python.login_page" />
         <item itemvalue="Python.vpps_only_3busML" />
         <item itemvalue="Python.runML" />
-        <item itemvalue="Python.other_agents" />
       </list>
     </recent_temporary>
   </component>
@@ -782,7 +792,14 @@
       <option name="project" value="LOCAL" />
       <updated>1531238346150</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <created>1532444265891</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1532444265891</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -824,7 +841,7 @@
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22150189" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5002701" side_tool="true" weight="0.7038934" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49972987" visible="true" weight="0.4385246" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49972987" visible="true" weight="0.32684427" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.32889345" />
       <window_info anchor="bottom" id="Python Console" order="8" weight="0.32889345" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -907,13 +924,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/numpy/matrixlib/defmatrix.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="283" selection-start-line="283" selection-end-line="283" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/osbrain/agent.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
@@ -1083,20 +1093,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="20" column="122" selection-start-line="20" selection-start-column="122" selection-end-line="20" selection-end-column="122" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/mod_json.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="607">
-          <caret line="49" column="28" selection-start-line="49" selection-start-column="28" selection-end-line="49" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/PV_AIESH_9_13.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-9690">
@@ -1139,6 +1135,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW_29_06_18.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/login_page.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="116">
+          <caret line="7" selection-start-line="7" selection-end-line="21" selection-end-column="46" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="380">
+          <caret line="20" column="122" selection-start-line="20" selection-start-column="122" selection-end-line="20" selection-end-column="122" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="467">
@@ -1146,15 +1162,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW_29_06_18.json">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/html_parser.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="79" column="16" selection-start-line="79" selection-start-column="16" selection-end-line="79" selection-end-column="16" />
+        <state relative-caret-position="76">
+          <caret line="4" column="3" lean-forward="true" selection-start-line="4" selection-start-column="3" selection-end-line="4" selection-end-column="3" />
           <folding>
             <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/mod_json.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="399">
+          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>

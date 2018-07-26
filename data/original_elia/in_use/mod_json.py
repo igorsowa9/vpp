@@ -1,8 +1,18 @@
+"""
+Modifies the data file to align time, originaly it aligned the time from 1,2,3 (as integers) i.e. every 15 minutes
+into 0,5,10 i.e. every 5 minutes i.e. already in the minutes values
+
+check input: names, raw_path_save, raw_path_load, extend_from (originally 15), extend_to (originally 5), regardless of
+the input in the form 1,2,3,4,5...
+"""
+
+
 import sys
 import json
 from pprint import pprint as pp
 import copy
 import numpy as np
+import os
 
 
 def load_jsonfile(path):
@@ -11,40 +21,50 @@ def load_jsonfile(path):
     return arr
 
 
-names = ["PV_AIESH_9_13", "PV_ReW_7_25", "wind_offshore_Elia_877", "wind_onshore_elia_158"]
-raw_path = "/home/iso/PycharmProjects/vpp/data/original_elia/in_use/"
+names = [
+    "PV_AIEG_9_97",
+    "PV_AIESH_9_13",
+    "PV_IVEG_26_27",
+    "PV_Ores_15_97",
+    "PV_Rew_7_25",
+    "PV_Sibelgas_21_34",
+    "PV_Tacteo_13_80",
+    "wind_onshore_elia_158",
+    "win_offshore_ellia_877"
+]
+raw_path_save = "/home/iso/PycharmProjects/vpp/data/original_elia/in_use/"
+raw_path_load = "/home/iso/PycharmProjects/vpp/data/original_elia/"
 
 for name in names:
 
-    path = raw_path + name + ".json"
+    path = raw_path_load + name + ".json"
     org_list = load_jsonfile(path)
 
-    extend = 15
+    extend_from = 15  # minutes
+    extend_to = 5  # minutes
 
-    # new_list = np.empty([extend * len(org_list),3])
-    # for i in range(len(org_list)):
-    #     org = org_list[i]
-    #     new_time0 = extend*i
-    #     for x in range(extend):
-    #         new_time = new_time0 + x
-    #         new = copy.deepcopy(org)
-    #         new[0] = new_time
-    #         idx = extend*i+x
-    #         new_list[idx] = new
+    ratio = int(extend_from/extend_to)
+    new_list_len = len(org_list)*ratio
+    new_list = np.zeros([new_list_len, 3])
 
-    new_list = np.empty([len(org_list), 3])
     for i in range(len(org_list)):
         org = org_list[i]
-        new_time0 = extend*i
         new = copy.deepcopy(org)
-        new[0] = new_time0
-        new_list[i] = new
+        new_time0 = extend_to*i*ratio
+        for k in range(ratio):
+            new[0] = new_time0 + k*extend_to
+            new_list[ratio*i+k] = new
 
     new_list = new_list.tolist()
 
-    new_path = raw_path + name + "_ver_"+str(extend)+"min" + ".json"
+    path_save = raw_path_save + "min" + str(extend_to) + "/"
+    new_path = path_save + name + ".json"
+
+    if not os.path.exists(path_save):
+        os.makedirs(path_save)
+
     with open(new_path, 'w') as outfile:
         json.dump(new_list, outfile)
 
-    print("Saving modified list to json (length: " + str(len(new_list)) + ", period: "+str(extend) +
+    print("Saving modified list to json (length: " + str(len(new_list)) + ", period: "+str(extend_to) +
           " min) to the file: \n" + new_path)
