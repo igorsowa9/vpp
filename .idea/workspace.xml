@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/mod_json.py" afterDir="false" />
+    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;&#10;Poprawi¢ wykres pierwszy o load and generation total. Nie może być taki sam cały czas i jeszcze niedokładnie!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/case4_vpp3.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/case4_vpp3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/other_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/other_agents.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runML.py" beforeDir="false" afterPath="$PROJECT_DIR$/runML.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings_4bus.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_4bus.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilities.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/vpp_ems_4bus.py" beforeDir="false" afterPath="$PROJECT_DIR$/vpp_ems_4bus.py" afterDir="false" />
     </list>
@@ -30,8 +20,8 @@
             <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="291">
-                    <caret line="392" lean-forward="true" selection-start-line="392" selection-end-line="392" />
+                  <state relative-caret-position="1600">
+                    <caret line="406" column="47" selection-start-line="406" selection-start-column="47" selection-end-line="406" selection-end-column="47" />
                     <folding>
                       <element signature="e#0#11#0" expanded="true" />
                     </folding>
@@ -42,7 +32,7 @@
             <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/other_agents.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="315">
+                  <state relative-caret-position="2686">
                     <caret line="169" lean-forward="true" selection-start-line="168" selection-start-column="8" selection-end-line="169" />
                   </state>
                 </provider>
@@ -52,7 +42,7 @@
               <entry file="file://$PROJECT_DIR$/settings_4bus.py">
                 <provider selected="true" editor-type-id="text-editor">
                   <state relative-caret-position="95">
-                    <caret line="9" column="17" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
+                    <caret line="9" column="18" selection-start-line="9" selection-start-column="18" selection-end-line="9" selection-end-column="18" />
                   </state>
                 </provider>
               </entry>
@@ -60,11 +50,11 @@
             <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/utilities.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="588">
-                    <caret line="275" column="33" lean-forward="true" selection-start-line="275" selection-start-column="33" selection-end-line="275" selection-end-column="33" />
+                  <state relative-caret-position="379">
+                    <caret line="249" lean-forward="true" selection-start-line="249" selection-end-line="249" />
                     <folding>
                       <element signature="e#0#27#0" expanded="true" />
-                      <marker date="1532702023732" expanded="true" signature="10029:10118" ph="..." />
+                      <marker date="1532704769776" expanded="true" signature="10029:10118" ph="..." />
                     </folding>
                   </state>
                 </provider>
@@ -90,8 +80,8 @@
             <file pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/runML.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="152">
-                    <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="42" />
+                  <state relative-caret-position="254">
+                    <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
                     <folding>
                       <element signature="e#0#25#0" expanded="true" />
                     </folding>
@@ -115,13 +105,15 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="json" value="30" />
-          <entry key="py" value="3062" />
+          <entry key="py" value="3111" />
+          <entry key="txt" value="147" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="JSON" value="30" />
-          <entry key="Python" value="3062" />
+          <entry key="PLAIN_TEXT" value="147" />
+          <entry key="Python" value="3111" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -143,8 +135,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="266">
-              <caret line="14" column="21" lean-forward="true" selection-start-line="14" selection-start-column="21" selection-end-line="14" selection-end-column="21" />
+            <state relative-caret-position="209">
+              <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
             </state>
           </provider>
         </entry>
@@ -216,8 +208,8 @@
       <find>opf1_save_balcost_all</find>
       <find>save_opf1_history</find>
       <find>cases</find>
-      <find>load</find>
       <find>wait</find>
+      <find>load</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -593,13 +585,6 @@
       <option name="presentableId" value="Default" />
       <updated>1498654725175</updated>
     </task>
-    <task id="LOCAL-00002" summary="v04 initialization with the req/rep for the bid answer and final confirmation, respectively">
-      <created>1522227679497</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1522227679497</updated>
-    </task>
     <task id="LOCAL-00003" summary="v04 requests handled in the separate loop, but then the script hangs at the vpp2 execution (?)&#10;- try to do each step separately like the requests?">
       <created>1522245669294</created>
       <option name="number" value="00003" />
@@ -936,7 +921,14 @@
       <option name="project" value="LOCAL" />
       <updated>1532602947661</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="next steps:&#10;&#10;Poprawi¢ wykres pierwszy o load and generation total. Nie może być taki sam cały czas i jeszcze niedokładnie!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <created>1532702503189</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1532702503190</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -973,6 +965,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="69" y="-4" width="1851" height="1084" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23249453" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -1027,7 +1020,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/Notebooks/MachineLearningWithPython" />
     </ignored-roots>
-    <MESSAGE value="next step:&#10;&#10;integrate power balance calculation based on mpc and new data file into the negotiation file,&#10;integrate with next step i.e. requests making." />
     <MESSAGE value="octave/oct2py does not work in the remote agents, need to convert to the pypower..." />
     <MESSAGE value="next step:&#10;finish making requests with opf - missing excess values&#10;then,&#10;make price curves derivation functions based on system (by Exc)&#10;make bids derivation (by Def)&#10;make bids acceptance evaluation (by Exc)&#10;final acceptance (by Def)&#10;&#10;make other scenarios" />
     <MESSAGE value="next step:&#10;&#10;finish price curves derivation functions based on system (by Exc)&#10;- see the error i.e. in v05 linke 78&#10;then,&#10;make bids derivation (by Def)&#10;make bids acceptance evaluation (by Exc)&#10;final acceptance (by Def)&#10;&#10;make other scenarios" />
@@ -1052,7 +1044,8 @@
     <MESSAGE value="next steps:&#10;&#10;deficita agents should recoll previous PC in case of modified bids! see the chart!&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;!!! thermal limits were removed!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
-    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <MESSAGE value="next steps:&#10;&#10;Poprawi¢ wykres pierwszy o load and generation total. Nie może być taki sam cały czas i jeszcze niedokładnie!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;Poprawi¢ wykres pierwszy o load and generation total. Nie może być taki sam cały czas i jeszcze niedokładnie!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;!!!!!!!!!!!!!!!!!!!!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/wind_onshore_elia_158.json" />
@@ -1212,55 +1205,55 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/other_agents.py">
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="169" lean-forward="true" selection-start-line="168" selection-start-column="8" selection-end-line="169" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/runML.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="42" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="209">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="291">
-          <caret line="392" lean-forward="true" selection-start-line="392" selection-end-line="392" />
+        <state relative-caret-position="1600">
+          <caret line="406" column="47" selection-start-line="406" selection-start-column="47" selection-end-line="406" selection-end-column="47" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/runML.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="254">
+          <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/utilities.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="588">
-          <caret line="275" column="33" lean-forward="true" selection-start-line="275" selection-start-column="33" selection-end-line="275" selection-end-column="33" />
+        <state relative-caret-position="379">
+          <caret line="249" lean-forward="true" selection-start-line="249" selection-end-line="249" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
-            <marker date="1532702023732" expanded="true" signature="10029:10118" ph="..." />
+            <marker date="1532704769776" expanded="true" signature="10029:10118" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/other_agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2686">
+          <caret line="169" lean-forward="true" selection-start-line="168" selection-start-column="8" selection-end-line="169" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/settings_4bus.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="95">
-          <caret line="9" column="17" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="14" column="21" lean-forward="true" selection-start-line="14" selection-start-column="21" selection-end-line="14" selection-end-column="21" />
+          <caret line="9" column="18" selection-start-line="9" selection-start-column="18" selection-end-line="9" selection-end-column="18" />
         </state>
       </provider>
     </entry>

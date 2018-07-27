@@ -269,7 +269,7 @@ def show_results_history(ns):
 
         plt.subplot(311)
         plt.title('total generation (green) and total load (red) in ' + str(alias))
-        pb = plt.plot(np.sum(opf1_save_genload_all[:, vpp_idx, :, LOAD_FIX], axis=1))
+        pb = plt.plot(np.sum(opf1_save_genload_all[:, vpp_idx, 1:, LOAD_FIX], axis=1))
         plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
         pb = plt.plot(np.sum(opf1_save_genload_all[:, vpp_idx, :, GEN_RES], axis=1))
         plt.setp(pb, 'color', 'r', 'linewidth', 2.0)

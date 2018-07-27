@@ -401,7 +401,7 @@ def runOneTimestep():
         if bn>bnmax:
             bnmax = bn
 
-    opf1_save_genload = np.full((vpp_n, bnmax, 4), 0)
+    opf1_save_genload = np.zeros((vpp_n, bnmax, 4))
     LOAD_FIX = 0  # max excess value
     GEN_RES = 1  # value to balance - deficit
     GEN_UP = 2  # objective function value from opf1
@@ -422,10 +422,10 @@ def runOneTimestep():
         bus_n = ppc_t['bus'].shape[0]
 
         for b in range(bus_n):
-            opf1_save_genload[vpp_idx, b, LOAD_FIX] = ppc_t['bus'][b, 2]
-            opf1_save_genload[vpp_idx, b, GEN_RES] = res['gen'][b, 1]  # resulting powers
-            opf1_save_genload[vpp_idx, b, GEN_UP] = ppc_t['gen'][b, 8]  # modified upper constraint
-            opf1_save_genload[vpp_idx, b, GEN_LOW] = ppc_t['gen'][b, 9]  # modified lower constraint
+            opf1_save_genload[vpp_idx, b, LOAD_FIX] = round(ppc_t['bus'][b, 2], 4)
+            opf1_save_genload[vpp_idx, b, GEN_RES] = round(res['gen'][b, 1], 4)  # resulting powers
+            opf1_save_genload[vpp_idx, b, GEN_UP] = round(ppc_t['gen'][b, 8], 4)  # modified upper constraint
+            opf1_save_genload[vpp_idx, b, GEN_LOW] = round(ppc_t['gen'][b, 9], 4)  # modified lower constraint
 
     save_opf1_history(global_time, opf1_save_balcost, opf1_save_genload)
 
