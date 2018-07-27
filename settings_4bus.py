@@ -6,10 +6,11 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 25
-ts_n = 15  # number of timestamps of whole simulation
+ts_0 = int(60/5*0)
+ts_n = int(60/5*24)  # number of timestamps of whole simulation
 
 max_iteration = 10
+negotiation = False  # if False, then only opf1 and requests
 
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}
@@ -23,7 +24,7 @@ adj_matrix = [[True, True, True, True],
               [True, True, True, False],
               [True, True, False, True]]
 
-small_wait = 0.1  # waiting time to separate some steps, for testing
+small_wait = 0.0  # waiting time to separate some steps, for testing
 iteration_wait = 0.1
 
 # the excess agents increase the original production prices when publishing the price curve, increase by 10%

@@ -6,7 +6,8 @@ from pprint import pprint as pp
 import copy
 from settings_4bus import *
 from other_agents import VPP_ext_agent
-from utilities import system_consensus_check, erase_iteration_memory, erase_timestep_memory, print_data, show_results_history
+from utilities import system_consensus_check, erase_iteration_memory, erase_timestep_memory, print_data, \
+    show_results_history, save_opf1_history
 
 global_time = ts_0
 
@@ -376,74 +377,130 @@ def runOneTimestep():
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
         agent.runopf1(global_time)
-    for vpp_idx in  range(vpp_n):
-        agent = ns.proxy(data_names[vpp_idx])
-        opf1 = agent.get_attr('opf1')
-        if opf1['power_balance'] < 0:
-            agent.log_info("I am deficit. I'll publish requests to neighbours.")
-            my_name = data_names[vpp_idx]
-            message_request = {"message_id": message_id_request, "vpp_name": my_name,
-                               "value": float(-1 * opf1['power_balance'])}
-            agent.send('main', message_request, topic='request_topic')
 
-    time.sleep(small_wait)  # show gathered requests
-    print('Adjacency matrix: ' + str(adj_matrix))
-    print("\n\n#######################")
-    print("# Resulting requests: #")
-    print("#######################")
-    for vpp_idx in range(vpp_n):
-        agent = ns.proxy(data_names[vpp_idx])
-        print(str(data_names[vpp_idx]) + ":\n(to balance, max exc, objf noslack: " + str(agent.get_attr('opf1')) +
-              ") \n(no. of received requests: " + str(agent.get_attr('n_requests')) + ") : \n" + str(agent.get_attr('requests')) + "\n")
-    print("#######################")
-    print("#######################")
-    print("#######################\n\n")
+    ######## Save OPF1 to opf1_history ########
+    ###########################################
+    ###########################################
+    # saving into opf1_history:
+    # - general results of opf1: excess/deficit value, objf, objf_noslackcost,
+    # - generators: results and constraints (dependent on the weather)
+    # - loads: results (and constraints)
+    opf1_save_balcost = np.zeros((vpp_n, 4))
+    VPP_MAXEXC = 0   # max excess value
+    VPP_PBAL = 1   # value to balance - deficit
+    OBJF = 2   # objective function value from opf1
+    OBJF_NODSO = 3  # objective function if no dso buying costs
 
-    while not multi_consensus:
+    # opf1_save_genload = np.zeros((vpp_n, 1, 1))
+    opf1_save_genload_list = [0] * vpp_n
 
-        print('\n\n\n\nNEW ITERATION LOOP')
+    bnmax = 1
+    for alias in ns.agents():
+        a = ns.proxy(alias)
+        bn = np.array(a.load_data(data_paths[data_names_dict[alias]])['bus_n'])
+        if bn>bnmax:
+            bnmax = bn
 
-        erase_iteration_memory(ns)
+    opf1_save_genload = np.full((vpp_n, bnmax, 4), 0)
+    LOAD_FIX = 0  # max excess value
+    GEN_RES = 1  # value to balance - deficit
+    GEN_UP = 2  # objective function value from opf1
+    GEN_LOW = 3  # objective function if no dso buying costs
 
-        time.sleep(iteration_wait)
-        print('--- Def loop: Execute requests ---')
+    for alias in ns.agents():
+        a = ns.proxy(alias)
+        vpp_idx = data_names_dict[alias]
+
+        opf1_save_balcost[vpp_idx, VPP_MAXEXC] = a.get_attr('opf1')['max_excess']
+        opf1_save_balcost[vpp_idx, VPP_PBAL] = a.get_attr('opf1')['power_balance']
+        opf1_save_balcost[vpp_idx, OBJF] = a.get_attr('opf1')['objf']
+        opf1_save_balcost[vpp_idx, OBJF_NODSO] = a.get_attr('opf1')['objf_noslackcost']
+
+        ppc_t = a.get_attr("opf1_ppct")
+        res = a.get_attr("opf1_res")
+
+        bus_n = ppc_t['bus'].shape[0]
+
+        for b in range(bus_n):
+            opf1_save_genload[vpp_idx, b, LOAD_FIX] = ppc_t['bus'][b, 2]
+            opf1_save_genload[vpp_idx, b, GEN_RES] = res['gen'][b, 1]  # resulting powers
+            opf1_save_genload[vpp_idx, b, GEN_UP] = ppc_t['gen'][b, 8]  # modified upper constraint
+            opf1_save_genload[vpp_idx, b, GEN_LOW] = ppc_t['gen'][b, 9]  # modified lower constraint
+
+    save_opf1_history(global_time, opf1_save_balcost, opf1_save_genload)
+
+    ###########################################
+    ###########################################
+
+    if negotiation:
+        for vpp_idx in  range(vpp_n):
+            agent = ns.proxy(data_names[vpp_idx])
+            opf1 = agent.get_attr('opf1')
+            if opf1['power_balance'] < 0:
+                agent.log_info("I am deficit. I'll publish requests to neighbours.")
+                my_name = data_names[vpp_idx]
+                message_request = {"message_id": message_id_request, "vpp_name": my_name,
+                                   "value": float(-1 * opf1['power_balance'])}
+                agent.send('main', message_request, topic='request_topic')
+
+        time.sleep(small_wait)  # show gathered requests
+        print('Adjacency matrix: ' + str(adj_matrix))
+        print("\n\n#######################")
+        print("# Resulting requests: #")
+        print("#######################")
         for vpp_idx in range(vpp_n):
             agent = ns.proxy(data_names[vpp_idx])
-            if agent.get_attr('n_requests') > 0:
-                requests_execute(agent, data_names[vpp_idx], agent.get_attr('requests'))
+            print(str(data_names[vpp_idx]) + ":\n(to balance, max exc, objf noslack: " + str(agent.get_attr('opf1')) +
+                  ") \n(no. of received requests: " + str(agent.get_attr('n_requests')) + ") : \n" + str(agent.get_attr('requests')) + "\n")
+        print("#######################")
+        print("#######################")
+        print("#######################\n\n")
 
-        time.sleep(small_wait)
-        print('- Def loop: Consensus Check 1')
-        if system_consensus_check(ns, global_time):
-            break
+        while not multi_consensus:
 
-        print('\n--- Excess and balanced agents loop: ---')
-        for vpp_idx in range(vpp_n):
-            agent = ns.proxy(data_names[vpp_idx])
+            print('\n\n\n\nNEW ITERATION LOOP')
 
-            if agent.get_attr('consensus'):
-                agent.log_info('I already have consensus from deficit loop.')
-                continue
+            erase_iteration_memory(ns)
 
-            if not agent.get_attr('consensus'):
-                if agent.get_attr('opf1'):
-                    opf1 = agent.get_attr('opf1')
-                else:
-                    agent.runopf1(agent.get_attr('agent_time'))
-                    opf1 = agent.get_attr('opf1')
+            time.sleep(iteration_wait)
+            print('--- Def loop: Execute requests ---')
+            for vpp_idx in range(vpp_n):
+                agent = ns.proxy(data_names[vpp_idx])
+                if agent.get_attr('n_requests') > 0:
+                    requests_execute(agent, data_names[vpp_idx], agent.get_attr('requests'))
 
-                if opf1['power_balance'] == 0 and opf1['max_excess'] > 0:
-                    agent.log_info("I am excess")
-                    agent.set_consensus_if_norequest()
-                elif opf1['power_balance'] == 0 and opf1['max_excess'] == 0:
-                    agent.log_info("I am balanced")
-                    agent.set_attr(timestep_memory_mydeals=[])
-                    agent.set_attr(consensus=True)
-                elif opf1['power_balance'] < 0 and opf1['max_excess'] == False:
-                    agent.log_info("I'm a deficit agent, shouldn't I be handled earlier...")
+            time.sleep(small_wait)
+            print('- Def loop: Consensus Check 1')
+            if system_consensus_check(ns, global_time):
+                break
 
-        time.sleep(small_wait)
-        multi_consensus = system_consensus_check(ns, global_time)
+            print('\n--- Excess and balanced agents loop: ---')
+            for vpp_idx in range(vpp_n):
+                agent = ns.proxy(data_names[vpp_idx])
+
+                if agent.get_attr('consensus'):
+                    agent.log_info('I already have consensus from deficit loop.')
+                    continue
+
+                if not agent.get_attr('consensus'):
+                    if agent.get_attr('opf1'):
+                        opf1 = agent.get_attr('opf1')
+                    else:
+                        agent.runopf1(agent.get_attr('agent_time'))
+                        opf1 = agent.get_attr('opf1')
+
+                    if opf1['power_balance'] == 0 and opf1['max_excess'] > 0:
+                        agent.log_info("I am excess")
+                        agent.set_consensus_if_norequest()
+                    elif opf1['power_balance'] == 0 and opf1['max_excess'] == 0:
+                        agent.log_info("I am balanced")
+                        agent.set_attr(timestep_memory_mydeals=[])
+                        agent.set_attr(consensus=True)
+                    elif opf1['power_balance'] < 0 and opf1['max_excess'] == False:
+                        agent.log_info("I'm a deficit agent, shouldn't I be handled earlier...")
+
+            time.sleep(small_wait)
+            multi_consensus = system_consensus_check(ns, global_time)
 
 
 if __name__ == '__main__':
@@ -473,11 +530,11 @@ if __name__ == '__main__':
     # ##### RUN the simulation
 
     ## TEST for one time only ###
-    global_time_set(35)         #
-    runOneTimestep()            #
-    time.sleep(1)               #
-    ns.shutdown()               #
-    sys.exit()                  #
+    # global_time_set(93)         #
+    # runOneTimestep()            #
+    # time.sleep(1)               #
+    # ns.shutdown()               #
+    # sys.exit()                  #
     #############################
 
     for t in range(ts_0, ts_0+ts_n):
@@ -487,7 +544,6 @@ if __name__ == '__main__':
         runOneTimestep()
 
     time.sleep(small_wait)
+
+    show_results_history(ns)
     ns.shutdown()
-
-    show_results_history()
-

@@ -5,6 +5,7 @@ import copy
 import sys
 from pypower.api import *
 from pypower_mod.rundcopf_noprint import rundcopf
+from pprint import pprint as pp
 
 
 def system_printing_opf(mpc_t, t, data):
@@ -199,6 +200,8 @@ def erase_timestep_memory(ns):
         a.set_attr(requests=[])
         a.set_attr(opf1=[])
         a.set_attr(opf1_resgen=[])
+        a.set_attr(opf1_ppct=[])
+        a.set_attr(opf1_res=[])
         a.set_attr(pc_memory_exc=np.array([{} for _ in range(max_iteration)]))
         a.set_attr(opfe2=0)  # this is set only once, refers to pc_memory_exc, that's why it's here for now
         a.set_attr(pc_memory_def=np.array([{} for _ in range(max_iteration)]))
@@ -219,43 +222,104 @@ def load_jsonfile(path):
 
 vpp_results = np.zeros((ts_n, vpp_n, 4))
 global_results = np.zeros((ts_n, 1))
-
-
 def save_results_history(global_time, global_result, vpp_result):
     vpp_results[global_time-ts_0, :, :] = vpp_result
     global_results[global_time-ts_0, :] = global_result
     return 1
 
 
-def show_results_history():
+opf1_save_balcost_all = np.zeros((ts_n, vpp_n, 4))
+opf1_save_genload_all = np.zeros((ts_n, vpp_n, 5, 4)) # as deep list due to different number of buses
+def save_opf1_history(global_time, opf1_save_balcost, opf1_save_genload):
+    opf1_save_balcost_all[global_time - ts_0, :, :] = opf1_save_balcost
+    opf1_save_genload_all[global_time - ts_0, :, :, :] = opf1_save_genload
+    return
 
-    VPP_VALUE = 0
-    OBJF1 = 1
-    OBJF1_NODSO = 2
-    OBJF_AFTER = 3
+
+def show_results_history(ns):
+
+    VPP_MAXEXC = 0   # max excess value
+    VPP_PBAL = 1   # value to balance - deficit
+    OBJF = 2   # objective function value from opf1
+    OBJF_NODSO = 3  # objective function if no dso buying costs
+
+    LOAD_FIX = 0  # max excess value
+    GEN_RES = 1  # value to balance - deficit
+    GEN_UP = 2  # objective function value from opf1
+    GEN_LOW = 3  # objective function if no dso buying costs
 
     print("###################")
     print("### PRINTING ######")
     print("###################")
-    vpp_idx = 0
 
-    plt.figure(1)
-    # plt.subplot(311)
-    pb = plt.plot(vpp_results[:, :, VPP_VALUE])
-    plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
-    plt.ylabel('value for vpp1')
-    plt.axhline(0, color='black')
+    figure_counter = 0
 
-    plt.figure(2)
-    for ch in range(vpp_n):
-        plt.subplot(411+ch)
-        pb = plt.plot(vpp_results[:, ch, OBJF1])
-        plt.setp(pb, color='r', linewidth=2.0)
-        pb = plt.plot(vpp_results[:, ch, OBJF1_NODSO])
-        plt.setp(pb, color='b', linewidth=2.0)
-        pb = plt.plot(vpp_results[:, ch, OBJF_AFTER])
-        plt.setp(pb, color='g', linewidth=2.0)
-        plt.ylabel('objf-red, nodso-blue, after-green')
+    # print(opf1_save_genload_all.shape)
+    # print(opf1_save_balcost_all.shape)
+    # print(opf1_save_genload_all[1,:,:,:])
+    # sys.exit()
+
+    for alias in ns.agents():
+        a = ns.proxy(alias)
+        vpp_idx = data_names_dict[alias]
+        figure_counter += 1
+
+        plt.figure(figure_counter)
+        plt.suptitle(str(alias) + ': balance and costs')
+
+        plt.subplot(311)
+        plt.title('total generation (green) and total load (red) in ' + str(alias))
+        pb = plt.plot(np.sum(opf1_save_genload_all[:, vpp_idx, :, LOAD_FIX], axis=1))
+        plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
+        pb = plt.plot(np.sum(opf1_save_genload_all[:, vpp_idx, :, GEN_RES], axis=1))
+        plt.setp(pb, 'color', 'r', 'linewidth', 2.0)
+        plt.ylabel('power value')
         plt.axhline(0, color='black')
+
+        plt.subplot(312)
+        plt.title('excess (green) and power to balance (price=Y) (blue) in vpp0')
+        pb = plt.plot(opf1_save_balcost_all[:, vpp_idx, VPP_MAXEXC])
+        plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
+        pb = plt.plot(opf1_save_balcost_all[:, vpp_idx, VPP_PBAL])
+        plt.setp(pb, 'color', 'b', 'linewidth', 2.0)
+        plt.ylabel('power value')
+        plt.axhline(0, color='black')
+
+        plt.subplot(313)
+        plt.title('cost in vpp0 (def from DSO - red), cost in vpp0 (def. costs excl. - blue)')
+        pb = plt.plot(opf1_save_balcost_all[:, vpp_idx, OBJF])
+        plt.setp(pb, 'color', 'r', 'linewidth', 2.0)
+        pb = plt.plot(opf1_save_balcost_all[:, vpp_idx, OBJF_NODSO])
+        plt.setp(pb, 'color', 'b', 'linewidth', 2.0)
+        plt.ylabel('cost value')
+        plt.axhline(0, color='black')
+
+        plt.xlabel('time in minutes')
+
+    # figure_counter = + 1
+    # plt.figure(figure_counter)
+    #
+    # for ch in range(vpp_n):
+    #     plt.subplot(vpp_n*100 + 11 + ch)
+    #     pb = plt.plot(opf1_results[:, ch, OBJF1])
+    #     plt.setp(pb, color='r', linewidth=2.0)
+    #     pb = plt.plot(opf1_results[:, ch, OBJF1_NODSO])
+    #     plt.setp(pb, color='b', linewidth=2.0)
+    #     plt.axhline(0, color='black')
+    # plt.ylabel('opf1 objf (red), opf1 objf\dso_costs (blue)')
+
+
+    if negotiation:
+        plt.figure(3)
+        for ch in range(vpp_n):
+            plt.subplot(411+ch)
+            pb = plt.plot(vpp_results[:, ch, OBJF1])
+            plt.setp(pb, color='r', linewidth=2.0)
+            pb = plt.plot(vpp_results[:, ch, OBJF1_NODSO])
+            plt.setp(pb, color='b', linewidth=2.0)
+            pb = plt.plot(vpp_results[:, ch, OBJF_AFTER])
+            plt.setp(pb, color='g', linewidth=2.0)
+            plt.ylabel('objf-red, nodso-blue, after-green')
+            plt.axhline(0, color='black')
 
     plt.show()

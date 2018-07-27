@@ -38,7 +38,6 @@ class VPP_ext_agent(Agent):
         vpp_file = self.load_data(data_paths[data_names_dict[self.name]])
         ppc0 = cases[vpp_file['case']]()
         ppc_t = copy.deepcopy(ppc0)
-        ppc_t = copy.deepcopy(ppc0)
 
         fixed_load0 = copy.deepcopy(ppc0['bus'][:, 2])
         max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])
@@ -55,7 +54,7 @@ class VPP_ext_agent(Agent):
                 fload_path = vpp_file['fixed_load_profiles_paths'][idx]
                 if not fload_path == "":
                     d = self.load_data(fload_path)
-                    mod = d[t]
+                    mod = d[t][2]
                     fixed_load_t[idx] = (mod + load_mod_offset) * fixed_load0[idx]
             ppc_t['bus'][:, 2] = fixed_load_t
 
@@ -105,6 +104,8 @@ class VPP_ext_agent(Agent):
         if res['success'] == 1:
             self.log_info("I have successfully run the OPF1.")
             self.set_attr(opf1_resgen=res['gen'])
+            self.set_attr(opf1_ppct=ppc_t)
+            self.set_attr(opf1_res=res)
 
             if round(res['gen'][slack_idx, 1], 4) > 0:  # there's a need for external resources (generation at slack >0) i.e. DEFICIT
                 self.set_attr(current_status='D')

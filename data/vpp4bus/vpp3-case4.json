@@ -18,14 +18,14 @@
 		"",
 		"",
 		"",
-		""
+		"/home/iso/PycharmProjects/vpp/data/original_elia/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_30_06_18.json"
 	],
 
 	"fixed_load_profiles_paths": [
 		"",
-		"",
-		"",
-		""
+		"/home/iso/PycharmProjects/vpp/data/german_load_profiles/min5/h0_sept17.json",
+		"/home/iso/PycharmProjects/vpp/data/german_load_profiles/min5/l1_sept17.json",
+		"/home/iso/PycharmProjects/vpp/data/german_load_profiles/min5/g1_sept17.json"
 	],
 
 	"price_profiles_paths": [
