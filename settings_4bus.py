@@ -6,23 +6,33 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = int(60/5*0)
-ts_n = int(60/5*24)  # number of timestamps of whole simulation
+ts_0 = 90#int(60/5*0)
+ts_n = 70#int(60/5*24)  # number of timestamps of whole simulation
+
 
 max_iteration = 10
-negotiation = False  # if False, then only opf1 and requests
+negotiation = True  # if False, then only opf1 and requests
 
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}
-data_paths = ["data/vpp4bus/vpp1-case5.json", "data/vpp4bus/vpp2-case4.json", "data/vpp4bus/vpp3-case4.json", "data/vpp4bus/vpp4-case4.json"]
 vpp_n = len(data_names)
+
+data_paths = ["data/vpp4bus/vpp1-case5.json",
+              "data/vpp4bus/vpp2-case4.json",
+              "data/vpp4bus/vpp3-case4.json",
+              "data/vpp4bus/vpp4-case4.json"]
+
+cases = {'case5_vpp1': case5_vpp1,
+         'case4_vpp2': case4_vpp2,
+         'case4_vpp3': case4_vpp3,
+         'case4_vpp4': case4_vpp4}
 
 system_status = np.zeros([ts_n, vpp_n])
 
-adj_matrix = [[True, True, True, True],
+adj_matrix = [[True, True, False, False],
               [True, True, True, True],
-              [True, True, True, False],
-              [True, True, False, True]]
+              [False, True, True, False],
+              [False, True, False, True]]
 
 small_wait = 0.0  # waiting time to separate some steps, for testing
 iteration_wait = 0.1
@@ -32,13 +42,8 @@ iteration_wait = 0.1
 # production_cost - bids_revenue = 0
 dso_green_price_increase_factor = 1.05
 
-cases = {'case5_vpp1': case5_vpp1,
-         'case4_vpp2': case4_vpp2,
-         'case4_vpp3': case4_vpp3,
-         'case4_vpp4': case4_vpp4}
-
 opf1_verbose = 0
-opf1_prinpf = False
+opf1_prinpf = True
 opfe3_prinpf = False
 opfe2_prinpf = False
 

@@ -530,11 +530,11 @@ if __name__ == '__main__':
     # ##### RUN the simulation
 
     ## TEST for one time only ###
-    # global_time_set(93)         #
-    # runOneTimestep()            #
-    # time.sleep(1)               #
-    # ns.shutdown()               #
-    # sys.exit()                  #
+    global_time_set(100)         #
+    runOneTimestep()            #
+    time.sleep(1)               #
+    ns.shutdown()               #
+    sys.exit()                  #
     #############################
 
     for t in range(ts_0, ts_0+ts_n):

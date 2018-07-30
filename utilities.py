@@ -254,11 +254,6 @@ def show_results_history(ns):
 
     figure_counter = 0
 
-    # print(opf1_save_genload_all.shape)
-    # print(opf1_save_balcost_all.shape)
-    # print(opf1_save_genload_all[1,:,:,:])
-    # sys.exit()
-
     for alias in ns.agents():
         a = ns.proxy(alias)
         vpp_idx = data_names_dict[alias]
@@ -267,17 +262,25 @@ def show_results_history(ns):
         plt.figure(figure_counter)
         plt.suptitle(str(alias) + ': balance and costs')
 
-        plt.subplot(311)
+        plt.subplot(411)
         plt.title('total generation (green) and total load (red) in ' + str(alias))
-        pb = plt.plot(np.sum(opf1_save_genload_all[:, vpp_idx, 1:, LOAD_FIX], axis=1))
+        pb = plt.plot(np.sum(opf1_save_genload_all[:, vpp_idx, 1:, GEN_RES], axis=1))
         plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
-        pb = plt.plot(np.sum(opf1_save_genload_all[:, vpp_idx, :, GEN_RES], axis=1))
+        pb = plt.plot(np.sum(opf1_save_genload_all[:, vpp_idx, 1:, LOAD_FIX], axis=1))
         plt.setp(pb, 'color', 'r', 'linewidth', 2.0)
+
+        plt.subplot(412)
+        plt.title('to DSO export (green) and from DSO import (red), at PCC.')
+        pb = plt.plot(opf1_save_genload_all[:, vpp_idx, 0, LOAD_FIX])
+        plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
+        pb = plt.plot(opf1_save_genload_all[:, vpp_idx, 0, GEN_RES])
+        plt.setp(pb, 'color', 'r', 'linewidth', 2.0)
+
         plt.ylabel('power value')
         plt.axhline(0, color='black')
 
-        plt.subplot(312)
-        plt.title('excess (green) and power to balance (price=Y) (blue) in vpp0')
+        plt.subplot(413)
+        plt.title('excess (green) and power to balance (price=Y) (blue).')
         pb = plt.plot(opf1_save_balcost_all[:, vpp_idx, VPP_MAXEXC])
         plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
         pb = plt.plot(opf1_save_balcost_all[:, vpp_idx, VPP_PBAL])
@@ -285,7 +288,7 @@ def show_results_history(ns):
         plt.ylabel('power value')
         plt.axhline(0, color='black')
 
-        plt.subplot(313)
+        plt.subplot(414)
         plt.title('cost in vpp0 (def from DSO - red), cost in vpp0 (def. costs excl. - blue)')
         pb = plt.plot(opf1_save_balcost_all[:, vpp_idx, OBJF])
         plt.setp(pb, 'color', 'r', 'linewidth', 2.0)
@@ -293,8 +296,31 @@ def show_results_history(ns):
         plt.setp(pb, 'color', 'b', 'linewidth', 2.0)
         plt.ylabel('cost value')
         plt.axhline(0, color='black')
-
         plt.xlabel('time in minutes')
+
+        figure_counter += 1
+        plt.figure(figure_counter)
+        plt.suptitle(str(alias) + ': generators/loads with constraints. \n'
+                                  'Bus 1 is slack with no internal gens and loads.')
+
+        n_bus = len(opf1_save_genload_all[0, vpp_idx, :, GEN_RES])
+        n_bus_real = a.load_data(data_paths[data_names_dict[alias]])['bus_n']
+
+        for g in range(0, n_bus_real):
+            if g == 0:
+                plt.subplot(int(n_bus_real * 100 + 11))
+                plt.title('fixed loads at all buses excl. 0 ')
+                pb = plt.plot(opf1_save_genload_all[:, vpp_idx, 1:, LOAD_FIX])
+                plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
+                continue
+            plt.subplot(int(n_bus_real * 100 + 10 + g + 1))
+            plt.title('generation at bus: ' + str(g+1))
+            pb = plt.plot(opf1_save_genload_all[:, vpp_idx, g, GEN_RES])
+            plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
+            pb = plt.plot(opf1_save_genload_all[:, vpp_idx, g, GEN_UP])
+            plt.setp(pb, 'color', 'r', 'linewidth', 1.0, dashes=[6, 2])
+            pb = plt.plot(opf1_save_genload_all[:, vpp_idx, g, GEN_LOW])
+            plt.setp(pb, 'color', 'b', 'linewidth', 1.0, dashes=[6, 2])
 
     # figure_counter = + 1
     # plt.figure(figure_counter)
@@ -310,7 +336,7 @@ def show_results_history(ns):
 
 
     if negotiation:
-        plt.figure(3)
+        plt.figure(figure_counter + 1)
         for ch in range(vpp_n):
             plt.subplot(411+ch)
             pb = plt.plot(vpp_results[:, ch, OBJF1])

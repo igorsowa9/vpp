@@ -99,7 +99,10 @@ class VPP_ext_agent(Agent):
         slack_idx = self.load_data(data_paths[data_names_dict[self.name]])['slack_idx']
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
         if opf1_prinpf:
-            printpf(res)
+            #printpf(res)
+            print("generators constraints from ppc_t:\n bus, actual, max, min, prices ")
+            pp(np.round(res['gen'][:, [0, 1, 8, 9]], 4))
+            pp(ppc_t['gencost'][:, 4])
 
         if res['success'] == 1:
             self.log_info("I have successfully run the OPF1.")
