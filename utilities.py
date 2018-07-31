@@ -6,6 +6,9 @@ import sys
 from pypower.api import *
 from pypower_mod.rundcopf_noprint import rundcopf
 from pprint import pprint as pp
+from time import gmtime, strftime
+import os
+import matplotlib.backends.backend_pdf
 
 
 def system_printing_opf(mpc_t, t, data):
@@ -123,6 +126,9 @@ def system_consensus_check(ns, global_time):
                 print('\tI did not run opfe3 / opfd3.')
 
             print("Contracts/deals:")
+            if data_names_dict[alias] in vpp_learn:
+                print("+++ Learning ON +++: ")
+
             for deal_vpp in a.get_attr('timestep_memory_mydeals'):
                 print("\tWith: " + str(deal_vpp[0]))
                 print("\t\tBid values:")
@@ -131,6 +137,65 @@ def system_consensus_check(ns, global_time):
                 for bid in deal_vpp[1]:
                     print("\t\t| " + str(bid[0]) + "\t| " +  str(bid[1]) + "\t| " + str(bid[2]) + "\t| " + str(bid[3]) + "\t| ")
                 print("\n")
+
+        print("##################")
+        print("##################\n\n")
+
+        #############################
+        #### saving for learning ####
+        #############################
+
+        # for VPP3 with ML as excess agent
+        myself = 'vpp3'
+        a = ns.proxy('vpp3')
+
+        memory = np.array([])
+
+        deals_memory = a.get_attr('timestep_memory_mydeals')
+
+        # with_who (def) | success | iterations | refuses || price | quantity || daytime | weekday | month |
+        # prospective_oppenents_weather_forecast | CALC: topology of negotiation |
+        # CALC: marginal generation of estimated opponents
+
+        n_refuse = False # has to be embedded
+        n_iter = a.get_attr('n_iteration') + 1
+
+        # record from deals memory:
+        for d in deals_memory:
+            deal_with = d[0]
+            prospective_opponents_idx = np.where(np.array(adj_matrix[data_names_dict[deal_with]]) == True)
+            prospective_opponents = np.array([])
+            for i in prospective_opponents_idx[0]:
+                if i == data_names_dict[myself] or i == data_names_dict[deal_with]:
+                    continue
+                prospective_opponents = np.append(prospective_opponents, data_names[int(i)])
+
+            memory_record = {
+                "deal_with": deal_with,
+                "success": 1,
+                "n_iter": n_iter,
+                "n_refuse": n_refuse,
+                "price": d[1][0, 3],
+                "quantity": np.abs(d[1][0, 2]),
+                "daytime": global_time,
+                "weekday": global_time,
+                "month": global_time,
+                "prospective_opponents": prospective_opponents,
+                "opp_weather_forecast:": 0,
+                "CALC_topology_of_negotiation": 0}
+
+            memory = np.append(memory, memory_record)
+
+
+        a.log_info("My learning memory:")
+        print(memory)
+
+        print("\n\n##################")
+        print("##################\n\n")
+
+        #############################
+        #############################
+        #############################
 
         # saving into results_history:
         # before negotiation: excess/deficit value, objf, objf_noslackcost,
@@ -206,12 +271,12 @@ def erase_timestep_memory(ns):
         a.set_attr(opfe2=0)  # this is set only once, refers to pc_memory_exc, that's why it's here for now
         a.set_attr(pc_memory_def=np.array([{} for _ in range(max_iteration)]))
 
-#
-# def erase_persistent_memory(ns):
-#     print('--- persistent M erase ---')
-#     for vpp_idx in range(vpp_n):
-#         a = ns.proxy(data_names[vpp_idx])
-#         a.set_attr(results_history=[])
+
+def erase_learning_memory(ns):
+    print('--- learning M erase ---')
+    for vpp_idx in vpp_learn:
+        a = ns.proxy(data_names[vpp_idx])
+        a.set_attr(learning_memory=[])
 
 
 def load_jsonfile(path):
@@ -229,10 +294,12 @@ def save_results_history(global_time, global_result, vpp_result):
 
 
 opf1_save_balcost_all = np.zeros((ts_n, vpp_n, 4))
-opf1_save_genload_all = np.zeros((ts_n, vpp_n, 5, 4)) # as deep list due to different number of buses
-def save_opf1_history(global_time, opf1_save_balcost, opf1_save_genload):
+opf1_save_genload_all = np.zeros((ts_n, vpp_n, 5, 4))  # as deep list due to different number of buses
+opf1_save_prices_all = np.zeros((ts_n, vpp_n, 5))
+def save_opf1_history(global_time, opf1_save_balcost, opf1_save_genload, opf1_save_prices):
     opf1_save_balcost_all[global_time - ts_0, :, :] = opf1_save_balcost
     opf1_save_genload_all[global_time - ts_0, :, :, :] = opf1_save_genload
+    opf1_save_prices_all[global_time - ts_0, :, :] = opf1_save_prices
     return
 
 
@@ -259,7 +326,7 @@ def show_results_history(ns):
         vpp_idx = data_names_dict[alias]
         figure_counter += 1
 
-        plt.figure(figure_counter)
+        plt.figure(figure_counter, figsize=(figsizeH, figsizeL))
         plt.suptitle(str(alias) + ': balance and costs')
 
         plt.subplot(411)
@@ -299,7 +366,7 @@ def show_results_history(ns):
         plt.xlabel('time in minutes')
 
         figure_counter += 1
-        plt.figure(figure_counter)
+        plt.figure(figure_counter, figsize=(figsizeH, figsizeL))
         plt.suptitle(str(alias) + ': generators/loads with constraints. \n'
                                   'Bus 1 is slack with no internal gens and loads.')
 
@@ -314,7 +381,8 @@ def show_results_history(ns):
                 plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
                 continue
             plt.subplot(int(n_bus_real * 100 + 10 + g + 1))
-            plt.title('generation at bus: ' + str(g+1))
+            fixed_price = opf1_save_prices_all[0, vpp_idx, g]
+            plt.title('generation at bus: ' + str(g+1) + ' price: ' + str(fixed_price))
             pb = plt.plot(opf1_save_genload_all[:, vpp_idx, g, GEN_RES])
             plt.setp(pb, 'color', 'g', 'linewidth', 2.0)
             pb = plt.plot(opf1_save_genload_all[:, vpp_idx, g, GEN_UP])
@@ -348,4 +416,15 @@ def show_results_history(ns):
             plt.ylabel('objf-red, nodso-blue, after-green')
             plt.axhline(0, color='black')
 
-    plt.show()
+    plt.figure(figsize=(50, 50))
+    path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + '/'
+    if not os.path.exists(path_save):
+        os.makedirs(path_save)
+
+    pdf = matplotlib.backends.backend_pdf.PdfPages(path_save + 'all_figs.pdf')
+    for fig in range(1, figure_counter + 1):
+        pdf.savefig(fig)
+    pdf.close()
+
+    # plt.savefig(path_save + 'name.png')
+    # plt.show()

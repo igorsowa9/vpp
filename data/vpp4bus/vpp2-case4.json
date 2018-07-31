@@ -3,7 +3,7 @@
 
 	"description":"data for the case4_vpp, 3 time stamps",
 
-	"generation_type":	[0, 1, 2, 11],
+	"generation_type":	[0, 11, 1, 1],
 
 	"case":	"case4_vpp2",
 

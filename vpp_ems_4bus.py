@@ -391,17 +391,15 @@ def runOneTimestep():
     OBJF = 2   # objective function value from opf1
     OBJF_NODSO = 3  # objective function if no dso buying costs
 
-    # opf1_save_genload = np.zeros((vpp_n, 1, 1))
-    opf1_save_genload_list = [0] * vpp_n
-
     bnmax = 1
     for alias in ns.agents():
         a = ns.proxy(alias)
         bn = np.array(a.load_data(data_paths[data_names_dict[alias]])['bus_n'])
-        if bn>bnmax:
+        if bn > bnmax:
             bnmax = bn
 
     opf1_save_genload = np.zeros((vpp_n, bnmax, 4))
+    opf1_save_prices = np.zeros((vpp_n, bnmax))
     LOAD_FIX = 0  # max excess value
     GEN_RES = 1  # value to balance - deficit
     GEN_UP = 2  # objective function value from opf1
@@ -427,7 +425,9 @@ def runOneTimestep():
             opf1_save_genload[vpp_idx, b, GEN_UP] = round(ppc_t['gen'][b, 8], 4)  # modified upper constraint
             opf1_save_genload[vpp_idx, b, GEN_LOW] = round(ppc_t['gen'][b, 9], 4)  # modified lower constraint
 
-    save_opf1_history(global_time, opf1_save_balcost, opf1_save_genload)
+            opf1_save_prices[vpp_idx, b] = ppc_t['gencost'][b, 4]
+
+    save_opf1_history(global_time, opf1_save_balcost, opf1_save_genload, opf1_save_prices)
 
     ###########################################
     ###########################################
@@ -530,7 +530,7 @@ if __name__ == '__main__':
     # ##### RUN the simulation
 
     ## TEST for one time only ###
-    global_time_set(100)         #
+    global_time_set(120)         #
     runOneTimestep()            #
     time.sleep(1)               #
     ns.shutdown()               #
