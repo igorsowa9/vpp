@@ -6,8 +6,7 @@ from pprint import pprint as pp
 import copy
 from settings_4bus import *
 from other_agents import VPP_ext_agent
-from utilities import system_consensus_check, erase_iteration_memory, erase_timestep_memory, print_data, \
-    show_results_history, save_opf1_history
+from utilities import *
 
 global_time = ts_0
 
@@ -515,7 +514,8 @@ if __name__ == '__main__':
         agent.set_attr(myname=str(data_names[vpp_idx]))
         agent.set_attr(adj=adj_matrix[vpp_idx])
 
-    # subscriptions to neighbours
+
+        # subscriptions to neighbours
     for vpp_idx in range(vpp_n):
         agent = ns.proxy(data_names[vpp_idx])
         addr = agent.bind('PUB', alias='main') # this agent will publish to neighbours
@@ -529,13 +529,23 @@ if __name__ == '__main__':
 
     # ##### RUN the simulation
 
-    ## TEST for one time only ###
-    global_time_set(120)         #
-    runOneTimestep()            #
-    time.sleep(1)               #
-    ns.shutdown()               #
-    sys.exit()                  #
-    #############################
+    ## TEST for one time only ###################
+    # ts_0 = 120
+    # ts_n = 1
+    # global_time_set(ts_0)                       #
+    # erase_learning_memory(ns)                   #
+    # runOneTimestep()                            #
+    # time.sleep(1)                               #
+    # for vpp_idx in vpp_learn:                   #
+    #     agent = ns.proxy(data_names[vpp_idx])   #
+    #     agent.log_info("My memory: \n")         #
+    #     print(agent.get_attr("learning_memory"))#
+    #     print("\n\n\n")                         #
+    # ns.shutdown()                               #
+    # sys.exit()                                  #
+    #############################################
+
+    erase_learning_memory(ns)
 
     for t in range(ts_0, ts_0+ts_n):
 
@@ -543,7 +553,13 @@ if __name__ == '__main__':
         global_time_set(t)
         runOneTimestep()
 
+    for vpp_idx in vpp_learn:
+        agent = ns.proxy(data_names[vpp_idx])
+        agent.log_info("My memory: \n")
+        print(agent.get_attr("learning_memory"))
+        print("\n\n\n")
+
     time.sleep(small_wait)
 
-    show_results_history(ns)
+    # show_results_history(ns)
     ns.shutdown()

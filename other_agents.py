@@ -10,6 +10,7 @@ import sys
 from pypower.api import *
 from pypower_mod.rundcopf_noprint import rundcopf
 from pypower_mod.rundcpf_noprint import rundcpf
+from datetime import datetime, timedelta
 
 
 class VPP_ext_agent(Agent):
@@ -569,3 +570,48 @@ class VPP_ext_agent(Agent):
             pc_msg = np.append(pc_msg, [{"vpp_idx": int(v), "pc_curve": pc}])
 
         return all_bids_mod, pc_msg
+
+    def save_deal_tomemory(self, with_idx, success, n_it, n_ref, price, quantity, global_time, po_idx, po_wf, ton):
+        """
+        "with_idx": memory based on the deal with this VPP
+        "success": successful negotiation of failure, for deal is ofc successful
+        "n_it": number of iteration to successful deal
+        "n_ref": number of refuse offers in this process of negotiation
+        "price": final price
+        "quantity": final quantity
+        "dt": day time (00:00 - 23:59) in minutes 0 - 288
+        "wt": week time 1-7
+        "mt": month time 1-12
+        "po_idx": list of prospective opponents (all)
+        "po_wf": forecast numbers of the prospective opponents (all)
+        "ton": estimated "topology of negotiation" i.e. opponents in this negotiation
+
+        :return:
+        """
+
+        memory = self.get_attr("learning_memory")
+
+        start_date = datetime.strptime(start_datetime, "%d/%m/%Y %H:%M")
+        global_delta = timedelta(minutes=global_time)
+        current_time = start_date + global_delta
+
+        memory = memory.append({'with_idx': int(with_idx),
+                                'success': success,
+                                'n_it': int(n_it),
+                                'n_ref': int(n_ref),
+                                'price': price,
+                                'quantity': quantity,
+                                'minute_t': int(current_time.hour * 60 + current_time.minute),
+                                'week_t': int(current_time.weekday()),
+                                'month_t': int(current_time.month),
+                                'po_idx': po_idx,
+                                'po_wf': po_wf,
+                                'ton': ton
+                                }, ignore_index=True)
+
+        memory = memory[['with_idx', 'success', 'n_it', 'n_ref', 'price', 'quantity',
+                         'minute_t', 'week_t', 'month_t', 'po_idx', 'po_wf', 'ton']]
+        self.set_attr(learning_memory=memory)
+        self.log_info("My learning memory updated.")
+
+        return

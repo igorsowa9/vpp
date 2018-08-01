@@ -9,6 +9,7 @@ from pprint import pprint as pp
 from time import gmtime, strftime
 import os
 import matplotlib.backends.backend_pdf
+import pandas as pd
 
 
 def system_printing_opf(mpc_t, t, data):
@@ -160,35 +161,32 @@ def system_consensus_check(ns, global_time):
         n_refuse = False # has to be embedded
         n_iter = a.get_attr('n_iteration') + 1
 
+        current_memory = a.get_attr('learning_memory')
+
         # record from deals memory:
         for d in deals_memory:
             deal_with = d[0]
             prospective_opponents_idx = np.where(np.array(adj_matrix[data_names_dict[deal_with]]) == True)
-            prospective_opponents = np.array([])
+            prospective_opponents = []
             for i in prospective_opponents_idx[0]:
                 if i == data_names_dict[myself] or i == data_names_dict[deal_with]:
                     continue
-                prospective_opponents = np.append(prospective_opponents, data_names[int(i)])
+                prospective_opponents.append(int(i))
 
-            memory_record = {
-                "deal_with": deal_with,
-                "success": 1,
-                "n_iter": n_iter,
-                "n_refuse": n_refuse,
-                "price": d[1][0, 3],
-                "quantity": np.abs(d[1][0, 2]),
-                "daytime": global_time,
-                "weekday": global_time,
-                "month": global_time,
-                "prospective_opponents": prospective_opponents,
-                "opp_weather_forecast:": 0,
-                "CALC_topology_of_negotiation": 0}
-
-            memory = np.append(memory, memory_record)
-
-
-        a.log_info("My learning memory:")
-        print(memory)
+            a.save_deal_tomemory(
+                data_names_dict[deal_with],  # memory based on the deal with this VPP
+                True,              # successful negotiation of failure, for deal is ofc successful
+                n_iter,         # number of iteration to successful deal
+                n_refuse,       # number of refuse offers in this process of negotiation
+                d[1][0, 3],     # final price
+                np.abs(d[1][0, 2]),     # final quantity
+                global_time,    # day time 00:00 - 23:59 in number of minutes
+                    # week time 1-7
+                    # month time 1-12
+                prospective_opponents,     # list of prospective opponents (all)
+                [1, 2, 3],      # forecast numbers of the prospective opponents (all)
+                [1, 2, 3]       # estimated "topology of negotiation" i.e. opponents in this negotiation
+            )
 
         print("\n\n##################")
         print("##################\n\n")
@@ -276,7 +274,9 @@ def erase_learning_memory(ns):
     print('--- learning M erase ---')
     for vpp_idx in vpp_learn:
         a = ns.proxy(data_names[vpp_idx])
-        a.set_attr(learning_memory=[])
+        a.set_attr(learning_memory=pd.DataFrame({'test1': [],
+                                                 'test2': []
+                                                 }))
 
 
 def load_jsonfile(path):
@@ -403,18 +403,18 @@ def show_results_history(ns):
     # plt.ylabel('opf1 objf (red), opf1 objf\dso_costs (blue)')
 
 
-    if negotiation:
-        plt.figure(figure_counter + 1)
-        for ch in range(vpp_n):
-            plt.subplot(411+ch)
-            pb = plt.plot(vpp_results[:, ch, OBJF1])
-            plt.setp(pb, color='r', linewidth=2.0)
-            pb = plt.plot(vpp_results[:, ch, OBJF1_NODSO])
-            plt.setp(pb, color='b', linewidth=2.0)
-            pb = plt.plot(vpp_results[:, ch, OBJF_AFTER])
-            plt.setp(pb, color='g', linewidth=2.0)
-            plt.ylabel('objf-red, nodso-blue, after-green')
-            plt.axhline(0, color='black')
+    # if negotiation:
+    #     plt.figure(figure_counter + 1)
+    #     for ch in range(vpp_n):
+    #         plt.subplot(411+ch)
+    #         pb = plt.plot(vpp_results[:, ch, OBJF1])
+    #         plt.setp(pb, color='r', linewidth=2.0)
+    #         pb = plt.plot(vpp_results[:, ch, OBJF1_NODSO])
+    #         plt.setp(pb, color='b', linewidth=2.0)
+    #         pb = plt.plot(vpp_results[:, ch, OBJF_AFTER])
+    #         plt.setp(pb, color='g', linewidth=2.0)
+    #         plt.ylabel('objf-red, nodso-blue, after-green')
+    #         plt.axhline(0, color='black')
 
     plt.figure(figsize=(50, 50))
     path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + '/'
