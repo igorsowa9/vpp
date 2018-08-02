@@ -158,7 +158,7 @@ def system_consensus_check(ns, global_time):
         # prospective_oppenents_weather_forecast | CALC: topology of negotiation |
         # CALC: marginal generation of estimated opponents
 
-        n_refuse = False # has to be embedded
+        n_refuse = False  # has to be embedded
         n_iter = a.get_attr('n_iteration') + 1
 
         current_memory = a.get_attr('learning_memory')
@@ -173,13 +173,15 @@ def system_consensus_check(ns, global_time):
                     continue
                 prospective_opponents.append(int(i))
 
-            a.save_deal_tomemory(
+            gen_deals = d[1]
+
+            a.save_deal_to_memory(
                 data_names_dict[deal_with],  # memory based on the deal with this VPP
                 True,              # successful negotiation of failure, for deal is ofc successful
                 n_iter,         # number of iteration to successful deal
                 n_refuse,       # number of refuse offers in this process of negotiation
-                d[1][0, 3],     # final price
-                np.abs(d[1][0, 2]),     # final quantity
+                gen_deals[:, 3],     # final price(s)
+                np.round(np.abs(gen_deals[:, 2]),3),     # final quantity/ies
                 global_time,    # day time 00:00 - 23:59 in number of minutes
                     # week time 1-7
                     # month time 1-12

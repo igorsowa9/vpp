@@ -222,7 +222,11 @@ class VPP_ext_agent(Agent):
         c1 = generation_type[exc_matrix[0, :].astype(int)]  # check gen types of the ones in pc_matrix
         c2 = np.isin(c1, green_sources)  # choose only green ones
         c3 = np.reshape(c2, np.squeeze(c2).shape)
+
         exc_matrix_green = exc_matrix[:, c3]
+
+        if exc_matrix_green.shape[1] == 1:
+            exc_matrix_green = np.matrix(np.squeeze(exc_matrix[:, c3])).T  # the most stupid line ever
 
         if exc_matrix_green.size > 0:
             self.get_attr('opfe2').update({'exc_matrix_green': exc_matrix_green})
@@ -252,6 +256,7 @@ class VPP_ext_agent(Agent):
             # relax thermal constr.
             ppc_tg['branch'][:, [5, 6, 7]] = ppc_tg['branch'][:, [5, 6, 7]] * (1 + relax_e2)
 
+            print(ppc_tg)
             res_g = rundcopf(ppc_tg, ppoption(VERBOSE=opf1_verbose, PDIPM_GRADTOL=PDIPM_GRADTOL_mod))
 
             show = np.array(
@@ -571,7 +576,7 @@ class VPP_ext_agent(Agent):
 
         return all_bids_mod, pc_msg
 
-    def save_deal_tomemory(self, with_idx, success, n_it, n_ref, price, quantity, global_time, po_idx, po_wf, ton):
+    def save_deal_to_memory(self, with_idx, success, n_it, n_ref, price, quantity, global_time, po_idx, po_wf, ton):
         """
         "with_idx": memory based on the deal with this VPP
         "success": successful negotiation of failure, for deal is ofc successful
@@ -591,10 +596,34 @@ class VPP_ext_agent(Agent):
 
         memory = self.get_attr("learning_memory")
 
+        # convert timestamp to other times
         start_date = datetime.strptime(start_datetime, "%d/%m/%Y %H:%M")
-        global_delta = timedelta(minutes=global_time)
+        global_delta = timedelta(minutes=global_time*5)
         current_time = start_date + global_delta
 
+        # download the weather forecast of the opponents
+        # known:        installed generators' power and forecasted max power factors
+        # not known:    loads, prices, topology
+
+        for vpp_idx in po_idx:
+            vpp_file = self.load_data(data_paths[vpp_idx])
+
+            ppc0 = cases[vpp_file['case']]()
+            max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])
+
+            forecast_max_generation_factor = np.zeros(vpp_file['bus_n'])
+            forecast_max_generation = np.zeros(vpp_file['bus_n'])
+            for idx in range(vpp_file['bus_n']):
+                gen_path = vpp_file['generation_profiles_paths'][idx]
+                if not gen_path == "":
+                    d = self.load_data(gen_path)
+                    forecast = d[global_time][MEASURED]  # should be FORECASTED but for now 100% accuracy
+                    forecast_max_generation_factor[idx] = forecast + gen_mod_offset
+                    forecast_max_generation[idx] = (forecast + gen_mod_offset) * max_generation0[idx]
+
+            print("forecast_max_generation (vppidx: "+str(vpp_idx)+"): " + str(forecast_max_generation))
+
+        # create the record
         memory = memory.append({'with_idx': int(with_idx),
                                 'success': success,
                                 'n_it': int(n_it),

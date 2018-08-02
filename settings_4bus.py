@@ -7,8 +7,8 @@ import time, datetime
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 120#int(60/5*0)
-ts_n = 5#int(60/5*24)  # number of timestamps of whole simulation
+ts_0 = 133#int(60/5*0)
+ts_n = 3#int(60/5*24)  # number of timestamps of whole simulation
 
 start_datetime = "01/09/2017 00:00"
 
