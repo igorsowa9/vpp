@@ -7,8 +7,8 @@ import time, datetime
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 133#int(60/5*0)
-ts_n = 3#int(60/5*24)  # number of timestamps of whole simulation
+ts_0 = 100#int(60/5*24)
+ts_n = 2#int(60/5*24)  # number of timestamps of whole simulation
 
 start_datetime = "01/09/2017 00:00"
 
@@ -69,7 +69,7 @@ PDIPM_GRADTOL_mod = 5*1e-6
 # ASSUMPTIONS:
 # slack bus as the first one with idx 0 (some simplification, non universalities in the code, e.g. in PC building)
 # only linear cost in gencost matrix, no offset.
-# deficit agents can buy only the amount of their deficit power, even if the excess of the neighbour migh be cheaper,
+# deficit agents can buy only the amount of their deficit power, even if the excess of the neighbour might be cheaper,
 #   than their own resources (deficit agents do not run opf when they receive PCs, but just take the cheapest resources)
 #   from the neighbours' excess, according to simple sorting i.e. starting from the cheapest
 #   - but if so, where is that effort for ML then...?

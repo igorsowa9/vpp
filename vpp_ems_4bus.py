@@ -561,5 +561,5 @@ if __name__ == '__main__':
 
     time.sleep(small_wait)
 
-    # show_results_history(ns)
+    show_results_history(ns, False)
     ns.shutdown()

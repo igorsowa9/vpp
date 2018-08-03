@@ -12,6 +12,8 @@ from pypower_mod.rundcopf_noprint import rundcopf
 from pypower_mod.rundcpf_noprint import rundcpf
 from datetime import datetime, timedelta
 
+from utilities import save_opfe3_history
+
 
 class VPP_ext_agent(Agent):
 
@@ -256,7 +258,6 @@ class VPP_ext_agent(Agent):
             # relax thermal constr.
             ppc_tg['branch'][:, [5, 6, 7]] = ppc_tg['branch'][:, [5, 6, 7]] * (1 + relax_e2)
 
-            print(ppc_tg)
             res_g = rundcopf(ppc_tg, ppoption(VERBOSE=opf1_verbose, PDIPM_GRADTOL=PDIPM_GRADTOL_mod))
 
             show = np.array(
@@ -415,6 +416,11 @@ class VPP_ext_agent(Agent):
 
         self.set_attr(opfe3={'objf_inclbidsrevenue': costs})
 
+        objf_inclbidsrevenue = self.get_attr("opfe3")['objf_inclbidsrevenue']
+        self.log_info("opfe3print: " + str(objf_inclbidsrevenue))
+
+        save_opfe3_history(t, data_names_dict[self.name], objf_inclbidsrevenue)
+
         return res['success']
 
     def runopf_d2(self):
@@ -490,6 +496,10 @@ class VPP_ext_agent(Agent):
             cost += np.sum(deal_vpp[1][:, 2] * deal_vpp[1][:, 3])
         cost = np.round(cost, 4)
         self.set_attr(opfd3={'buybids_cost': cost})
+
+        self.log_info("opfd3print: " + str(self.get_attr("opfd3")))
+
+        # save_opf3_history(global_time, opf1_save_balcost, opf1_save_genload, opf1_save_prices)
 
         return True
 
@@ -576,7 +586,9 @@ class VPP_ext_agent(Agent):
 
         return all_bids_mod, pc_msg
 
-    def save_deal_to_memory(self, with_idx, success, n_it, n_ref, price, quantity, global_time, po_idx, po_wf, ton):
+    def save_deal_to_memory(self, d, global_time):
+
+        # self, with_idx, success, n_it, n_ref, price, quantity, global_time, po_idx, ton):
         """
         "with_idx": memory based on the deal with this VPP
         "success": successful negotiation of failure, for deal is ofc successful
@@ -593,6 +605,18 @@ class VPP_ext_agent(Agent):
 
         :return:
         """
+        myself = self.name
+
+        deal_with = d[0]
+
+        # define prospective opponents in case of such a deal
+        prospective_opponents_idx = np.where(np.array(adj_matrix[data_names_dict[deal_with]]) == True)
+        po_idx = []
+        for i in prospective_opponents_idx[0]:
+            if i == data_names_dict[myself] or i == data_names_dict[deal_with]:
+                continue
+            po_idx.append(int(i))
+        gen_deals = d[1]
 
         memory = self.get_attr("learning_memory")
 
@@ -601,10 +625,15 @@ class VPP_ext_agent(Agent):
         global_delta = timedelta(minutes=global_time*5)
         current_time = start_date + global_delta
 
+        my_req = self.get_attr('requests')
+
         # download the weather forecast of the opponents
         # known:        installed generators' power and forecasted max power factors
         # not known:    loads, prices, topology
 
+        po_wf = {}
+        res_installed_power_factor = {}
+        av_weather_factor = {}
         for vpp_idx in po_idx:
             vpp_file = self.load_data(data_paths[vpp_idx])
 
@@ -619,27 +648,63 @@ class VPP_ext_agent(Agent):
                     d = self.load_data(gen_path)
                     forecast = d[global_time][MEASURED]  # should be FORECASTED but for now 100% accuracy
                     forecast_max_generation_factor[idx] = forecast + gen_mod_offset
-                    forecast_max_generation[idx] = (forecast + gen_mod_offset) * max_generation0[idx]
+                    forecast_max_generation[idx] = np.round((forecast + gen_mod_offset) * max_generation0[idx], 4)
+                po_wf.update({vpp_idx: forecast_max_generation})
 
-            print("forecast_max_generation (vppidx: "+str(vpp_idx)+"): " + str(forecast_max_generation))
+            generation_type = np.array(self.load_data(data_paths[vpp_idx])['generation_type'])
+
+            stack = np.vstack((max_generation0, forecast_max_generation, generation_type))
+            stack = stack[:, 1:].T
+
+            res = 0
+            max_res = 0
+            max_nores = 0
+            max = np.sum(stack[:, 0])
+            for s in stack:
+                if s[2] in green_sources:
+                    res += s[1]
+                    max_res += s[0]
+                else:
+                    max_nores += s[0]
+            res_installed_power_factor.update({vpp_idx: round(max_res / max, 4)})
+            av_weather_factor.update({vpp_idx: round(res / max_res, 4)})
+            # print("stack: " + str(stack))
+
+        for req in my_req:
+            if req['vpp_name'] == deal_with:
+                req_value = req['value']
 
         # create the record
-        memory = memory.append({'with_idx': int(with_idx),
-                                'success': success,
-                                'n_it': int(n_it),
-                                'n_ref': int(n_ref),
-                                'price': price,
-                                'quantity': quantity,
+        memory = memory.append({'with_idx_req': np.array([int(data_names_dict[deal_with]), req_value]),
+                                'success': True,   # its based on successful deals so far only
+                                'n_it': self.get_attr('n_iteration') + 1,
+                                'n_ref': "tbd",
+                                'price': gen_deals[:, 3],
+                                'quantity': np.round(np.abs(gen_deals[:, 2]), 3),
                                 'minute_t': int(current_time.hour * 60 + current_time.minute),
                                 'week_t': int(current_time.weekday()),
                                 'month_t': int(current_time.month),
-                                'po_idx': po_idx,
+                                # 'po_idx': po_idx, # redundant, included in po_wf actually
                                 'po_wf': po_wf,
-                                'ton': ton
+                                # 'res_inst': res_installed_power_factor, # could be here, but it is constant
+                                'av_weather': av_weather_factor,
+                                'ton': "tb calculated"
                                 }, ignore_index=True)
 
-        memory = memory[['with_idx', 'success', 'n_it', 'n_ref', 'price', 'quantity',
-                         'minute_t', 'week_t', 'month_t', 'po_idx', 'po_wf', 'ton']]
+        memory = memory[['with_idx_req',
+                         'success',
+                         'n_it',
+                         'n_ref',
+                         'price',
+                         'quantity',
+                         'minute_t',
+                         'week_t',
+                         'month_t',
+                         # 'po_idx',
+                         'po_wf',
+                         # 'res_inst',
+                         'av_weather',
+                         'ton']]
         self.set_attr(learning_memory=memory)
         self.log_info("My learning memory updated.")
 

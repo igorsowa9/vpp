@@ -147,48 +147,12 @@ def system_consensus_check(ns, global_time):
         #############################
 
         # for VPP3 with ML as excess agent
-        myself = 'vpp3'
         a = ns.proxy('vpp3')
-
-        memory = np.array([])
-
         deals_memory = a.get_attr('timestep_memory_mydeals')
-
-        # with_who (def) | success | iterations | refuses || price | quantity || daytime | weekday | month |
-        # prospective_oppenents_weather_forecast | CALC: topology of negotiation |
-        # CALC: marginal generation of estimated opponents
-
-        n_refuse = False  # has to be embedded
-        n_iter = a.get_attr('n_iteration') + 1
-
-        current_memory = a.get_attr('learning_memory')
 
         # record from deals memory:
         for d in deals_memory:
-            deal_with = d[0]
-            prospective_opponents_idx = np.where(np.array(adj_matrix[data_names_dict[deal_with]]) == True)
-            prospective_opponents = []
-            for i in prospective_opponents_idx[0]:
-                if i == data_names_dict[myself] or i == data_names_dict[deal_with]:
-                    continue
-                prospective_opponents.append(int(i))
-
-            gen_deals = d[1]
-
-            a.save_deal_to_memory(
-                data_names_dict[deal_with],  # memory based on the deal with this VPP
-                True,              # successful negotiation of failure, for deal is ofc successful
-                n_iter,         # number of iteration to successful deal
-                n_refuse,       # number of refuse offers in this process of negotiation
-                gen_deals[:, 3],     # final price(s)
-                np.round(np.abs(gen_deals[:, 2]),3),     # final quantity/ies
-                global_time,    # day time 00:00 - 23:59 in number of minutes
-                    # week time 1-7
-                    # month time 1-12
-                prospective_opponents,     # list of prospective opponents (all)
-                [1, 2, 3],      # forecast numbers of the prospective opponents (all)
-                [1, 2, 3]       # estimated "topology of negotiation" i.e. opponents in this negotiation
-            )
+            a.save_deal_to_memory(d, global_time)
 
         print("\n\n##################")
         print("##################\n\n")
@@ -276,9 +240,7 @@ def erase_learning_memory(ns):
     print('--- learning M erase ---')
     for vpp_idx in vpp_learn:
         a = ns.proxy(data_names[vpp_idx])
-        a.set_attr(learning_memory=pd.DataFrame({'test1': [],
-                                                 'test2': []
-                                                 }))
+        a.set_attr(learning_memory=pd.DataFrame({}))
 
 
 def load_jsonfile(path):
@@ -305,7 +267,14 @@ def save_opf1_history(global_time, opf1_save_balcost, opf1_save_genload, opf1_sa
     return
 
 
-def show_results_history(ns):
+opfe3_save_costs_all = np.zeros((ts_n, vpp_n, 1))
+def save_opfe3_history(global_time, vpp_idx, objf_inclbidsrevenue):
+    opfe3_save_costs_all[global_time - ts_0, vpp_idx, :] = objf_inclbidsrevenue
+    print("opfe3_save_costs_all-1 " + str(opfe3_save_costs_all))
+    return
+
+
+def show_results_history(ns, pdf):
 
     VPP_MAXEXC = 0   # max excess value
     VPP_PBAL = 1   # value to balance - deficit
@@ -363,9 +332,17 @@ def show_results_history(ns):
         plt.setp(pb, 'color', 'r', 'linewidth', 2.0)
         pb = plt.plot(opf1_save_balcost_all[:, vpp_idx, OBJF_NODSO])
         plt.setp(pb, 'color', 'b', 'linewidth', 2.0)
+        ####################
+        print("opfe3_save_costs_all-2 " + str(opfe3_save_costs_all))
+        if vpp_idx == 2:
+            pb = plt.plot(opfe3_save_costs_all[:, vpp_idx])
+            plt.setp(pb, 'color', 'yellow', 'linewidth', 2.0)
+        ####################
         plt.ylabel('cost value')
         plt.axhline(0, color='black')
         plt.xlabel('time in minutes')
+
+
 
         figure_counter += 1
         plt.figure(figure_counter, figsize=(figsizeH, figsizeL))
@@ -419,14 +396,15 @@ def show_results_history(ns):
     #         plt.axhline(0, color='black')
 
     plt.figure(figsize=(50, 50))
-    path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + '/'
-    if not os.path.exists(path_save):
-        os.makedirs(path_save)
 
-    pdf = matplotlib.backends.backend_pdf.PdfPages(path_save + 'all_figs.pdf')
-    for fig in range(1, figure_counter + 1):
-        pdf.savefig(fig)
-    pdf.close()
+    if pdf:
+        path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + '/'
+        if not os.path.exists(path_save):
+            os.makedirs(path_save)
 
-    # plt.savefig(path_save + 'name.png')
-    # plt.show()
+        pdf = matplotlib.backends.backend_pdf.PdfPages(path_save + 'all_figs.pdf')
+        for fig in range(1, figure_counter + 1):
+            pdf.savefig(fig)
+        pdf.close()
+    else:
+        plt.show()
