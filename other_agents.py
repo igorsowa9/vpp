@@ -416,11 +416,6 @@ class VPP_ext_agent(Agent):
 
         self.set_attr(opfe3={'objf_inclbidsrevenue': costs})
 
-        objf_inclbidsrevenue = self.get_attr("opfe3")['objf_inclbidsrevenue']
-        self.log_info("opfe3print: " + str(objf_inclbidsrevenue))
-
-        save_opfe3_history(t, data_names_dict[self.name], objf_inclbidsrevenue)
-
         return res['success']
 
     def runopf_d2(self):
@@ -464,9 +459,9 @@ class VPP_ext_agent(Agent):
         # fill the bids with the unbidded vpps for refuse messages
         bids = np.array(bids)
         b = np.matrix(all_pc)
-        all = np.unique(np.array(b[:, 0]))
+        allb = np.unique(np.array(b[:, 0]))
         are = np.array(np.matrix(bids)[:, 0])
-        missing = np.setdiff1d(all, are)
+        missing = np.setdiff1d(allb, are)
         for m in missing:
             empty_bid = np.array([[m, 0, 0, 0]])
             bids = np.concatenate((bids, empty_bid), axis=0)
@@ -656,23 +651,33 @@ class VPP_ext_agent(Agent):
             stack = np.vstack((max_generation0, forecast_max_generation, generation_type))
             stack = stack[:, 1:].T
 
-            res = 0
-            max_res = 0
-            max_nores = 0
+            print("stack: " + str(stack))
+
+            res_weather = 0
+            max_res_weather = 0
+            max_other = 0
             max = np.sum(stack[:, 0])
             for s in stack:
-                if s[2] in green_sources:
-                    res += s[1]
-                    max_res += s[0]
+                if s[2] in weather_dependant_sources:
+                    res_weather += s[1]
+                    max_res_weather += s[0]
                 else:
-                    max_nores += s[0]
-            res_installed_power_factor.update({vpp_idx: round(max_res / max, 4)})
-            av_weather_factor.update({vpp_idx: round(res / max_res, 4)})
+                    max_other += s[0]
+            res_installed_power_factor.update({vpp_idx: round(max_res_weather / max, 4)})
+
+            print(res_installed_power_factor)
+
+            av_weather_factor.update({vpp_idx: round(res_weather / max_res_weather, 4)})
             # print("stack: " + str(stack))
 
         for req in my_req:
             if req['vpp_name'] == deal_with:
                 req_value = req['value']
+
+        ton = "tb calculated"
+
+        if req_value == np.round(np.sum(np.abs(gen_deals[:, 2])), 3):
+            ton = []
 
         # create the record
         memory = memory.append({'with_idx_req': np.array([int(data_names_dict[deal_with]), req_value]),
@@ -688,7 +693,7 @@ class VPP_ext_agent(Agent):
                                 'po_wf': po_wf,
                                 # 'res_inst': res_installed_power_factor, # could be here, but it is constant
                                 'av_weather': av_weather_factor,
-                                'ton': "tb calculated"
+                                'ton': ton
                                 }, ignore_index=True)
 
         memory = memory[['with_idx_req',

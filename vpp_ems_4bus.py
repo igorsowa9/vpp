@@ -233,6 +233,7 @@ def bid_offer_handler(self, message):
             # but do not set consensus yet, only when final accept is received
             if count == 0:
                 feasibility = self.runopf_e3(all_bids_nz, self.get_attr('agent_time'))
+
                 if feasibility:
                     self.log_info('pf_e3 (1): feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
@@ -260,6 +261,7 @@ def bid_offer_handler(self, message):
 
                 # opf should be checked if the transport of such a power is possible to the respective deficit vpps through the respective PCCs:
                 feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
+
                 if feasibility:
                     self.log_info('pf_e3 (2): feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
@@ -501,6 +503,32 @@ def runOneTimestep():
             time.sleep(small_wait)
             multi_consensus = system_consensus_check(ns, global_time)
 
+        ######## Save OPF3 to opf3_history ########
+        ###########################################
+        ###########################################
+        # saving into opf1_history:
+        # - general results of opf1: excess/deficit value, objf, objf_noslackcost,
+        # - generators: results and constraints (dependent on the weather)
+        # - loads: results (and constraints)
+
+        VPP_OBJF_AFTER = 0  # costs after negotiation
+
+        opfe3_history = np.zeros((vpp_n, 1))
+
+        for alias in ns.agents():
+            a = ns.proxy(alias)
+            vpp_idx = data_names_dict[alias]
+            if a.get_attr("opfe3"):
+                objf_inclbidsrevenue = a.get_attr("opfe3")['objf_inclbidsrevenue']
+                opfe3_history[vpp_idx, VPP_OBJF_AFTER] = np.round(objf_inclbidsrevenue, 4)
+            elif a.get_attr("opfd3"):
+                total_withbids = np.round(a.get_attr('opfd3')['buybids_cost'] + a.get_attr('opf1')['objf_noslackcost'], 4)
+                opfe3_history[vpp_idx, VPP_OBJF_AFTER] = total_withbids
+            else:
+                opfe3_history[vpp_idx, VPP_OBJF_AFTER] = np.round(a.get_attr('opf1')['objf'], 4)
+
+        save_opfe3_history(global_time, opfe3_history)
+
 
 if __name__ == '__main__':
 
@@ -529,22 +557,6 @@ if __name__ == '__main__':
 
     # ##### RUN the simulation
 
-    ## TEST for one time only ###################
-    # ts_0 = 120
-    # ts_n = 1
-    # global_time_set(ts_0)                       #
-    # erase_learning_memory(ns)                   #
-    # runOneTimestep()                            #
-    # time.sleep(1)                               #
-    # for vpp_idx in vpp_learn:                   #
-    #     agent = ns.proxy(data_names[vpp_idx])   #
-    #     agent.log_info("My memory: \n")         #
-    #     print(agent.get_attr("learning_memory"))#
-    #     print("\n\n\n")                         #
-    # ns.shutdown()                               #
-    # sys.exit()                                  #
-    #############################################
-
     erase_learning_memory(ns)
 
     for t in range(ts_0, ts_0+ts_n):
@@ -553,13 +565,9 @@ if __name__ == '__main__':
         global_time_set(t)
         runOneTimestep()
 
-    for vpp_idx in vpp_learn:
-        agent = ns.proxy(data_names[vpp_idx])
-        agent.log_info("My memory: \n")
-        print(agent.get_attr("learning_memory"))
-        print("\n\n\n")
-
     time.sleep(small_wait)
 
-    show_results_history(ns, False)
+    save_learning_memory(ns, tofile)
+    show_results_history(ns, pdf)
+
     ns.shutdown()

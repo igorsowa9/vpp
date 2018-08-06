@@ -12,13 +12,13 @@
 
 	"pc_matrix_price_increase_factor": 1.47,
 
-	"dso_price": 200,
+	"dso_price": 100,
 
 	"generation_profiles_paths": [
 		"",
 		"",
-		"/home/iso/PycharmProjects/vpp/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_18_06_18.json",
-		"/home/iso/PycharmProjects/vpp/data/original_elia/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_30_06_18.json"
+		"/home/iso/PycharmProjects/vpp/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180618_20180624.json",
+		"/home/iso/PycharmProjects/vpp/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180618_20180624.json"
 	],
 
 	"fixed_load_profiles_paths": [

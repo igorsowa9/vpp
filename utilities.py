@@ -268,9 +268,8 @@ def save_opf1_history(global_time, opf1_save_balcost, opf1_save_genload, opf1_sa
 
 
 opfe3_save_costs_all = np.zeros((ts_n, vpp_n, 1))
-def save_opfe3_history(global_time, vpp_idx, objf_inclbidsrevenue):
-    opfe3_save_costs_all[global_time - ts_0, vpp_idx, :] = objf_inclbidsrevenue
-    print("opfe3_save_costs_all-1 " + str(opfe3_save_costs_all))
+def save_opfe3_history(global_time, opf3_history):
+    opfe3_save_costs_all[global_time - ts_0, :, :] = opf3_history
     return
 
 
@@ -327,22 +326,20 @@ def show_results_history(ns, pdf):
         plt.axhline(0, color='black')
 
         plt.subplot(414)
-        plt.title('cost in vpp0 (def from DSO - red), cost in vpp0 (def. costs excl. - blue)')
+        plt.title('cost in vpp0 (def from DSO - red), cost in vpp0 (def. costs excl. - blue), incl. negotiation: yellow')
         pb = plt.plot(opf1_save_balcost_all[:, vpp_idx, OBJF])
         plt.setp(pb, 'color', 'r', 'linewidth', 2.0)
         pb = plt.plot(opf1_save_balcost_all[:, vpp_idx, OBJF_NODSO])
         plt.setp(pb, 'color', 'b', 'linewidth', 2.0)
+
+        ####### AFTER NEGOTIATION #############
+        pb = plt.plot(opfe3_save_costs_all[:, vpp_idx])
+        plt.setp(pb, 'color', 'gold', 'linewidth', 2.0)
         ####################
-        print("opfe3_save_costs_all-2 " + str(opfe3_save_costs_all))
-        if vpp_idx == 2:
-            pb = plt.plot(opfe3_save_costs_all[:, vpp_idx])
-            plt.setp(pb, 'color', 'yellow', 'linewidth', 2.0)
-        ####################
+
         plt.ylabel('cost value')
         plt.axhline(0, color='black')
         plt.xlabel('time in minutes')
-
-
 
         figure_counter += 1
         plt.figure(figure_counter, figsize=(figsizeH, figsizeL))
@@ -369,32 +366,6 @@ def show_results_history(ns, pdf):
             pb = plt.plot(opf1_save_genload_all[:, vpp_idx, g, GEN_LOW])
             plt.setp(pb, 'color', 'b', 'linewidth', 1.0, dashes=[6, 2])
 
-    # figure_counter = + 1
-    # plt.figure(figure_counter)
-    #
-    # for ch in range(vpp_n):
-    #     plt.subplot(vpp_n*100 + 11 + ch)
-    #     pb = plt.plot(opf1_results[:, ch, OBJF1])
-    #     plt.setp(pb, color='r', linewidth=2.0)
-    #     pb = plt.plot(opf1_results[:, ch, OBJF1_NODSO])
-    #     plt.setp(pb, color='b', linewidth=2.0)
-    #     plt.axhline(0, color='black')
-    # plt.ylabel('opf1 objf (red), opf1 objf\dso_costs (blue)')
-
-
-    # if negotiation:
-    #     plt.figure(figure_counter + 1)
-    #     for ch in range(vpp_n):
-    #         plt.subplot(411+ch)
-    #         pb = plt.plot(vpp_results[:, ch, OBJF1])
-    #         plt.setp(pb, color='r', linewidth=2.0)
-    #         pb = plt.plot(vpp_results[:, ch, OBJF1_NODSO])
-    #         plt.setp(pb, color='b', linewidth=2.0)
-    #         pb = plt.plot(vpp_results[:, ch, OBJF_AFTER])
-    #         plt.setp(pb, color='g', linewidth=2.0)
-    #         plt.ylabel('objf-red, nodso-blue, after-green')
-    #         plt.axhline(0, color='black')
-
     plt.figure(figsize=(50, 50))
 
     if pdf:
@@ -408,3 +379,21 @@ def show_results_history(ns, pdf):
         pdf.close()
     else:
         plt.show()
+
+
+def save_learning_memory(ns, tofile):
+
+    path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + '/'
+
+    for vpp_idx in vpp_learn:
+
+        agent = ns.proxy(data_names[vpp_idx])
+        agent.log_info("My memory: \n")
+
+        print(agent.get_attr("learning_memory"))
+        print("\n\n\n")
+
+        if tofile:
+            if not os.path.exists(path_save):
+                os.makedirs(path_save)
+            agent.get_attr("learning_memory").to_csv(path_save + str(vpp_idx) + ".csv")

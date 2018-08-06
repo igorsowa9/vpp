@@ -38,7 +38,7 @@ def case4_vpp2():
     # 1 startup shutdown n x1 y1 ... xn yn
     # 2 startup shutdown n c(n-1) ... c0
     ppc["gencost"] = array([
-        [2, 0, 0, 2, 200, 0],  # slack-export
+        [2, 0, 0, 2, 100, 0],  # slack-export
         [2, 0, 0, 2, 29,   0],
         [2, 0, 0, 2, 7,   0],
         [2, 0, 0, 2, 11,  0]

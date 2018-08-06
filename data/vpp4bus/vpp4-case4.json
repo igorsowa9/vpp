@@ -3,7 +3,7 @@
 
 	"description":"data for the case4_vpp, 3 time stamps",
 
-	"generation_type":	[0, 5, 1, 2],
+	"generation_type":	[0, 4, 1, 2],
 
 	"case":	"case4_vpp4",
 
@@ -12,7 +12,7 @@
 
 	"pc_matrix_price_increase_factor": 1.1,
 
-	"dso_price": 200,
+	"dso_price": 100,
 
 	"generation_profiles_paths": [
 		"",

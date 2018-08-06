@@ -7,8 +7,10 @@ import time, datetime
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 100#int(60/5*24)
-ts_n = 2#int(60/5*24)  # number of timestamps of whole simulation
+ts_0 = 0#*int(60/5*24)
+ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
+tofile = False
+pdf = False
 
 start_datetime = "01/09/2017 00:00"
 
@@ -50,7 +52,7 @@ figsizeL = 12
 dso_green_price_increase_factor = 1.05
 
 opf1_verbose = 0
-opf1_prinpf = True
+opf1_prinpf = False
 opfe3_prinpf = False
 opfe2_prinpf = False
 
@@ -90,6 +92,7 @@ PDIPM_GRADTOL_mod = 5*1e-6
 #       - contracts with DSO might be different for different VPPs (that could be learned by the other VPPs too)
 
 green_sources = [1, 2, 3, 4, 5]
+weather_dependant_sources = [1, 2, 3]
 grey_sources = [11, 12, 13, 14, 15]
 
 # Generation types:
