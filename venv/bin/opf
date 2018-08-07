@@ -1,6 +1,6 @@
 #!/home/iso/PycharmProjects/vpp/venv/bin/python
-# EASY-INSTALL-ENTRY-SCRIPT: 'PYPOWER==5.1.3','console_scripts','opf'
-__requires__ = 'PYPOWER==5.1.3'
+# EASY-INSTALL-ENTRY-SCRIPT: 'PYPOWER==5.1.4','console_scripts','opf'
+__requires__ = 'PYPOWER==5.1.4'
 import re
 import sys
 from pkg_resources import load_entry_point
@@ -8,5 +8,5 @@ from pkg_resources import load_entry_point
 if __name__ == '__main__':
     sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
     sys.exit(
-        load_entry_point('PYPOWER==5.1.3', 'console_scripts', 'opf')()
+        load_entry_point('PYPOWER==5.1.4', 'console_scripts', 'opf')()
     )

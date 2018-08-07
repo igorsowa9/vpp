@@ -1,6 +1,11 @@
 from __future__ import division, absolute_import, print_function
 
-import collections
+try:
+    # Accessing collections abstract classes from collections
+    # has been deprecated since Python 3.3
+    import collections.abc as collections_abc
+except ImportError:
+    import collections as collections_abc
 import itertools
 import operator
 import sys
@@ -42,7 +47,13 @@ else:
     import cPickle as pickle
     import __builtin__ as builtins
 
-loads = pickle.loads
+
+def loads(*args, **kwargs):
+    # NumPy 1.15.0, 2017-12-10
+    warnings.warn(
+        "np.core.numeric.loads is deprecated, use pickle.loads instead",
+        DeprecationWarning, stacklevel=2)
+    return pickle.loads(*args, **kwargs)
 
 
 __all__ = [
@@ -63,7 +74,7 @@ __all__ = [
     'False_', 'True_', 'bitwise_not', 'CLIP', 'RAISE', 'WRAP', 'MAXDIMS',
     'BUFSIZE', 'ALLOW_THREADS', 'ComplexWarning', 'full', 'full_like',
     'matmul', 'shares_memory', 'may_share_memory', 'MAY_SHARE_BOUNDS',
-    'MAY_SHARE_EXACT', 'TooHardError', 'AxisError' ]
+    'MAY_SHARE_EXACT', 'TooHardError', 'AxisError']
 
 if sys.version_info[0] < 3:
     __all__.extend(['getbuffer', 'newbuffer'])
@@ -112,11 +123,10 @@ def zeros_like(a, dtype=None, order='K', subok=True):
 
     See Also
     --------
-    ones_like : Return an array of ones with shape and type of input.
     empty_like : Return an empty array with shape and type of input.
+    ones_like : Return an array of ones with shape and type of input.
+    full_like : Return a new array with shape of input filled with value.
     zeros : Return a new array setting values to zero.
-    ones : Return a new array setting values to one.
-    empty : Return a new uninitialized array.
 
     Examples
     --------
@@ -154,9 +164,10 @@ def ones(shape, dtype=None, order='C'):
     dtype : data-type, optional
         The desired data-type for the array, e.g., `numpy.int8`.  Default is
         `numpy.float64`.
-    order : {'C', 'F'}, optional
-        Whether to store multidimensional data in C- or Fortran-contiguous
-        (row- or column-wise) order in memory.
+    order : {'C', 'F'}, optional, default: C
+        Whether to store multi-dimensional data in row-major
+        (C-style) or column-major (Fortran-style) order in
+        memory.
 
     Returns
     -------
@@ -165,7 +176,11 @@ def ones(shape, dtype=None, order='C'):
 
     See Also
     --------
-    zeros, ones_like
+    ones_like : Return an array of ones with shape and type of input.
+    empty : Return a new uninitialized array.
+    zeros : Return a new array setting values to zero.
+    full : Return a new array of given shape filled with value.
+
 
     Examples
     --------
@@ -222,11 +237,10 @@ def ones_like(a, dtype=None, order='K', subok=True):
 
     See Also
     --------
-    zeros_like : Return an array of zeros with shape and type of input.
     empty_like : Return an empty array with shape and type of input.
-    zeros : Return a new array setting values to zero.
+    zeros_like : Return an array of zeros with shape and type of input.
+    full_like : Return a new array with shape of input filled with value.
     ones : Return a new array setting values to one.
-    empty : Return a new uninitialized array.
 
     Examples
     --------
@@ -275,13 +289,10 @@ def full(shape, fill_value, dtype=None, order='C'):
 
     See Also
     --------
-    zeros_like : Return an array of zeros with shape and type of input.
-    ones_like : Return an array of ones with shape and type of input.
-    empty_like : Return an empty array with shape and type of input.
-    full_like : Fill an array with shape and type of input.
-    zeros : Return a new array setting values to zero.
-    ones : Return a new array setting values to one.
+    full_like : Return a new array with shape of input filled with value.
     empty : Return a new uninitialized array.
+    ones : Return a new array setting values to one.
+    zeros : Return a new array setting values to zero.
 
     Examples
     --------
@@ -330,13 +341,10 @@ def full_like(a, fill_value, dtype=None, order='K', subok=True):
 
     See Also
     --------
-    zeros_like : Return an array of zeros with shape and type of input.
-    ones_like : Return an array of ones with shape and type of input.
     empty_like : Return an empty array with shape and type of input.
-    zeros : Return a new array setting values to zero.
-    ones : Return a new array setting values to one.
-    empty : Return a new uninitialized array.
-    full : Fill a new array.
+    ones_like : Return an array of ones with shape and type of input.
+    zeros_like : Return an array of zeros with shape and type of input.
+    full : Return a new array of given shape filled with value.
 
     Examples
     --------
@@ -358,6 +366,7 @@ def full_like(a, fill_value, dtype=None, order='K', subok=True):
     res = empty_like(a, dtype=dtype, order=order, subok=subok)
     multiarray.copyto(res, fill_value, casting='unsafe')
     return res
+
 
 def count_nonzero(a, axis=None):
     """
@@ -480,9 +489,9 @@ def asarray(a, dtype=None, order=None):
 
     Contrary to `asanyarray`, ndarray subclasses are not passed through:
 
-    >>> issubclass(np.matrix, np.ndarray)
+    >>> issubclass(np.recarray, np.ndarray)
     True
-    >>> a = np.matrix([[1, 2]])
+    >>> a = np.array([(1.0, 2), (3.0, 4)], dtype='f4,i4').view(np.recarray)
     >>> np.asarray(a) is a
     False
     >>> np.asanyarray(a) is a
@@ -536,7 +545,7 @@ def asanyarray(a, dtype=None, order=None):
 
     Instances of `ndarray` subclasses are passed through as-is:
 
-    >>> a = np.matrix([1, 2])
+    >>> a = np.array([(1.0, 2), (3.0, 4)], dtype='f4,i4').view(np.recarray)
     >>> np.asanyarray(a) is a
     True
 
@@ -680,12 +689,12 @@ def require(a, dtype=None, requirements=None):
       UPDATEIFCOPY : False
 
     """
-    possible_flags = {'C':'C', 'C_CONTIGUOUS':'C', 'CONTIGUOUS':'C',
-                      'F':'F', 'F_CONTIGUOUS':'F', 'FORTRAN':'F',
-                      'A':'A', 'ALIGNED':'A',
-                      'W':'W', 'WRITEABLE':'W',
-                      'O':'O', 'OWNDATA':'O',
-                      'E':'E', 'ENSUREARRAY':'E'}
+    possible_flags = {'C': 'C', 'C_CONTIGUOUS': 'C', 'CONTIGUOUS': 'C',
+                      'F': 'F', 'F_CONTIGUOUS': 'F', 'FORTRAN': 'F',
+                      'A': 'A', 'ALIGNED': 'A',
+                      'W': 'W', 'WRITEABLE': 'W',
+                      'O': 'O', 'OWNDATA': 'O',
+                      'E': 'E', 'ENSUREARRAY': 'E'}
     if not requirements:
         return asanyarray(a, dtype=dtype)
     else:
@@ -823,12 +832,12 @@ def flatnonzero(a):
     """
     Return indices that are non-zero in the flattened version of a.
 
-    This is equivalent to a.ravel().nonzero()[0].
+    This is equivalent to np.nonzero(np.ravel(a))[0].
 
     Parameters
     ----------
-    a : ndarray
-        Input array.
+    a : array_like
+        Input data.
 
     Returns
     -------
@@ -856,7 +865,7 @@ def flatnonzero(a):
     array([-2, -1,  1,  2])
 
     """
-    return a.ravel().nonzero()[0]
+    return np.nonzero(np.ravel(a))[0]
 
 
 _mode_from_name_dict = {'v': 0,
@@ -1076,7 +1085,7 @@ def outer(a, b, out=None):
 
     References
     ----------
-    .. [1] : G. H. Golub and C. F. van Loan, *Matrix Computations*, 3rd
+    .. [1] : G. H. Golub and C. F. Van Loan, *Matrix Computations*, 3rd
              ed., Baltimore, MD, Johns Hopkins University Press, 1996,
              pg. 8.
 
@@ -1117,7 +1126,7 @@ def outer(a, b, out=None):
     """
     a = asarray(a)
     b = asarray(b)
-    return multiply(a.ravel()[:, newaxis], b.ravel()[newaxis,:], out)
+    return multiply(a.ravel()[:, newaxis], b.ravel()[newaxis, :], out)
 
 
 def tensordot(a, b, axes=2):
@@ -1784,6 +1793,7 @@ def cross(a, b, axisa=-1, axisb=-1, axisc=-1, axis=None):
 
     return moveaxis(cp, -1, axisc)
 
+
 little_endian = (sys.byteorder == 'little')
 
 
@@ -2025,7 +2035,7 @@ def binary_repr(num, width=None):
     '11101'
 
     """
-    def warn_if_insufficient(width, binwdith):
+    def warn_if_insufficient(width, binwidth):
         if width is not None and width < binwidth:
             warnings.warn(
                 "Insufficient bit width provided. This behavior "
@@ -2134,6 +2144,10 @@ def load(file):
     load, save
 
     """
+    # NumPy 1.15.0, 2017-12-10
+    warnings.warn(
+        "np.core.numeric.load is deprecated, use pickle.load instead",
+        DeprecationWarning, stacklevel=2)
     if isinstance(file, type("")):
         file = open(file, "rb")
     return pickle.load(file)
@@ -2267,6 +2281,9 @@ def isclose(a, b, rtol=1.e-5, atol=1.e-8, equal_nan=False):
     `atol` are added together to compare against the absolute difference
     between `a` and `b`.
 
+    .. warning:: The default `atol` is not appropriate for comparing numbers
+                 that are much smaller than one (see Notes).
+
     Parameters
     ----------
     a, b : array_like
@@ -2299,9 +2316,15 @@ def isclose(a, b, rtol=1.e-5, atol=1.e-8, equal_nan=False):
 
      absolute(`a` - `b`) <= (`atol` + `rtol` * absolute(`b`))
 
-    The above equation is not symmetric in `a` and `b`, so that
-    `isclose(a, b)` might be different from `isclose(b, a)` in
-    some rare cases.
+    Unlike the built-in `math.isclose`, the above equation is not symmetric
+    in `a` and `b` -- it assumes `b` is the reference value -- so that
+    `isclose(a, b)` might be different from `isclose(b, a)`. Furthermore,
+    the default value of atol is not zero, and is used to determine what
+    small values should be considered close to zero. The default value is
+    appropriate for expected values of order unity: if the expected values
+    are significantly smaller than one, it can result in false positives.
+    `atol` should be carefully selected for the use case at hand. A zero value
+    for `atol` will result in `False` if either `a` or `b` is zero.
 
     Examples
     --------
@@ -2315,6 +2338,14 @@ def isclose(a, b, rtol=1.e-5, atol=1.e-8, equal_nan=False):
     array([True, False])
     >>> np.isclose([1.0, np.nan], [1.0, np.nan], equal_nan=True)
     array([True, True])
+    >>> np.isclose([1e-8, 1e-7], [0.0, 0.0])
+    array([ True, False], dtype=bool)
+    >>> np.isclose([1e-100, 1e-7], [0.0, 0.0], atol=0.0)
+    array([False, False], dtype=bool)
+    >>> np.isclose([1e-10, 1e-10], [1e-20, 0.0])
+    array([ True,  True], dtype=bool)
+    >>> np.isclose([1e-10, 1e-10], [1e-20, 0.999999e-10], atol=0.0)
+    array([False,  True], dtype=bool)
     """
     def within_tol(x, y, atol, rtol):
         with errstate(invalid='ignore'):
@@ -2444,12 +2475,12 @@ def array_equiv(a1, a2):
     return bool(asarray(a1 == a2).all())
 
 
-_errdict = {"ignore":ERR_IGNORE,
-            "warn":ERR_WARN,
-            "raise":ERR_RAISE,
-            "call":ERR_CALL,
-            "print":ERR_PRINT,
-            "log":ERR_LOG}
+_errdict = {"ignore": ERR_IGNORE,
+            "warn": ERR_WARN,
+            "raise": ERR_RAISE,
+            "call": ERR_CALL,
+            "print": ERR_PRINT,
+            "log": ERR_LOG}
 
 _errdict_rev = {}
 for key in _errdict.keys():
@@ -2498,7 +2529,7 @@ def seterr(all=None, divide=None, over=None, under=None, invalid=None):
 
     Notes
     -----
-    The floating-point exceptions are defined in the IEEE 754 standard [1]:
+    The floating-point exceptions are defined in the IEEE 754 standard [1]_:
 
     - Division by zero: infinite result obtained from finite numbers.
     - Overflow: result too large to be expressed.
@@ -2516,7 +2547,8 @@ def seterr(all=None, divide=None, over=None, under=None, invalid=None):
     {'over': 'ignore', 'divide': 'ignore', 'invalid': 'ignore',
      'under': 'ignore'}
     >>> np.seterr(**old_settings)  # reset to default
-    {'over': 'raise', 'divide': 'ignore', 'invalid': 'ignore', 'under': 'ignore'}
+    {'over': 'raise', 'divide': 'ignore', 'invalid': 'ignore',
+     'under': 'ignore'}
 
     >>> np.int16(32000) * np.int16(3)
     30464
@@ -2663,11 +2695,11 @@ def seterrcall(func):
         Function to call upon floating-point errors ('call'-mode) or
         object whose 'write' method is used to log such message ('log'-mode).
 
-        The call function takes two arguments. The first is a string describing the
-        type of error (such as "divide by zero", "overflow", "underflow", or "invalid value"),
-        and the second is the status flag.  The flag is a byte, whose four
-        least-significant bits indicate the type of error, one of "divide", "over",
-        "under", "invalid"::
+        The call function takes two arguments. The first is a string describing
+        the type of error (such as "divide by zero", "overflow", "underflow",
+        or "invalid value"), and the second is the status flag.  The flag is a
+        byte, whose four least-significant bits indicate the type of error, one
+        of "divide", "over", "under", "invalid"::
 
           [0 0 0 0 divide over under invalid]
 
@@ -2727,8 +2759,8 @@ def seterrcall(func):
     {'over': 'log', 'divide': 'log', 'invalid': 'log', 'under': 'log'}
 
     """
-    if func is not None and not isinstance(func, collections.Callable):
-        if not hasattr(func, 'write') or not isinstance(func.write, collections.Callable):
+    if func is not None and not isinstance(func, collections_abc.Callable):
+        if not hasattr(func, 'write') or not isinstance(func.write, collections_abc.Callable):
             raise ValueError("Only callable can be used as callback")
     pyvals = umath.geterrobj()
     old = geterrcall()
@@ -2784,6 +2816,8 @@ def geterrcall():
 
 class _unspecified(object):
     pass
+
+
 _Unspecified = _unspecified()
 
 
@@ -2890,6 +2924,7 @@ def extend_all(module):
     for a in mall:
         if a not in adict:
             __all__.append(a)
+
 
 from .umath import *
 from .numerictypes import *

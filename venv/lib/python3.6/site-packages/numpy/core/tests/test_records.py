@@ -1,16 +1,22 @@
 from __future__ import division, absolute_import, print_function
 
 import sys
-import collections
+try:
+    # Accessing collections abstract classes from collections
+    # has been deprecated since Python 3.3
+    import collections.abc as collections_abc
+except ImportError:
+    import collections as collections_abc
 import pickle
 import warnings
 import textwrap
 from os import path
+import pytest
 
 import numpy as np
 from numpy.testing import (
-    run_module_suite, assert_, assert_equal, assert_array_equal,
-    assert_array_almost_equal, assert_raises, assert_warns
+    assert_, assert_equal, assert_array_equal, assert_array_almost_equal,
+    assert_raises, assert_warns
     )
 
 
@@ -252,7 +258,7 @@ class TestFromrecords(object):
         assert_array_equal(ra['shape'], [['A', 'B', 'C']])
         ra.field = 5
         assert_array_equal(ra['field'], [[5, 5, 5]])
-        assert_(isinstance(ra.field, collections.Callable))
+        assert_(isinstance(ra.field, collections_abc.Callable))
 
     def test_fromrecords_with_explicit_dtype(self):
         a = np.rec.fromrecords([(1, 'a'), (2, 'bbb')],
@@ -355,11 +361,18 @@ class TestRecord(object):
         with assert_raises(ValueError):
             r.setfield([2,3], *r.dtype.fields['f'])
 
+    @pytest.mark.xfail(reason="See gh-10411, becomes real error in 1.16")
     def test_out_of_order_fields(self):
-        dt = np.dtype({'names': ['a', 'b'],
-                    'formats': ['i4', 'i4'],
-                    'offsets': [4, 0]})
-        y = np.rec.fromrecords([(1, 2), (4, 5)], dtype=dt)
+        # names in the same order, padding added to descr
+        x = self.data[['col1', 'col2']]
+        assert_equal(x.dtype.names, ('col1', 'col2'))
+        assert_equal(x.dtype.descr,
+                     [('col1', '<i4'), ('col2', '<i4'), ('', '|V4')])
+
+        # names change order to match indexing, as of 1.14 - descr can't
+        # represent that
+        y = self.data[['col2', 'col1']]
+        assert_equal(y.dtype.names, ('col2', 'col1'))
         assert_raises(ValueError, lambda: y.dtype.descr)
 
     def test_pickle_1(self):
@@ -390,8 +403,7 @@ class TestRecord(object):
 
         # https://github.com/numpy/numpy/issues/3256
         ra = np.recarray((2,), dtype=[('x', object), ('y', float), ('z', int)])
-        with assert_warns(FutureWarning):
-            ra[['x','y']]  # TypeError?
+        ra[['x','y']]  # TypeError?
 
     def test_record_scalar_setitem(self):
         # https://github.com/numpy/numpy/issues/3561
@@ -403,6 +415,7 @@ class TestRecord(object):
         # https://github.com/numpy/numpy/issues/4806
         arr = np.zeros((3,), dtype=[('x', int), ('y', int)])
         assert_raises(ValueError, lambda: arr[['nofield']])
+
 
 def test_find_duplicate():
     l1 = [1, 2, 3, 4, 5, 6]
@@ -416,6 +429,3 @@ def test_find_duplicate():
 
     l3 = [2, 2, 1, 4, 1, 6, 2, 3]
     assert_(np.rec.find_duplicate(l3) == [2, 1])
-
-if __name__ == "__main__":
-    run_module_suite()

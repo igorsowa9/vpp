@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function
 
-import sys, gc
+import sys
+import gc
+import pytest
 
 import numpy as np
 from numpy.testing import (
-     run_module_suite, assert_, assert_equal, assert_raises, assert_warns, dec
-)
+    assert_, assert_equal, assert_raises, assert_warns, HAS_REFCOUNT,
+    )
 import textwrap
 
 class TestArrayRepr(object):
@@ -34,7 +36,7 @@ class TestArrayRepr(object):
             "     [(1,), (1,)]], dtype=[('a', '<i4')])"
         )
 
-    @dec.knownfailureif(True, "See gh-10544")
+    @pytest.mark.xfail(reason="See gh-10544")
     def test_object_subclass(self):
         class sub(np.ndarray):
             def __new__(cls, inp):
@@ -388,6 +390,7 @@ class TestArray2String(object):
             "[ 'xxxxx']"
         )
 
+    @pytest.mark.skipif(not HAS_REFCOUNT, reason="Python lacks refcounts")
     def test_refcount(self):
         # make sure we do not hold references to the array due to a recursive
         # closure (gh-10620)
@@ -488,6 +491,8 @@ class TestPrintOptions(object):
                                          np.array(1.), style=repr)
         # but not in legacy mode
         np.array2string(np.array(1.), style=repr, legacy='1.13')
+        # gh-10934 style was broken in legacy mode, check it works
+        np.array2string(np.array(1.), legacy='1.13')
 
     def test_float_spacing(self):
         x = np.array([1., 2., 3.])
@@ -838,5 +843,33 @@ def test_unicode_object_array():
     assert_equal(repr(x), expected)
 
 
-if __name__ == "__main__":
-    run_module_suite()
+class TestContextManager(object):
+    def test_ctx_mgr(self):
+        # test that context manager actuall works
+        with np.printoptions(precision=2):
+            s = str(np.array([2.0]) / 3)
+        assert_equal(s, '[0.67]')
+
+    def test_ctx_mgr_restores(self):
+        # test that print options are actually restrored
+        opts = np.get_printoptions()
+        with np.printoptions(precision=opts['precision'] - 1,
+                             linewidth=opts['linewidth'] - 4):
+            pass
+        assert_equal(np.get_printoptions(), opts)
+
+    def test_ctx_mgr_exceptions(self):
+        # test that print options are restored even if an exception is raised
+        opts = np.get_printoptions()
+        try:
+            with np.printoptions(precision=2, linewidth=11):
+                raise ValueError
+        except ValueError:
+            pass
+        assert_equal(np.get_printoptions(), opts)
+
+    def test_ctx_mgr_as_smth(self):
+        opts = {"precision": 2}
+        with np.printoptions(**opts) as ctx:
+            saved_opts = ctx.copy()
+        assert_equal({k: saved_opts[k] for k in opts}, opts)

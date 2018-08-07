@@ -6,6 +6,7 @@ import time
 from pprint import pprint as pp
 import copy
 import sys
+from create_ppc_file import create_ppc_file
 
 from pypower.api import *
 from pypower_mod.rundcopf_noprint import rundcopf
@@ -401,11 +402,13 @@ class VPP_ext_agent(Agent):
         bids_sum = np.round(np.sum(all_bids_mod[:, 3]), 4)
         ppc_t['bus'][0, 2] += bids_sum
 
+        create_ppc_file("fromOPF_e3", ppc_t)
         # with bids updated, verify the power flow if feasible - must be opf in order to include e.g. thermal limits
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
 
         if opfe3_prinpf:
             printpf(res)
+            pp(ppc_t)
 
         # calculation of the costs: objective function minus revenue from selling
         bids_revenue = 0

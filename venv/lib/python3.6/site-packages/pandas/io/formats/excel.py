@@ -10,11 +10,11 @@ import numpy as np
 from pandas.compat import reduce
 from pandas.io.formats.css import CSSResolver, CSSWarning
 from pandas.io.formats.printing import pprint_thing
-from pandas.core.common import _any_not_none
-from pandas.core.dtypes.common import is_float
-import pandas._libs.lib as lib
+import pandas.core.common as com
+from pandas.core.dtypes.common import is_float, is_scalar
+from pandas.core.dtypes import missing
 from pandas import Index, MultiIndex, PeriodIndex
-from pandas.io.formats.common import get_level_lengths
+from pandas.io.formats.format import get_level_lengths
 
 
 class ExcelCell(object):
@@ -277,7 +277,9 @@ class CSSToExcelConverter(object):
 
     NAMED_COLORS = {
         'maroon': '800000',
+        'brown': 'A52A2A',
         'red': 'FF0000',
+        'pink': 'FFC0CB',
         'orange': 'FFA500',
         'yellow': 'FFFF00',
         'olive': '808000',
@@ -291,6 +293,7 @@ class CSSToExcelConverter(object):
         'navy': '000080',
         'black': '000000',
         'gray': '808080',
+        'grey': '808080',
         'silver': 'C0C0C0',
         'white': 'FFFFFF',
     }
@@ -381,12 +384,12 @@ class ExcelFormatter(object):
         self.inf_rep = inf_rep
 
     def _format_value(self, val):
-        if lib.checknull(val):
+        if is_scalar(val) and missing.isna(val):
             val = self.na_rep
         elif is_float(val):
-            if lib.isposinf_scalar(val):
+            if missing.isposinf_scalar(val):
                 val = self.inf_rep
-            elif lib.isneginf_scalar(val):
+            elif missing.isneginf_scalar(val):
                 val = '-{inf}'.format(inf=self.inf_rep)
             elif self.float_format is not None:
                 val = float(self.float_format % val)
@@ -492,7 +495,7 @@ class ExcelFormatter(object):
 
         # output index and index_label?
         if self.index:
-            # chek aliases
+            # check aliases
             # if list only take first as this is not a MultiIndex
             if (self.index_label and
                     isinstance(self.index_label, (list, tuple, np.ndarray,
@@ -549,7 +552,7 @@ class ExcelFormatter(object):
                 self.rowcounter += 1
 
             # if index labels are not empty go ahead and dump
-            if _any_not_none(*index_labels) and self.header is not False:
+            if com._any_not_none(*index_labels) and self.header is not False:
 
                 for cidx, name in enumerate(index_labels):
                     yield ExcelCell(self.rowcounter - 1, cidx, name,

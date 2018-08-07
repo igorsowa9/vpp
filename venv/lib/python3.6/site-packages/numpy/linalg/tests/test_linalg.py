@@ -7,27 +7,27 @@ import os
 import sys
 import itertools
 import traceback
-import warnings
+import textwrap
+import subprocess
+import pytest
 
 import numpy as np
-from numpy import array, single, double, csingle, cdouble, dot, identity
+from numpy import array, single, double, csingle, cdouble, dot, identity, matmul
 from numpy import multiply, atleast_2d, inf, asarray, matrix
 from numpy import linalg
 from numpy.linalg import matrix_power, norm, matrix_rank, multi_dot, LinAlgError
 from numpy.linalg.linalg import _multi_dot_matrix_chain_order
 from numpy.testing import (
     assert_, assert_equal, assert_raises, assert_array_equal,
-    assert_almost_equal, assert_allclose, run_module_suite,
-    dec, SkipTest, suppress_warnings
-)
+    assert_almost_equal, assert_allclose, SkipTest, suppress_warnings
+    )
 
 
-def ifthen(a, b):
-    return not a or b
-
-
-def imply(a, b):
-    return not a or b
+def consistent_subclass(out, in_):
+    # For ndarray subclass input, our output should have the same subclass
+    # (non-ndarray input gets converted to ndarray).
+    return type(out) is (type(in_) if isinstance(in_, np.ndarray)
+                         else np.ndarray)
 
 
 old_assert_almost_equal = assert_almost_equal
@@ -65,6 +65,7 @@ all_tags = {
   'generalized', 'size-0', 'strided' # optional additions
 }
 
+
 class LinalgCase(object):
     def __init__(self, name, a, b, tags=set()):
         """
@@ -85,6 +86,7 @@ class LinalgCase(object):
 
     def __repr__(self):
         return "<LinalgCase: %s>" % (self.name,)
+
 
 def apply_tag(tag, cases):
     """
@@ -129,10 +131,6 @@ CASES += apply_tag('square', [
                np.empty((0, 0), dtype=double),
                np.empty((0,), dtype=double),
                tags={'size-0'}),
-    LinalgCase("0x0_matrix",
-               np.empty((0, 0), dtype=double).view(np.matrix),
-               np.empty((0, 1), dtype=double).view(np.matrix),
-               tags={'size-0'}),
     LinalgCase("8x8",
                np.random.rand(8, 8),
                np.random.rand(8)),
@@ -142,12 +140,6 @@ CASES += apply_tag('square', [
     LinalgCase("nonarray",
                [[1, 2], [3, 4]],
                [2, 1]),
-    LinalgCase("matrix_b_only",
-               array([[1., 2.], [3., 4.]]),
-               matrix([2., 1.]).T),
-    LinalgCase("matrix_a_and_b",
-               matrix([[1., 2.], [3., 4.]]),
-               matrix([2., 1.]).T),
 ])
 
 # non-square test-cases
@@ -231,9 +223,6 @@ CASES += apply_tag('hermitian', [
     LinalgCase("matrix_b_only",
                array([[1., 2.], [2., 1.]]),
                None),
-    LinalgCase("hmatrix_a_and_b",
-               matrix([[1., 2.], [2., 1.]]),
-               None),
     LinalgCase("hmatrix_1x1",
                np.random.rand(1, 1),
                None),
@@ -270,12 +259,13 @@ def _make_generalized_cases():
 
     return new_cases
 
+
 CASES += _make_generalized_cases()
+
 
 #
 # Generate stride combination variations of the above
 #
-
 def _stride_comb_iter(x):
     """
     Generate cartesian product of strides for all axes
@@ -323,6 +313,7 @@ def _stride_comb_iter(x):
             xi = np.lib.stride_tricks.as_strided(x, strides=s)
             yield xi, "stride_xxx_0_0"
 
+
 def _make_strided_cases():
     new_cases = []
     for case in CASES:
@@ -333,94 +324,104 @@ def _make_strided_cases():
                 new_cases.append(new_case)
     return new_cases
 
+
 CASES += _make_strided_cases()
 
 
 #
 # Test different routines against the above cases
 #
+class LinalgTestCase(object):
+    TEST_CASES = CASES
 
-def _check_cases(func, require=set(), exclude=set()):
-    """
-    Run func on each of the cases with all of the tags in require, and none
-    of the tags in exclude
-    """
-    for case in CASES:
-        # filter by require and exclude
-        if case.tags & require != require:
-            continue
-        if case.tags & exclude:
-            continue
+    def check_cases(self, require=set(), exclude=set()):
+        """
+        Run func on each of the cases with all of the tags in require, and none
+        of the tags in exclude
+        """
+        for case in self.TEST_CASES:
+            # filter by require and exclude
+            if case.tags & require != require:
+                continue
+            if case.tags & exclude:
+                continue
 
-        try:
-            case.check(func)
-        except Exception:
-            msg = "In test case: %r\n\n" % case
-            msg += traceback.format_exc()
-            raise AssertionError(msg)
+            try:
+                case.check(self.do)
+            except Exception:
+                msg = "In test case: %r\n\n" % case
+                msg += traceback.format_exc()
+                raise AssertionError(msg)
 
 
-class LinalgSquareTestCase(object):
+class LinalgSquareTestCase(LinalgTestCase):
 
     def test_sq_cases(self):
-        _check_cases(self.do, require={'square'}, exclude={'generalized', 'size-0'})
+        self.check_cases(require={'square'},
+                         exclude={'generalized', 'size-0'})
 
     def test_empty_sq_cases(self):
-        _check_cases(self.do, require={'square', 'size-0'}, exclude={'generalized'})
+        self.check_cases(require={'square', 'size-0'},
+                         exclude={'generalized'})
 
 
-class LinalgNonsquareTestCase(object):
+class LinalgNonsquareTestCase(LinalgTestCase):
 
     def test_nonsq_cases(self):
-        _check_cases(self.do, require={'nonsquare'}, exclude={'generalized', 'size-0'})
+        self.check_cases(require={'nonsquare'},
+                         exclude={'generalized', 'size-0'})
 
     def test_empty_nonsq_cases(self):
-        _check_cases(self.do, require={'nonsquare', 'size-0'}, exclude={'generalized'})
+        self.check_cases(require={'nonsquare', 'size-0'},
+                         exclude={'generalized'})
 
-class HermitianTestCase(object):
+
+class HermitianTestCase(LinalgTestCase):
 
     def test_herm_cases(self):
-        _check_cases(self.do, require={'hermitian'}, exclude={'generalized', 'size-0'})
+        self.check_cases(require={'hermitian'},
+                         exclude={'generalized', 'size-0'})
 
     def test_empty_herm_cases(self):
-        _check_cases(self.do, require={'hermitian', 'size-0'}, exclude={'generalized'})
+        self.check_cases(require={'hermitian', 'size-0'},
+                         exclude={'generalized'})
 
 
-class LinalgGeneralizedSquareTestCase(object):
+class LinalgGeneralizedSquareTestCase(LinalgTestCase):
 
-    @dec.slow
+    @pytest.mark.slow
     def test_generalized_sq_cases(self):
-        _check_cases(self.do, require={'generalized', 'square'}, exclude={'size-0'})
+        self.check_cases(require={'generalized', 'square'},
+                         exclude={'size-0'})
 
-    @dec.slow
+    @pytest.mark.slow
     def test_generalized_empty_sq_cases(self):
-        _check_cases(self.do, require={'generalized', 'square', 'size-0'})
+        self.check_cases(require={'generalized', 'square', 'size-0'})
 
 
-class LinalgGeneralizedNonsquareTestCase(object):
+class LinalgGeneralizedNonsquareTestCase(LinalgTestCase):
 
-    @dec.slow
+    @pytest.mark.slow
     def test_generalized_nonsq_cases(self):
-        _check_cases(self.do, require={'generalized', 'nonsquare'}, exclude={'size-0'})
+        self.check_cases(require={'generalized', 'nonsquare'},
+                         exclude={'size-0'})
 
-    @dec.slow
+    @pytest.mark.slow
     def test_generalized_empty_nonsq_cases(self):
-        _check_cases(self.do, require={'generalized', 'nonsquare', 'size-0'})
+        self.check_cases(require={'generalized', 'nonsquare', 'size-0'})
 
 
-class HermitianGeneralizedTestCase(object):
+class HermitianGeneralizedTestCase(LinalgTestCase):
 
-    @dec.slow
+    @pytest.mark.slow
     def test_generalized_herm_cases(self):
-        _check_cases(self.do,
-            require={'generalized', 'hermitian'},
-            exclude={'size-0'})
+        self.check_cases(require={'generalized', 'hermitian'},
+                         exclude={'size-0'})
 
-    @dec.slow
+    @pytest.mark.slow
     def test_generalized_empty_herm_cases(self):
-        _check_cases(self.do,
-            require={'generalized', 'hermitian', 'size-0'},
-            exclude={'none'})
+        self.check_cases(require={'generalized', 'hermitian', 'size-0'},
+                         exclude={'none'})
 
 
 def dot_generalized(a, b):
@@ -446,26 +447,27 @@ def identity_like_generalized(a):
     a = asarray(a)
     if a.ndim >= 3:
         r = np.empty(a.shape, dtype=a.dtype)
-        for c in itertools.product(*map(range, a.shape[:-2])):
-            r[c] = identity(a.shape[-2])
+        r[...] = identity(a.shape[-2])
         return r
     else:
         return identity(a.shape[0])
 
 
-class TestSolve(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
-
+class SolveCases(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
+    # kept apart from TestSolve for use for testing with matrices.
     def do(self, a, b, tags):
         x = linalg.solve(a, b)
         assert_almost_equal(b, dot_generalized(a, x))
-        assert_(imply(isinstance(b, matrix), isinstance(x, matrix)))
+        assert_(consistent_subclass(x, b))
 
+
+class TestSolve(SolveCases):
     def test_types(self):
         def check(dtype):
             x = np.array([[1, 0.5], [0.5, 1]], dtype=dtype)
             assert_equal(linalg.solve(x, x).dtype, dtype)
         for dtype in [single, double, csingle, cdouble]:
-            yield check, dtype
+            check(dtype)
 
     def test_0_size(self):
         class ArraySubclass(np.ndarray):
@@ -519,20 +521,22 @@ class TestSolve(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
         assert_(isinstance(result, ArraySubclass))
 
 
-class TestInv(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
+class InvCases(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
 
     def do(self, a, b, tags):
         a_inv = linalg.inv(a)
         assert_almost_equal(dot_generalized(a, a_inv),
                             identity_like_generalized(a))
-        assert_(imply(isinstance(a, matrix), isinstance(a_inv, matrix)))
+        assert_(consistent_subclass(a_inv, a))
 
+
+class TestInv(InvCases):
     def test_types(self):
         def check(dtype):
             x = np.array([[1, 0.5], [0.5, 1]], dtype=dtype)
             assert_equal(linalg.inv(x).dtype, dtype)
         for dtype in [single, double, csingle, cdouble]:
-            yield check, dtype
+            check(dtype)
 
     def test_0_size(self):
         # Check that all kinds of 0-sized arrays work
@@ -551,13 +555,15 @@ class TestInv(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
         assert_(isinstance(res, ArraySubclass))
 
 
-class TestEigvals(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
+class EigvalsCases(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
 
     def do(self, a, b, tags):
         ev = linalg.eigvals(a)
         evalues, evectors = linalg.eig(a)
         assert_almost_equal(ev, evalues)
 
+
+class TestEigvals(EigvalsCases):
     def test_types(self):
         def check(dtype):
             x = np.array([[1, 0.5], [0.5, 1]], dtype=dtype)
@@ -565,7 +571,7 @@ class TestEigvals(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
             x = np.array([[1, 0.5], [-1, 1]], dtype=dtype)
             assert_equal(linalg.eigvals(x).dtype, get_complex_dtype(dtype))
         for dtype in [single, double, csingle, cdouble]:
-            yield check, dtype
+            check(dtype)
 
     def test_0_size(self):
         # Check that all kinds of 0-sized arrays work
@@ -586,15 +592,17 @@ class TestEigvals(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
         assert_(isinstance(res, np.ndarray))
 
 
-class TestEig(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
+class EigCases(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
 
     def do(self, a, b, tags):
         evalues, evectors = linalg.eig(a)
         assert_allclose(dot_generalized(a, evectors),
                         np.asarray(evectors) * np.asarray(evalues)[..., None, :],
                         rtol=get_rtol(evalues.dtype))
-        assert_(imply(isinstance(a, matrix), isinstance(evectors, matrix)))
+        assert_(consistent_subclass(evectors, a))
 
+
+class TestEig(EigCases):
     def test_types(self):
         def check(dtype):
             x = np.array([[1, 0.5], [0.5, 1]], dtype=dtype)
@@ -608,7 +616,7 @@ class TestEig(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
             assert_equal(v.dtype, get_complex_dtype(dtype))
 
         for dtype in [single, double, csingle, cdouble]:
-            yield check, dtype
+            check(dtype)
 
     def test_0_size(self):
         # Check that all kinds of 0-sized arrays work
@@ -633,7 +641,7 @@ class TestEig(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
         assert_(isinstance(a, np.ndarray))
 
 
-class TestSVD(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
+class SVDCases(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
 
     def do(self, a, b, tags):
         if 'size-0' in tags:
@@ -644,9 +652,11 @@ class TestSVD(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
         assert_allclose(a, dot_generalized(np.asarray(u) * np.asarray(s)[..., None, :],
                                            np.asarray(vt)),
                         rtol=get_rtol(u.dtype))
-        assert_(imply(isinstance(a, matrix), isinstance(u, matrix)))
-        assert_(imply(isinstance(a, matrix), isinstance(vt, matrix)))
+        assert_(consistent_subclass(u, a))
+        assert_(consistent_subclass(vt, a))
 
+
+class TestSVD(SVDCases):
     def test_types(self):
         def check(dtype):
             x = np.array([[1, 0.5], [0.5, 1]], dtype=dtype)
@@ -658,7 +668,7 @@ class TestSVD(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
             assert_equal(s.dtype, get_real_dtype(dtype))
 
         for dtype in [single, double, csingle, cdouble]:
-            yield check, dtype
+            check(dtype)
 
     def test_0_size(self):
         # These raise errors currently
@@ -671,61 +681,134 @@ class TestSVD(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
         assert_raises(linalg.LinAlgError, linalg.svd, a)
 
 
-class TestCondSVD(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
+class CondCases(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
+    # cond(x, p) for p in (None, 2, -2)
 
     def do(self, a, b, tags):
         c = asarray(a)  # a might be a matrix
         if 'size-0' in tags:
-            assert_raises(LinAlgError, linalg.svd, c, compute_uv=False)
+            assert_raises(LinAlgError, linalg.cond, c)
             return
+
+        # +-2 norms
         s = linalg.svd(c, compute_uv=False)
         assert_almost_equal(
-            s[..., 0] / s[..., -1], linalg.cond(a),
+            linalg.cond(a), s[..., 0] / s[..., -1],
             single_decimal=5, double_decimal=11)
-
-    def test_stacked_arrays_explicitly(self):
-        A = np.array([[1., 2., 1.], [0, -2., 0], [6., 2., 3.]])
-        assert_equal(linalg.cond(A), linalg.cond(A[None, ...])[0])
-
-
-class TestCond2(LinalgSquareTestCase):
-
-    def do(self, a, b, tags):
-        c = asarray(a)  # a might be a matrix
-        if 'size-0' in tags:
-            assert_raises(LinAlgError, linalg.svd, c, compute_uv=False)
-            return
-        s = linalg.svd(c, compute_uv=False)
         assert_almost_equal(
-            s[..., 0] / s[..., -1], linalg.cond(a, 2),
+            linalg.cond(a, 2), s[..., 0] / s[..., -1],
+            single_decimal=5, double_decimal=11)
+        assert_almost_equal(
+            linalg.cond(a, -2), s[..., -1] / s[..., 0],
             single_decimal=5, double_decimal=11)
 
-    def test_stacked_arrays_explicitly(self):
-        A = np.array([[1., 2., 1.], [0, -2., 0], [6., 2., 3.]])
-        assert_equal(linalg.cond(A, 2), linalg.cond(A[None, ...], 2)[0])
+        # Other norms
+        cinv = np.linalg.inv(c)
+        assert_almost_equal(
+            linalg.cond(a, 1),
+            abs(c).sum(-2).max(-1) * abs(cinv).sum(-2).max(-1),
+            single_decimal=5, double_decimal=11)
+        assert_almost_equal(
+            linalg.cond(a, -1),
+            abs(c).sum(-2).min(-1) * abs(cinv).sum(-2).min(-1),
+            single_decimal=5, double_decimal=11)
+        assert_almost_equal(
+            linalg.cond(a, np.inf),
+            abs(c).sum(-1).max(-1) * abs(cinv).sum(-1).max(-1),
+            single_decimal=5, double_decimal=11)
+        assert_almost_equal(
+            linalg.cond(a, -np.inf),
+            abs(c).sum(-1).min(-1) * abs(cinv).sum(-1).min(-1),
+            single_decimal=5, double_decimal=11)
+        assert_almost_equal(
+            linalg.cond(a, 'fro'),
+            np.sqrt((abs(c)**2).sum(-1).sum(-1)
+                    * (abs(cinv)**2).sum(-1).sum(-1)),
+            single_decimal=5, double_decimal=11)
 
 
-class TestCondInf(object):
+class TestCond(CondCases):
+    def test_basic_nonsvd(self):
+        # Smoketest the non-svd norms
+        A = array([[1., 0, 1], [0, -2., 0], [0, 0, 3.]])
+        assert_almost_equal(linalg.cond(A, inf), 4)
+        assert_almost_equal(linalg.cond(A, -inf), 2/3)
+        assert_almost_equal(linalg.cond(A, 1), 4)
+        assert_almost_equal(linalg.cond(A, -1), 0.5)
+        assert_almost_equal(linalg.cond(A, 'fro'), np.sqrt(265 / 12))
 
-    def test(self):
-        A = array([[1., 0, 0], [0, -2., 0], [0, 0, 3.]])
-        assert_almost_equal(linalg.cond(A, inf), 3.)
+    def test_singular(self):
+        # Singular matrices have infinite condition number for
+        # positive norms, and negative norms shouldn't raise
+        # exceptions
+        As = [np.zeros((2, 2)), np.ones((2, 2))]
+        p_pos = [None, 1, 2, 'fro']
+        p_neg = [-1, -2]
+        for A, p in itertools.product(As, p_pos):
+            # Inversion may not hit exact infinity, so just check the
+            # number is large
+            assert_(linalg.cond(A, p) > 1e15)
+        for A, p in itertools.product(As, p_neg):
+            linalg.cond(A, p)
+
+    def test_nan(self):
+        # nans should be passed through, not converted to infs
+        ps = [None, 1, -1, 2, -2, 'fro']
+        p_pos = [None, 1, 2, 'fro']
+
+        A = np.ones((2, 2))
+        A[0,1] = np.nan
+        for p in ps:
+            c = linalg.cond(A, p)
+            assert_(isinstance(c, np.float_))
+            assert_(np.isnan(c))
+
+        A = np.ones((3, 2, 2))
+        A[1,0,1] = np.nan
+        for p in ps:
+            c = linalg.cond(A, p)
+            assert_(np.isnan(c[1]))
+            if p in p_pos:
+                assert_(c[0] > 1e15)
+                assert_(c[2] > 1e15)
+            else:
+                assert_(not np.isnan(c[0]))
+                assert_(not np.isnan(c[2]))
+
+    def test_stacked_singular(self):
+        # Check behavior when only some of the stacked matrices are
+        # singular
+        np.random.seed(1234)
+        A = np.random.rand(2, 2, 2, 2)
+        A[0,0] = 0
+        A[1,1] = 0
+
+        for p in (None, 1, 2, 'fro', -1, -2):
+            c = linalg.cond(A, p)
+            assert_equal(c[0,0], np.inf)
+            assert_equal(c[1,1], np.inf)
+            assert_(np.isfinite(c[0,1]))
+            assert_(np.isfinite(c[1,0]))
 
 
-class TestPinv(LinalgSquareTestCase,
-               LinalgNonsquareTestCase,
-               LinalgGeneralizedSquareTestCase,
-               LinalgGeneralizedNonsquareTestCase):
+class PinvCases(LinalgSquareTestCase,
+                LinalgNonsquareTestCase,
+                LinalgGeneralizedSquareTestCase,
+                LinalgGeneralizedNonsquareTestCase):
 
     def do(self, a, b, tags):
         a_ginv = linalg.pinv(a)
         # `a @ a_ginv == I` does not hold if a is singular
         dot = dot_generalized
         assert_almost_equal(dot(dot(a, a_ginv), a), a, single_decimal=5, double_decimal=11)
-        assert_(imply(isinstance(a, matrix), isinstance(a_ginv, matrix)))
+        assert_(consistent_subclass(a_ginv, a))
 
 
-class TestDet(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
+class TestPinv(PinvCases):
+    pass
+
+
+class DetCases(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
 
     def do(self, a, b, tags):
         d = linalg.det(a)
@@ -744,6 +827,8 @@ class TestDet(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
         assert_almost_equal(np.abs(s[m]), 1)
         assert_equal(ld[~m], -inf)
 
+
+class TestDet(DetCases):
     def test_zero(self):
         assert_equal(linalg.det([[0.0]]), 0.0)
         assert_equal(type(linalg.det([[0.0]])), double)
@@ -765,7 +850,7 @@ class TestDet(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
             assert_equal(s.dtype, get_real_dtype(dtype))
             assert_equal(ph.dtype, dtype)
         for dtype in [single, double, csingle, cdouble]:
-            yield check, dtype
+            check(dtype)
 
     def test_0_size(self):
         a = np.zeros((0, 0), dtype=np.complex64)
@@ -787,7 +872,7 @@ class TestDet(LinalgSquareTestCase, LinalgGeneralizedSquareTestCase):
         assert_(res[1].dtype.type is np.float64)
 
 
-class TestLstsq(LinalgSquareTestCase, LinalgNonsquareTestCase):
+class LstsqCases(LinalgSquareTestCase, LinalgNonsquareTestCase):
 
     def do(self, a, b, tags):
         if 'size-0' in tags:
@@ -815,9 +900,11 @@ class TestLstsq(LinalgSquareTestCase, LinalgNonsquareTestCase):
             expect_resids = np.array([]).view(type(x))
         assert_almost_equal(residuals, expect_resids)
         assert_(np.issubdtype(residuals.dtype, np.floating))
-        assert_(imply(isinstance(b, matrix), isinstance(x, matrix)))
-        assert_(imply(isinstance(b, matrix), isinstance(residuals, matrix)))
+        assert_(consistent_subclass(x, b))
+        assert_(consistent_subclass(residuals, b))
 
+
+class TestLstsq(LstsqCases):
     def test_future_rcond(self):
         a = np.array([[0., 1.,  0.,  1.,  2.,  0.],
                       [0., 2.,  0.,  0.,  1.,  0.],
@@ -836,20 +923,26 @@ class TestLstsq(LinalgSquareTestCase, LinalgNonsquareTestCase):
             # Warning should be raised exactly once (first command)
             assert_(len(w) == 1)
 
+
 class TestMatrixPower(object):
     R90 = array([[0, 1], [-1, 0]])
     Arb22 = array([[4, -7], [-2, 10]])
     noninv = array([[1, 0], [0, 0]])
-    arbfloat = array([[0.1, 3.2], [1.2, 0.7]])
+    arbfloat = array([[[0.1, 3.2], [1.2, 0.7]],
+                      [[0.2, 6.4], [2.4, 1.4]]])
 
     large = identity(10)
     t = large[1, :].copy()
-    large[1, :] = large[0,:]
+    large[1, :] = large[0, :]
     large[0, :] = t
 
     def test_large_power(self):
         assert_equal(
             matrix_power(self.R90, 2 ** 100 + 2 ** 10 + 2 ** 5 + 1), self.R90)
+        assert_equal(
+            matrix_power(self.R90, 2 ** 100 + 2 ** 10 + 1), self.R90)
+        assert_equal(
+            matrix_power(self.R90, 2 ** 100 + 2 + 1), -self.R90)
 
     def test_large_power_trailing_zero(self):
         assert_equal(
@@ -858,10 +951,10 @@ class TestMatrixPower(object):
     def testip_zero(self):
         def tz(M):
             mz = matrix_power(M, 0)
-            assert_equal(mz, identity(M.shape[0]))
+            assert_equal(mz, identity_like_generalized(M))
             assert_equal(mz.dtype, M.dtype)
         for M in [self.Arb22, self.arbfloat, self.large]:
-            yield tz, M
+            tz(M)
 
     def testip_one(self):
         def tz(M):
@@ -869,27 +962,32 @@ class TestMatrixPower(object):
             assert_equal(mz, M)
             assert_equal(mz.dtype, M.dtype)
         for M in [self.Arb22, self.arbfloat, self.large]:
-            yield tz, M
+            tz(M)
 
     def testip_two(self):
         def tz(M):
             mz = matrix_power(M, 2)
-            assert_equal(mz, dot(M, M))
+            assert_equal(mz, matmul(M, M))
             assert_equal(mz.dtype, M.dtype)
         for M in [self.Arb22, self.arbfloat, self.large]:
-            yield tz, M
+            tz(M)
 
     def testip_invert(self):
         def tz(M):
             mz = matrix_power(M, -1)
-            assert_almost_equal(identity(M.shape[0]), dot(mz, M))
+            assert_almost_equal(matmul(mz, M), identity_like_generalized(M))
         for M in [self.R90, self.Arb22, self.arbfloat, self.large]:
-            yield tz, M
+            tz(M)
 
     def test_invert_noninvertible(self):
-        import numpy.linalg
-        assert_raises(numpy.linalg.linalg.LinAlgError,
-                      lambda: matrix_power(self.noninv, -1))
+        assert_raises(LinAlgError, matrix_power, self.noninv, -1)
+
+    def test_invalid(self):
+        assert_raises(TypeError, matrix_power, self.R90, 1.5)
+        assert_raises(TypeError, matrix_power, self.R90, [1])
+        assert_raises(LinAlgError, matrix_power, np.array([1]), 1)
+        assert_raises(LinAlgError, matrix_power, np.array([[1], [2]]), 1)
+        assert_raises(LinAlgError, matrix_power, np.ones((4, 3, 2)), 1)
 
 
 class TestBoolPower(object):
@@ -899,7 +997,7 @@ class TestBoolPower(object):
         assert_equal(matrix_power(A, 2), A)
 
 
-class TestEigvalsh(HermitianTestCase, HermitianGeneralizedTestCase):
+class TestEigvalshCases(HermitianTestCase, HermitianGeneralizedTestCase):
 
     def do(self, a, b, tags):
         # note that eigenvalue arrays returned by eig must be sorted since
@@ -912,13 +1010,15 @@ class TestEigvalsh(HermitianTestCase, HermitianGeneralizedTestCase):
         ev2 = linalg.eigvalsh(a, 'U')
         assert_allclose(ev2, evalues, rtol=get_rtol(ev.dtype))
 
+
+class TestEigvalsh(object):
     def test_types(self):
         def check(dtype):
             x = np.array([[1, 0.5], [0.5, 1]], dtype=dtype)
             w = np.linalg.eigvalsh(x)
             assert_equal(w.dtype, get_real_dtype(dtype))
         for dtype in [single, double, csingle, cdouble]:
-            yield check, dtype
+            check(dtype)
 
     def test_invalid(self):
         x = np.array([[1, 0.5], [0.5, 1]], dtype=np.float32)
@@ -967,7 +1067,7 @@ class TestEigvalsh(HermitianTestCase, HermitianGeneralizedTestCase):
         assert_(isinstance(res, np.ndarray))
 
 
-class TestEigh(HermitianTestCase, HermitianGeneralizedTestCase):
+class TestEighCases(HermitianTestCase, HermitianGeneralizedTestCase):
 
     def do(self, a, b, tags):
         # note that eigenvalue arrays returned by eig must be sorted since
@@ -988,6 +1088,8 @@ class TestEigh(HermitianTestCase, HermitianGeneralizedTestCase):
                         np.asarray(ev2)[..., None, :] * np.asarray(evc2),
                         rtol=get_rtol(ev.dtype), err_msg=repr(a))
 
+
+class TestEigh(object):
     def test_types(self):
         def check(dtype):
             x = np.array([[1, 0.5], [0.5, 1]], dtype=dtype)
@@ -995,7 +1097,7 @@ class TestEigh(HermitianTestCase, HermitianGeneralizedTestCase):
             assert_equal(w.dtype, get_real_dtype(dtype))
             assert_equal(v.dtype, dtype)
         for dtype in [single, double, csingle, cdouble]:
-            yield check, dtype
+            check(dtype)
 
     def test_invalid(self):
         x = np.array([[1, 0.5], [0.5, 1]], dtype=np.float32)
@@ -1048,10 +1150,12 @@ class TestEigh(HermitianTestCase, HermitianGeneralizedTestCase):
         assert_(isinstance(a, np.ndarray))
 
 
-class _TestNorm(object):
-
+class _TestNormBase(object):
     dt = None
     dec = None
+
+
+class _TestNormGeneral(_TestNormBase):
 
     def test_empty(self):
         assert_equal(norm([]), 0.0)
@@ -1099,57 +1203,6 @@ class _TestNorm(object):
             assert_(issubclass(an.dtype.type, np.floating))
             assert_almost_equal(an, 1.0)
 
-    def test_matrix_return_type(self):
-        a = np.array([[1, 0, 1], [0, 1, 1]])
-
-        exact_types = np.typecodes['AllInteger']
-
-        # float32, complex64, float64, complex128 types are the only types
-        # allowed by `linalg`, which performs the matrix operations used
-        # within `norm`.
-        inexact_types = 'fdFD'
-
-        all_types = exact_types + inexact_types
-
-        for each_inexact_types in all_types:
-            at = a.astype(each_inexact_types)
-
-            an = norm(at, -np.inf)
-            assert_(issubclass(an.dtype.type, np.floating))
-            assert_almost_equal(an, 2.0)
-
-            with suppress_warnings() as sup:
-                sup.filter(RuntimeWarning, "divide by zero encountered")
-                an = norm(at, -1)
-                assert_(issubclass(an.dtype.type, np.floating))
-                assert_almost_equal(an, 1.0)
-
-            an = norm(at, 1)
-            assert_(issubclass(an.dtype.type, np.floating))
-            assert_almost_equal(an, 2.0)
-
-            an = norm(at, 2)
-            assert_(issubclass(an.dtype.type, np.floating))
-            assert_almost_equal(an, 3.0**(1.0/2.0))
-
-            an = norm(at, -2)
-            assert_(issubclass(an.dtype.type, np.floating))
-            assert_almost_equal(an, 1.0)
-
-            an = norm(at, np.inf)
-            assert_(issubclass(an.dtype.type, np.floating))
-            assert_almost_equal(an, 2.0)
-
-            an = norm(at, 'fro')
-            assert_(issubclass(an.dtype.type, np.floating))
-            assert_almost_equal(an, 2.0)
-
-            an = norm(at, 'nuc')
-            assert_(issubclass(an.dtype.type, np.floating))
-            # Lower bar needed to support low precision floats.
-            # They end up being off by 1 in the 7th place.
-            old_assert_almost_equal(an, 2.7320508075688772, decimal=6)
-
     def test_vector(self):
         a = [1, 2, 3, 4]
         b = [-1, -2, -3, -4]
@@ -1179,39 +1232,6 @@ class _TestNorm(object):
         for v in (array(a, dtype=self.dt), array(b, dtype=self.dt),
                   array(c, dtype=self.dt)):
             _test(v)
-
-    def test_matrix_2x2(self):
-        A = matrix([[1, 3], [5, 7]], dtype=self.dt)
-        assert_almost_equal(norm(A), 84 ** 0.5)
-        assert_almost_equal(norm(A, 'fro'), 84 ** 0.5)
-        assert_almost_equal(norm(A, 'nuc'), 10.0)
-        assert_almost_equal(norm(A, inf), 12.0)
-        assert_almost_equal(norm(A, -inf), 4.0)
-        assert_almost_equal(norm(A, 1), 10.0)
-        assert_almost_equal(norm(A, -1), 6.0)
-        assert_almost_equal(norm(A, 2), 9.1231056256176615)
-        assert_almost_equal(norm(A, -2), 0.87689437438234041)
-
-        assert_raises(ValueError, norm, A, 'nofro')
-        assert_raises(ValueError, norm, A, -3)
-        assert_raises(ValueError, norm, A, 0)
-
-    def test_matrix_3x3(self):
-        # This test has been added because the 2x2 example
-        # happened to have equal nuclear norm and induced 1-norm.
-        # The 1/10 scaling factor accommodates the absolute tolerance
-        # used in assert_almost_equal.
-        A = (1 / 10) * \
-            np.array([[1, 2, 3], [6, 0, 5], [3, 2, 1]], dtype=self.dt)
-        assert_almost_equal(norm(A), (1 / 10) * 89 ** 0.5)
-        assert_almost_equal(norm(A, 'fro'), (1 / 10) * 89 ** 0.5)
-        assert_almost_equal(norm(A, 'nuc'), 1.3366836911774836)
-        assert_almost_equal(norm(A, inf), 1.1)
-        assert_almost_equal(norm(A, -inf), 0.6)
-        assert_almost_equal(norm(A, 1), 1.0)
-        assert_almost_equal(norm(A, -1), 0.4)
-        assert_almost_equal(norm(A, 2), 0.88722940323461277)
-        assert_almost_equal(norm(A, -2), 0.19456584790481812)
 
     def test_axis(self):
         # Vector norms.
@@ -1292,10 +1312,103 @@ class _TestNorm(object):
                 assert_(found.shape == expected_shape,
                         shape_err.format(found.shape, expected_shape, order, k))
 
+
+class _TestNorm2D(_TestNormBase):
+    # Define the part for 2d arrays separately, so we can subclass this
+    # and run the tests using np.matrix in matrixlib.tests.test_matrix_linalg.
+    array = np.array
+
+    def test_matrix_empty(self):
+        assert_equal(norm(self.array([[]], dtype=self.dt)), 0.0)
+
+    def test_matrix_return_type(self):
+        a = self.array([[1, 0, 1], [0, 1, 1]])
+
+        exact_types = np.typecodes['AllInteger']
+
+        # float32, complex64, float64, complex128 types are the only types
+        # allowed by `linalg`, which performs the matrix operations used
+        # within `norm`.
+        inexact_types = 'fdFD'
+
+        all_types = exact_types + inexact_types
+
+        for each_inexact_types in all_types:
+            at = a.astype(each_inexact_types)
+
+            an = norm(at, -np.inf)
+            assert_(issubclass(an.dtype.type, np.floating))
+            assert_almost_equal(an, 2.0)
+
+            with suppress_warnings() as sup:
+                sup.filter(RuntimeWarning, "divide by zero encountered")
+                an = norm(at, -1)
+                assert_(issubclass(an.dtype.type, np.floating))
+                assert_almost_equal(an, 1.0)
+
+            an = norm(at, 1)
+            assert_(issubclass(an.dtype.type, np.floating))
+            assert_almost_equal(an, 2.0)
+
+            an = norm(at, 2)
+            assert_(issubclass(an.dtype.type, np.floating))
+            assert_almost_equal(an, 3.0**(1.0/2.0))
+
+            an = norm(at, -2)
+            assert_(issubclass(an.dtype.type, np.floating))
+            assert_almost_equal(an, 1.0)
+
+            an = norm(at, np.inf)
+            assert_(issubclass(an.dtype.type, np.floating))
+            assert_almost_equal(an, 2.0)
+
+            an = norm(at, 'fro')
+            assert_(issubclass(an.dtype.type, np.floating))
+            assert_almost_equal(an, 2.0)
+
+            an = norm(at, 'nuc')
+            assert_(issubclass(an.dtype.type, np.floating))
+            # Lower bar needed to support low precision floats.
+            # They end up being off by 1 in the 7th place.
+            np.testing.assert_almost_equal(an, 2.7320508075688772, decimal=6)
+
+    def test_matrix_2x2(self):
+        A = self.array([[1, 3], [5, 7]], dtype=self.dt)
+        assert_almost_equal(norm(A), 84 ** 0.5)
+        assert_almost_equal(norm(A, 'fro'), 84 ** 0.5)
+        assert_almost_equal(norm(A, 'nuc'), 10.0)
+        assert_almost_equal(norm(A, inf), 12.0)
+        assert_almost_equal(norm(A, -inf), 4.0)
+        assert_almost_equal(norm(A, 1), 10.0)
+        assert_almost_equal(norm(A, -1), 6.0)
+        assert_almost_equal(norm(A, 2), 9.1231056256176615)
+        assert_almost_equal(norm(A, -2), 0.87689437438234041)
+
+        assert_raises(ValueError, norm, A, 'nofro')
+        assert_raises(ValueError, norm, A, -3)
+        assert_raises(ValueError, norm, A, 0)
+
+    def test_matrix_3x3(self):
+        # This test has been added because the 2x2 example
+        # happened to have equal nuclear norm and induced 1-norm.
+        # The 1/10 scaling factor accommodates the absolute tolerance
+        # used in assert_almost_equal.
+        A = (1 / 10) * \
+            self.array([[1, 2, 3], [6, 0, 5], [3, 2, 1]], dtype=self.dt)
+        assert_almost_equal(norm(A), (1 / 10) * 89 ** 0.5)
+        assert_almost_equal(norm(A, 'fro'), (1 / 10) * 89 ** 0.5)
+        assert_almost_equal(norm(A, 'nuc'), 1.3366836911774836)
+        assert_almost_equal(norm(A, inf), 1.1)
+        assert_almost_equal(norm(A, -inf), 0.6)
+        assert_almost_equal(norm(A, 1), 1.0)
+        assert_almost_equal(norm(A, -1), 0.4)
+        assert_almost_equal(norm(A, 2), 0.88722940323461277)
+        assert_almost_equal(norm(A, -2), 0.19456584790481812)
+
     def test_bad_args(self):
         # Check that bad arguments raise the appropriate exceptions.
 
-        A = array([[1, 2, 3], [4, 5, 6]], dtype=self.dt)
+        A = self.array([[1, 2, 3], [4, 5, 6]], dtype=self.dt)
         B = np.arange(1, 25, dtype=self.dt).reshape(2, 3, 4)
 
         # Using `axis=<integer>` or passing in a 1-D array implies vector
@@ -1317,6 +1430,10 @@ class _TestNorm(object):
         assert_raises(np.AxisError, norm, B, None, 3)
         assert_raises(np.AxisError, norm, B, None, (2, 3))
         assert_raises(ValueError, norm, B, None, (0, 1, 2))
+
+
+class _TestNorm(_TestNorm2D, _TestNormGeneral):
+    pass
 
 
 class TestNorm_NonSystematic(object):
@@ -1346,55 +1463,68 @@ class TestNorm_NonSystematic(object):
         old_assert_almost_equal(np.linalg.norm(d, ord=3), res, decimal=5)
 
 
-class TestNormDouble(_TestNorm):
+# Separate definitions so we can use them for matrix tests.
+class _TestNormDoubleBase(_TestNormBase):
     dt = np.double
     dec = 12
 
 
-class TestNormSingle(_TestNorm):
+class _TestNormSingleBase(_TestNormBase):
     dt = np.float32
     dec = 6
 
 
-class TestNormInt64(_TestNorm):
+class _TestNormInt64Base(_TestNormBase):
     dt = np.int64
     dec = 12
+
+
+class TestNormDouble(_TestNorm, _TestNormDoubleBase):
+    pass
+
+
+class TestNormSingle(_TestNorm, _TestNormSingleBase):
+    pass
+
+
+class TestNormInt64(_TestNorm, _TestNormInt64Base):
+    pass
 
 
 class TestMatrixRank(object):
 
     def test_matrix_rank(self):
         # Full rank matrix
-        yield assert_equal, 4, matrix_rank(np.eye(4))
+        assert_equal(4, matrix_rank(np.eye(4)))
         # rank deficient matrix
         I = np.eye(4)
         I[-1, -1] = 0.
-        yield assert_equal, matrix_rank(I), 3
+        assert_equal(matrix_rank(I), 3)
         # All zeros - zero rank
-        yield assert_equal, matrix_rank(np.zeros((4, 4))), 0
+        assert_equal(matrix_rank(np.zeros((4, 4))), 0)
         # 1 dimension - rank 1 unless all 0
-        yield assert_equal, matrix_rank([1, 0, 0, 0]), 1
-        yield assert_equal, matrix_rank(np.zeros((4,))), 0
+        assert_equal(matrix_rank([1, 0, 0, 0]), 1)
+        assert_equal(matrix_rank(np.zeros((4,))), 0)
         # accepts array-like
-        yield assert_equal, matrix_rank([1]), 1
+        assert_equal(matrix_rank([1]), 1)
         # greater than 2 dimensions treated as stacked matrices
         ms = np.array([I, np.eye(4), np.zeros((4,4))])
-        yield assert_equal, matrix_rank(ms), np.array([3, 4, 0])
+        assert_equal(matrix_rank(ms), np.array([3, 4, 0]))
         # works on scalar
-        yield assert_equal, matrix_rank(1), 1
+        assert_equal(matrix_rank(1), 1)
 
     def test_symmetric_rank(self):
-        yield assert_equal, 4, matrix_rank(np.eye(4), hermitian=True)
-        yield assert_equal, 1, matrix_rank(np.ones((4, 4)), hermitian=True)
-        yield assert_equal, 0, matrix_rank(np.zeros((4, 4)), hermitian=True)
+        assert_equal(4, matrix_rank(np.eye(4), hermitian=True))
+        assert_equal(1, matrix_rank(np.ones((4, 4)), hermitian=True))
+        assert_equal(0, matrix_rank(np.zeros((4, 4)), hermitian=True))
         # rank deficient matrix
         I = np.eye(4)
         I[-1, -1] = 0.
-        yield assert_equal, 3, matrix_rank(I, hermitian=True)
+        assert_equal(3, matrix_rank(I, hermitian=True))
         # manually supplied tolerance
         I[-1, -1] = 1e-8
-        yield assert_equal, 4, matrix_rank(I, hermitian=True, tol=0.99e-8)
-        yield assert_equal, 3, matrix_rank(I, hermitian=True, tol=1.01e-8)
+        assert_equal(4, matrix_rank(I, hermitian=True, tol=0.99e-8))
+        assert_equal(3, matrix_rank(I, hermitian=True, tol=1.01e-8))
 
 
 def test_reduced_rank():
@@ -1411,6 +1541,8 @@ def test_reduced_rank():
 
 
 class TestQR(object):
+    # Define the array class here, so run this on matrices elsewhere.
+    array = np.array
 
     def check_qr(self, a):
         # This test expects the argument `a` to be an ndarray or
@@ -1461,7 +1593,7 @@ class TestQR(object):
         # of the functions in lapack_lite. Consequently, this test is
         # very limited in scope. Note that the results are in FORTRAN
         # order, hence the h arrays are transposed.
-        a = array([[1, 2], [3, 4], [5, 6]], dtype=np.double)
+        a = self.array([[1, 2], [3, 4], [5, 6]], dtype=np.double)
 
         # Test double
         h, tau = linalg.qr(a, mode='raw')
@@ -1477,22 +1609,21 @@ class TestQR(object):
         assert_(tau.shape == (2,))
 
     def test_mode_all_but_economic(self):
-        a = array([[1, 2], [3, 4]])
-        b = array([[1, 2], [3, 4], [5, 6]])
+        a = self.array([[1, 2], [3, 4]])
+        b = self.array([[1, 2], [3, 4], [5, 6]])
         for dt in "fd":
             m1 = a.astype(dt)
             m2 = b.astype(dt)
             self.check_qr(m1)
             self.check_qr(m2)
             self.check_qr(m2.T)
-            self.check_qr(matrix(m1))
+
         for dt in "fd":
             m1 = 1 + 1j * a.astype(dt)
             m2 = 1 + 1j * b.astype(dt)
             self.check_qr(m1)
             self.check_qr(m2)
             self.check_qr(m2.T)
-            self.check_qr(matrix(m1))
 
     def test_0_size(self):
         # There may be good ways to do (some of this) reasonably:
@@ -1632,6 +1763,40 @@ def test_xerbla_override():
             raise SkipTest('Numpy xerbla not linked in.')
 
 
+def test_sdot_bug_8577():
+    # Regression test that loading certain other libraries does not
+    # result to wrong results in float32 linear algebra.
+    #
+    # There's a bug gh-8577 on OSX that can trigger this, and perhaps
+    # there are also other situations in which it occurs.
+    #
+    # Do the check in a separate process.
+
+    bad_libs = ['PyQt5.QtWidgets', 'IPython']
+
+    template = textwrap.dedent("""
+    import sys
+    {before}
+    try:
+        import {bad_lib}
+    except ImportError:
+        sys.exit(0)
+    {after}
+    x = np.ones(2, dtype=np.float32)
+    sys.exit(0 if np.allclose(x.dot(x), 2.0) else 1)
+    """)
+
+    for bad_lib in bad_libs:
+        code = template.format(before="import numpy as np", after="",
+                               bad_lib=bad_lib)
+        subprocess.check_call([sys.executable, "-c", code])
+
+        # Swapped import order
+        code = template.format(after="import numpy as np", before="",
+                               bad_lib=bad_lib)
+        subprocess.check_call([sys.executable, "-c", code])
+
+
 class TestMultiDot(object):
 
     def test_basic_function_with_three_arguments(self):
@@ -1716,7 +1881,3 @@ class TestMultiDot(object):
     def test_too_few_input_arrays(self):
         assert_raises(ValueError, multi_dot, [])
         assert_raises(ValueError, multi_dot, [np.random.random((3, 3))])
-
-
-if __name__ == "__main__":
-    run_module_suite()

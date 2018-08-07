@@ -77,6 +77,17 @@ class TestSeriesApply(TestData):
         assert result[0] == ['foo', 'bar']
         assert isinstance(result[0], list)
 
+    def test_series_map_box_timestamps(self):
+        # GH#2689, GH#2627
+        ser = Series(pd.date_range('1/1/2000', periods=10))
+
+        def func(x):
+            return (x.hour, x.day, x.month)
+
+        # it works!
+        ser.map(func)
+        ser.apply(func)
+
     def test_apply_box(self):
         # ufunc will not be boxed. Same test cases as the test_map_box
         vals = [pd.Timestamp('2011-01-01'), pd.Timestamp('2011-01-02')]
@@ -152,8 +163,6 @@ class TestSeriesApply(TestData):
 
 
 class TestSeriesAggregate(TestData):
-
-    _multiprocess_can_split_ = True
 
     def test_transform(self):
         # transforming functions
@@ -377,6 +386,14 @@ class TestSeriesMap(TestData):
         exp = Series([np.nan, 'B', 'C', 'D'])
         tm.assert_series_equal(a.map(c), exp)
 
+    @pytest.mark.parametrize("index", tm.all_index_generator(10))
+    def test_map_empty(self, index):
+        s = Series(index)
+        result = s.map({})
+
+        expected = pd.Series(np.nan, index=s.index)
+        tm.assert_series_equal(result, expected)
+
     def test_map_compat(self):
         # related GH 8024
         s = Series([True, True, False], index=[1, 2, 3])
@@ -422,8 +439,10 @@ class TestSeriesMap(TestData):
         converted to a multi-index, preventing tuple values
         from being mapped properly.
         """
+        # GH 18496
         df = pd.DataFrame({'a': [(1, ), (2, ), (3, 4), (5, 6)]})
         label_mappings = {(1, ): 'A', (2, ): 'B', (3, 4): 'A', (5, 6): 'B'}
+
         df['labels'] = df['a'].map(label_mappings)
         df['expected_labels'] = pd.Series(['A', 'B', 'A', 'B'], index=df.index)
         # All labels should be filled now
@@ -557,3 +576,14 @@ class TestSeriesMap(TestData):
         result = s.map(f)
         exp = pd.Series(['Asia/Tokyo'] * 25, name='XX')
         tm.assert_series_equal(result, exp)
+
+    @pytest.mark.parametrize("vals,mapping,exp", [
+        (list('abc'), {np.nan: 'not NaN'}, [np.nan] * 3 + ['not NaN']),
+        (list('abc'), {'a': 'a letter'}, ['a letter'] + [np.nan] * 3),
+        (list(range(3)), {0: 42}, [42] + [np.nan] * 3)])
+    def test_map_missing_mixed(self, vals, mapping, exp):
+        # GH20495
+        s = pd.Series(vals + [np.nan])
+        result = s.map(mapping)
+
+        tm.assert_series_equal(result, pd.Series(exp))

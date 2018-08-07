@@ -6,8 +6,8 @@ $Id: arrayprint.py,v 1.9 2005/09/13 13:58:44 teoliphant Exp $
 from __future__ import division, absolute_import, print_function
 
 __all__ = ["array2string", "array_str", "array_repr", "set_string_function",
-           "set_printoptions", "get_printoptions", "format_float_positional",
-           "format_float_scientific"]
+           "set_printoptions", "get_printoptions", "printoptions",
+           "format_float_positional", "format_float_scientific"]
 __docformat__ = 'restructuredtext'
 
 #
@@ -49,7 +49,7 @@ from .numeric import concatenate, asarray, errstate
 from .numerictypes import (longlong, intc, int_, float_, complex_, bool_,
                            flexible)
 import warnings
-
+import contextlib
 
 _format_options = {
     'edgeitems': 3,  # repr N leading and trailing items of each dimension
@@ -132,44 +132,45 @@ def set_printoptions(precision=None, threshold=None, edgeitems=None,
         formatting function applies to.  Callables should return a string.
         Types that are not specified (by their corresponding keys) are handled
         by the default formatters.  Individual types for which a formatter
-        can be set are::
+        can be set are:
 
-            - 'bool'
-            - 'int'
-            - 'timedelta' : a `numpy.timedelta64`
-            - 'datetime' : a `numpy.datetime64`
-            - 'float'
-            - 'longfloat' : 128-bit floats
-            - 'complexfloat'
-            - 'longcomplexfloat' : composed of two 128-bit floats
-            - 'numpystr' : types `numpy.string_` and `numpy.unicode_`
-            - 'object' : `np.object_` arrays
-            - 'str' : all other strings
+        - 'bool'
+        - 'int'
+        - 'timedelta' : a `numpy.timedelta64`
+        - 'datetime' : a `numpy.datetime64`
+        - 'float'
+        - 'longfloat' : 128-bit floats
+        - 'complexfloat'
+        - 'longcomplexfloat' : composed of two 128-bit floats
+        - 'numpystr' : types `numpy.string_` and `numpy.unicode_`
+        - 'object' : `np.object_` arrays
+        - 'str' : all other strings
 
-        Other keys that can be used to set a group of types at once are::
+        Other keys that can be used to set a group of types at once are:
 
-            - 'all' : sets all types
-            - 'int_kind' : sets 'int'
-            - 'float_kind' : sets 'float' and 'longfloat'
-            - 'complex_kind' : sets 'complexfloat' and 'longcomplexfloat'
-            - 'str_kind' : sets 'str' and 'numpystr'
+        - 'all' : sets all types
+        - 'int_kind' : sets 'int'
+        - 'float_kind' : sets 'float' and 'longfloat'
+        - 'complex_kind' : sets 'complexfloat' and 'longcomplexfloat'
+        - 'str_kind' : sets 'str' and 'numpystr'
     floatmode : str, optional
         Controls the interpretation of the `precision` option for
         floating-point types. Can take the following values:
-            - 'fixed' : Always print exactly `precision` fractional digits,
-                    even if this would print more or fewer digits than
-                    necessary to specify the value uniquely.
-            - 'unique : Print the minimum number of fractional digits necessary
-                    to represent each value uniquely. Different elements may
-                    have a different number of digits. The value of the
-                    `precision` option is ignored.
-            - 'maxprec' : Print at most `precision` fractional digits, but if
-                    an element can be uniquely represented with fewer digits
-                    only print it with that many.
-            - 'maxprec_equal' : Print at most `precision` fractional digits,
-                    but if every element in the array can be uniquely
-                    represented with an equal number of fewer digits, use that
-                    many digits for all elements.
+
+        * 'fixed': Always print exactly `precision` fractional digits,
+                even if this would print more or fewer digits than
+                necessary to specify the value uniquely.
+        * 'unique': Print the minimum number of fractional digits necessary
+                to represent each value uniquely. Different elements may
+                have a different number of digits. The value of the
+                `precision` option is ignored.
+        * 'maxprec': Print at most `precision` fractional digits, but if
+                an element can be uniquely represented with fewer digits
+                only print it with that many.
+        * 'maxprec_equal': Print at most `precision` fractional digits,
+                but if every element in the array can be uniquely
+                represented with an equal number of fewer digits, use that
+                many digits for all elements.
     legacy : string or `False`, optional
         If set to the string `'1.13'` enables 1.13 legacy printing mode. This
         approximates numpy 1.13 print output by including a space in the sign
@@ -275,6 +276,39 @@ def get_printoptions():
 
     """
     return _format_options.copy()
+
+
+@contextlib.contextmanager
+def printoptions(*args, **kwargs):
+    """Context manager for setting print options.
+
+    Set print options for the scope of the `with` block, and restore the old
+    options at the end. See `set_printoptions` for the full description of
+    available options.
+
+    Examples
+    --------
+
+    >>> with np.printoptions(precision=2):
+    ...     print(np.array([2.0])) / 3
+    [0.67]
+
+    The `as`-clause of the `with`-statement gives the current print options:
+
+    >>> with np.printoptions(precision=2) as opts:
+    ...      assert_equal(opts, np.get_printoptions())
+
+    See Also
+    --------
+    set_printoptions, get_printoptions
+
+    """
+    opts = np.get_printoptions()
+    try:
+        np.set_printoptions(*args, **kwargs)
+        yield np.get_printoptions()
+    finally:
+        np.set_printoptions(**opts)
 
 
 def _leading_trailing(a, edgeitems, index=()):
@@ -503,27 +537,27 @@ def array2string(a, max_line_width=None, precision=None,
         formatting function applies to.  Callables should return a string.
         Types that are not specified (by their corresponding keys) are handled
         by the default formatters.  Individual types for which a formatter
-        can be set are::
+        can be set are:
 
-            - 'bool'
-            - 'int'
-            - 'timedelta' : a `numpy.timedelta64`
-            - 'datetime' : a `numpy.datetime64`
-            - 'float'
-            - 'longfloat' : 128-bit floats
-            - 'complexfloat'
-            - 'longcomplexfloat' : composed of two 128-bit floats
-            - 'void' : type `numpy.void`
-            - 'numpystr' : types `numpy.string_` and `numpy.unicode_`
-            - 'str' : all other strings
+        - 'bool'
+        - 'int'
+        - 'timedelta' : a `numpy.timedelta64`
+        - 'datetime' : a `numpy.datetime64`
+        - 'float'
+        - 'longfloat' : 128-bit floats
+        - 'complexfloat'
+        - 'longcomplexfloat' : composed of two 128-bit floats
+        - 'void' : type `numpy.void`
+        - 'numpystr' : types `numpy.string_` and `numpy.unicode_`
+        - 'str' : all other strings
 
-        Other keys that can be used to set a group of types at once are::
+        Other keys that can be used to set a group of types at once are:
 
-            - 'all' : sets all types
-            - 'int_kind' : sets 'int'
-            - 'float_kind' : sets 'float' and 'longfloat'
-            - 'complex_kind' : sets 'complexfloat' and 'longcomplexfloat'
-            - 'str_kind' : sets 'str' and 'numpystr'
+        - 'all' : sets all types
+        - 'int_kind' : sets 'int'
+        - 'float_kind' : sets 'float' and 'longfloat'
+        - 'complex_kind' : sets 'complexfloat' and 'longcomplexfloat'
+        - 'str_kind' : sets 'str' and 'numpystr'
     threshold : int, optional
         Total number of array elements which trigger summarization
         rather than full repr.
@@ -538,20 +572,21 @@ def array2string(a, max_line_width=None, precision=None,
     floatmode : str, optional
         Controls the interpretation of the `precision` option for
         floating-point types. Can take the following values:
-            - 'fixed' : Always print exactly `precision` fractional digits,
-                    even if this would print more or fewer digits than
-                    necessary to specify the value uniquely.
-            - 'unique : Print the minimum number of fractional digits necessary
-                    to represent each value uniquely. Different elements may
-                    have a different number of digits.  The value of the
-                    `precision` option is ignored.
-            - 'maxprec' : Print at most `precision` fractional digits, but if
-                    an element can be uniquely represented with fewer digits
-                    only print it with that many.
-            - 'maxprec_equal' : Print at most `precision` fractional digits,
-                    but if every element in the array can be uniquely
-                    represented with an equal number of fewer digits, use that
-                    many digits for all elements.
+
+        - 'fixed': Always print exactly `precision` fractional digits,
+          even if this would print more or fewer digits than
+          necessary to specify the value uniquely.
+        - 'unique': Print the minimum number of fractional digits necessary
+          to represent each value uniquely. Different elements may
+          have a different number of digits.  The value of the
+          `precision` option is ignored.
+        - 'maxprec': Print at most `precision` fractional digits, but if
+          an element can be uniquely represented with fewer digits
+          only print it with that many.
+        - 'maxprec_equal': Print at most `precision` fractional digits,
+          but if every element in the array can be uniquely
+          represented with an equal number of fewer digits, use that
+          many digits for all elements.
     legacy : string or `False`, optional
         If set to the string `'1.13'` enables 1.13 legacy printing mode. This
         approximates numpy 1.13 print output by including a space in the sign
@@ -612,6 +647,9 @@ def array2string(a, max_line_width=None, precision=None,
     options.update(overrides)
 
     if options['legacy'] == '1.13':
+        if style is np._NoValue:
+            style = repr
+
         if a.shape == () and not a.dtype.names:
             return style(a.item())
     elif style is not np._NoValue:
@@ -715,7 +753,7 @@ def _formatArray(a, format_function, line_width, next_line_prefix,
                 line += separator
 
             if legacy == '1.13':
-                # width of the seperator is not considered on 1.13
+                # width of the separator is not considered on 1.13
                 elem_width = curr_width
             word = recurser(index + (-1,), next_hanging_indent, next_width)
             s, line = _extendLine(
@@ -951,11 +989,12 @@ def format_float_scientific(x, precision=None, unique=True, trim='k',
         value.
     trim : one of 'k', '.', '0', '-', optional
         Controls post-processing trimming of trailing digits, as follows:
-            k : keep trailing zeros, keep decimal point (no trimming)
-            . : trim all trailing zeros, leave decimal point
-            0 : trim all but the zero before the decimal point. Insert the
-                zero if it is missing.
-            - : trim trailing zeros and any trailing decimal point
+
+        * 'k' : keep trailing zeros, keep decimal point (no trimming)
+        * '.' : trim all trailing zeros, leave decimal point
+        * '0' : trim all but the zero before the decimal point. Insert the
+          zero if it is missing.
+        * '-' : trim trailing zeros and any trailing decimal point
     sign : boolean, optional
         Whether to show the sign for positive values.
     pad_left : non-negative integer, optional
@@ -1023,11 +1062,12 @@ def format_float_positional(x, precision=None, unique=True,
         digits, before or after the decimal point, ignoring leading zeros.
     trim : one of 'k', '.', '0', '-', optional
         Controls post-processing trimming of trailing digits, as follows:
-            k : keep trailing zeros, keep decimal point (no trimming)
-            . : trim all trailing zeros, leave decimal point
-            0 : trim all but the zero before the decimal point. Insert the
-                zero if it is missing.
-            - : trim trailing zeros and any trailing decimal point
+
+        * 'k' : keep trailing zeros, keep decimal point (no trimming)
+        * '.' : trim all trailing zeros, leave decimal point
+        * '0' : trim all but the zero before the decimal point. Insert the
+          zero if it is missing.
+        * '-' : trim trailing zeros and any trailing decimal point
     sign : boolean, optional
         Whether to show the sign for positive values.
     pad_left : non-negative integer, optional
@@ -1048,7 +1088,7 @@ def format_float_positional(x, precision=None, unique=True,
 
     Examples
     --------
-    >>> np.format_float_scientific(np.float32(np.pi))
+    >>> np.format_float_positional(np.float32(np.pi))
     '3.1415927'
     >>> np.format_float_positional(np.float16(np.pi))
     '3.14'

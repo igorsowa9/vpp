@@ -9,6 +9,7 @@ import atexit
 import tempfile
 import subprocess
 import shutil
+import multiprocessing
 
 import distutils
 from distutils.errors import DistutilsError
@@ -92,7 +93,11 @@ def get_num_build_jobs():
 
     """
     from numpy.distutils.core import get_distribution
-    envjobs = int(os.environ.get("NPY_NUM_BUILD_JOBS", 1))
+    try:
+        cpu_count = len(os.sched_getaffinity(0))
+    except AttributeError:
+        cpu_count = multiprocessing.cpu_count()
+    envjobs = int(os.environ.get("NPY_NUM_BUILD_JOBS", cpu_count))
     dist = get_distribution()
     # may be None during configuration
     if dist is None:
@@ -251,6 +256,11 @@ def minrelpath(path):
         return ''
     return os.sep.join(l)
 
+def sorted_glob(fileglob):
+    """sorts output of python glob for http://bugs.python.org/issue30461
+    to allow extensions to have reproducible build results"""
+    return sorted(glob.glob(fileglob))
+
 def _fix_paths(paths, local_path, include_non_existing):
     assert is_sequence(paths), repr(type(paths))
     new_paths = []
@@ -258,8 +268,8 @@ def _fix_paths(paths, local_path, include_non_existing):
     for n in paths:
         if is_string(n):
             if '*' in n or '?' in n:
-                p = glob.glob(n)
-                p2 = glob.glob(njoin(local_path, n))
+                p = sorted_glob(n)
+                p2 = sorted_glob(njoin(local_path, n))
                 if p2:
                     new_paths.extend(p2)
                 elif p:
@@ -523,7 +533,7 @@ def _get_headers(directory_list):
     # get *.h files from list of directories
     headers = []
     for d in directory_list:
-        head = glob.glob(os.path.join(d, "*.h")) #XXX: *.hpp files??
+        head = sorted_glob(os.path.join(d, "*.h")) #XXX: *.hpp files??
         headers.extend(head)
     return headers
 
@@ -877,7 +887,7 @@ class Configuration(object):
                                  caller_level = 1):
         l = subpackage_name.split('.')
         subpackage_path = njoin([self.local_path]+l)
-        dirs = [_m for _m in glob.glob(subpackage_path) if os.path.isdir(_m)]
+        dirs = [_m for _m in sorted_glob(subpackage_path) if os.path.isdir(_m)]
         config_list = []
         for d in dirs:
             if not os.path.isfile(njoin(d, '__init__.py')):
@@ -1213,15 +1223,15 @@ class Configuration(object):
           #. file.txt -> (., file.txt)-> parent/file.txt
           #. foo/file.txt -> (foo, foo/file.txt) -> parent/foo/file.txt
           #. /foo/bar/file.txt -> (., /foo/bar/file.txt) -> parent/file.txt
-          #. *.txt -> parent/a.txt, parent/b.txt
-          #. foo/*.txt -> parent/foo/a.txt, parent/foo/b.txt
-          #. */*.txt -> (*, */*.txt) -> parent/c/a.txt, parent/d/b.txt
+          #. ``*``.txt -> parent/a.txt, parent/b.txt
+          #. foo/``*``.txt`` -> parent/foo/a.txt, parent/foo/b.txt
+          #. ``*/*.txt`` -> (``*``, ``*``/``*``.txt) -> parent/c/a.txt, parent/d/b.txt
           #. (sun, file.txt) -> parent/sun/file.txt
           #. (sun, bar/file.txt) -> parent/sun/file.txt
           #. (sun, /foo/bar/file.txt) -> parent/sun/file.txt
-          #. (sun, *.txt) -> parent/sun/a.txt, parent/sun/b.txt
-          #. (sun, bar/*.txt) -> parent/sun/a.txt, parent/sun/b.txt
-          #. (sun/*, */*.txt) -> parent/sun/c/a.txt, parent/d/b.txt
+          #. (sun, ``*``.txt) -> parent/sun/a.txt, parent/sun/b.txt
+          #. (sun, bar/``*``.txt) -> parent/sun/a.txt, parent/sun/b.txt
+          #. (sun/``*``, ``*``/``*``.txt) -> parent/sun/c/a.txt, parent/d/b.txt
 
         An additional feature is that the path to a data-file can actually be
         a function that takes no arguments and returns the actual path(s) to
@@ -2284,13 +2294,16 @@ def generate_config_py(target):
 
     # For gfortran+msvc combination, extra shared libraries may exist
     f.write("""
+
 import os
 import sys
 
 extra_dll_dir = os.path.join(os.path.dirname(__file__), '.libs')
+
 if sys.platform == 'win32' and os.path.isdir(extra_dll_dir):
     os.environ.setdefault('PATH', '')
     os.environ['PATH'] += os.pathsep + extra_dll_dir
+
 """)
 
     for k, i in system_info.saved_results.items():

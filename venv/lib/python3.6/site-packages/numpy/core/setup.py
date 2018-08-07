@@ -30,7 +30,7 @@ NPY_RELAXED_STRIDES_DEBUG = NPY_RELAXED_STRIDES_DEBUG and NPY_RELAXED_STRIDES_CH
 # XXX: ugly, we use a class to avoid calling twice some expensive functions in
 # config.h/numpyconfig.h. I don't see a better way because distutils force
 # config.h generation inside an Extension class, and as such sharing
-# configuration informations between extensions is not easy.
+# configuration information between extensions is not easy.
 # Using a pickled-based memoize does not work because config_cmd is an instance
 # method, which cPickle does not like.
 #
@@ -452,17 +452,8 @@ def configuration(parent_package='',top_path=None):
                 moredefs.append(('NPY_RELAXED_STRIDES_DEBUG', 1))
 
             # Get long double representation
-            if sys.platform != 'darwin':
-                rep = check_long_double_representation(config_cmd)
-                if rep in ['INTEL_EXTENDED_12_BYTES_LE',
-                           'INTEL_EXTENDED_16_BYTES_LE',
-                           'MOTOROLA_EXTENDED_12_BYTES_BE',
-                           'IEEE_QUAD_LE', 'IEEE_QUAD_BE',
-                           'IEEE_DOUBLE_LE', 'IEEE_DOUBLE_BE',
-                           'DOUBLE_DOUBLE_BE', 'DOUBLE_DOUBLE_LE']:
-                    moredefs.append(('HAVE_LDOUBLE_%s' % rep, 1))
-                else:
-                    raise ValueError("Unrecognized long double format: %s" % rep)
+            rep = check_long_double_representation(config_cmd)
+            moredefs.append(('HAVE_LDOUBLE_%s' % rep, 1))
 
             # Py3K check
             if sys.version_info[0] == 3:
@@ -557,7 +548,7 @@ def configuration(parent_package='',top_path=None):
             if NPY_RELAXED_STRIDES_DEBUG:
                 moredefs.append(('NPY_RELAXED_STRIDES_DEBUG', 1))
 
-            # Check wether we can use inttypes (C99) formats
+            # Check whether we can use inttypes (C99) formats
             if config_cmd.check_decl('PRIdPTR', headers=['inttypes.h']):
                 moredefs.append(('NPY_USE_C99_FORMATS', 1))
 
@@ -664,7 +655,7 @@ def configuration(parent_package='',top_path=None):
     def get_mathlib_info(*args):
         # Another ugly hack: the mathlib info is known once build_src is run,
         # but we cannot use add_installed_pkg_config here either, so we only
-        # update the substition dictionary during npymath build
+        # update the substitution dictionary during npymath build
         config_cmd = config.get_config_cmd()
 
         # Check that the toolchain works, to fail early if it doesn't
@@ -750,6 +741,7 @@ def configuration(parent_package='',top_path=None):
             join('src', 'multiarray', 'sequence.h'),
             join('src', 'multiarray', 'shape.h'),
             join('src', 'multiarray', 'strfuncs.h'),
+            join('src', 'multiarray', 'typeinfo.h'),
             join('src', 'multiarray', 'ucsnarrow.h'),
             join('src', 'multiarray', 'usertypes.h'),
             join('src', 'multiarray', 'vdot.h'),
@@ -827,6 +819,7 @@ def configuration(parent_package='',top_path=None):
             join('src', 'multiarray', 'scalartypes.c.src'),
             join('src', 'multiarray', 'strfuncs.c'),
             join('src', 'multiarray', 'temp_elide.c'),
+            join('src', 'multiarray', 'typeinfo.c'),
             join('src', 'multiarray', 'usertypes.c'),
             join('src', 'multiarray', 'ucsnarrow.c'),
             join('src', 'multiarray', 'vdot.c'),
@@ -886,6 +879,7 @@ def configuration(parent_package='',top_path=None):
             join('src', 'umath', 'loops.c.src'),
             join('src', 'umath', 'ufunc_object.c'),
             join('src', 'umath', 'extobj.c'),
+            join('src', 'umath', 'cpuid.c'),
             join('src', 'umath', 'scalarmath.c.src'),
             join('src', 'umath', 'ufunc_type_resolution.c'),
             join('src', 'umath', 'override.c'),
@@ -922,29 +916,29 @@ def configuration(parent_package='',top_path=None):
     #                        umath_tests module                           #
     #######################################################################
 
-    config.add_extension('umath_tests',
-                    sources=[join('src', 'umath', 'umath_tests.c.src')])
+    config.add_extension('_umath_tests',
+                    sources=[join('src', 'umath', '_umath_tests.c.src')])
 
     #######################################################################
     #                   custom rational dtype module                      #
     #######################################################################
 
-    config.add_extension('test_rational',
-                    sources=[join('src', 'umath', 'test_rational.c.src')])
+    config.add_extension('_rational_tests',
+                    sources=[join('src', 'umath', '_rational_tests.c.src')])
 
     #######################################################################
     #                        struct_ufunc_test module                     #
     #######################################################################
 
-    config.add_extension('struct_ufunc_test',
-                    sources=[join('src', 'umath', 'struct_ufunc_test.c.src')])
+    config.add_extension('_struct_ufunc_tests',
+                    sources=[join('src', 'umath', '_struct_ufunc_tests.c.src')])
 
     #######################################################################
     #                     multiarray_tests module                         #
     #######################################################################
 
-    config.add_extension('multiarray_tests',
-                    sources=[join('src', 'multiarray', 'multiarray_tests.c.src'),
+    config.add_extension('_multiarray_tests',
+                    sources=[join('src', 'multiarray', '_multiarray_tests.c.src'),
                              join('src', 'private', 'mem_overlap.c')],
                     depends=[join('src', 'private', 'mem_overlap.h'),
                              join('src', 'private', 'npy_extint128.h')],
@@ -954,8 +948,8 @@ def configuration(parent_package='',top_path=None):
     #                        operand_flag_tests module                    #
     #######################################################################
 
-    config.add_extension('operand_flag_tests',
-                    sources=[join('src', 'umath', 'operand_flag_tests.c.src')])
+    config.add_extension('_operand_flag_tests',
+                    sources=[join('src', 'umath', '_operand_flag_tests.c.src')])
 
     config.add_data_dir('tests')
     config.add_data_dir('tests/data')

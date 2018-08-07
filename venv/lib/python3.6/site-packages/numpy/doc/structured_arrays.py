@@ -250,7 +250,7 @@ alias for the field. The title may be used to index an array, just like a
 field name.
 
 To add titles when using the list-of-tuples form of dtype specification, the
-field name may be be specified as a tuple of two strings instead of a single
+field name may be specified as a tuple of two strings instead of a single
 string, which will be the field's title and field name respectively. For
 example::
 
@@ -288,7 +288,7 @@ the desired underlying dtype, and fields and flags will be copied from
 ``dtype``. This dtype is similar to a 'union' in C.
 
 Indexing and Assignment to Structured arrays
-=============================================
+============================================
 
 Assigning data to a Structured Array
 ------------------------------------
@@ -297,7 +297,7 @@ There are a number of ways to assign values to a structured array: Using python
 tuples, using scalar values, or using other structured arrays.
 
 Assignment from Python Native Types (Tuples)
-```````````````````````````````````````````
+````````````````````````````````````````````
 
 The simplest way to assign values to a structured array is using python tuples.
 Each assigned value should be a tuple of length equal to the number of fields
@@ -404,10 +404,10 @@ One can index and assign to a structured array with a multi-field index, where
 the index is a list of field names.
 
 .. warning::
-    The behavior of multi-field indexes will change from Numpy 1.14 to Numpy
-    1.15.
+    The behavior of multi-field indexes will change from Numpy 1.15 to Numpy
+    1.16.
 
-In Numpy 1.15, the result of indexing with a multi-field index will be a view
+In Numpy 1.16, the result of indexing with a multi-field index will be a view
 into the original array, as follows::
 
  >>> a = np.zeros(3, dtype=[('a', 'i4'), ('b', 'i4'), ('c', 'f4')])
@@ -420,31 +420,31 @@ in the order they were indexed. Note that unlike for single-field indexing, the
 view's dtype has the same itemsize as the original array, and has fields at the
 same offsets as in the original array, and unindexed fields are merely missing.
 
-In Numpy 1.14, indexing an array with a multi-field index returns a copy of
-the result above for 1.15, but with fields packed together in memory as if
+In Numpy 1.15, indexing an array with a multi-field index returns a copy of
+the result above for 1.16, but with fields packed together in memory as if
 passed through :func:`numpy.lib.recfunctions.repack_fields`. This is the
-behavior of Numpy 1.7 to 1.13.
+behavior since Numpy 1.7.
 
 .. warning::
-   The new behavior in Numpy 1.15 leads to extra "padding" bytes at the
+   The new behavior in Numpy 1.16 leads to extra "padding" bytes at the
    location of unindexed fields. You will need to update any code which depends
    on the data having a "packed" layout. For instance code such as::
 
-    >>> a[['a','c']].view('i8')  # will fail in Numpy 1.15
+    >>> a[['a','c']].view('i8')  # will fail in Numpy 1.16
     ValueError: When changing to a smaller dtype, its size must be a divisor of the size of original dtype
 
    will need to be changed. This code has raised a ``FutureWarning`` since
    Numpy 1.12.
 
    The following is a recommended fix, which will behave identically in Numpy
-   1.14 and Numpy 1.15::
+   1.15 and Numpy 1.16::
 
     >>> from numpy.lib.recfunctions import repack_fields
-    >>> repack_fields(a[['a','c']]).view('i8')  # supported 1.14 and 1.15
+    >>> repack_fields(a[['a','c']]).view('i8')  # supported 1.15 and 1.16
     array([0, 0, 0])
 
 Assigning to an array with a multi-field index will behave the same in Numpy
-1.14 and Numpy 1.15. In both versions the assignment will modify the original
+1.15 and Numpy 1.16. In both versions the assignment will modify the original
 array::
 
  >>> a[['a', 'c']] = (2, 3)

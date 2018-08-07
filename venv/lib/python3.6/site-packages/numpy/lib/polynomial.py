@@ -113,11 +113,6 @@ def poly(seq_of_zeros):
     >>> np.poly(P)
     array([ 1.        ,  0.        ,  0.16666667])
 
-    Or a square matrix object:
-
-    >>> np.poly(np.matrix(P))
-    array([ 1.        ,  0.        ,  0.16666667])
-
     Note how in all cases the leading coefficient is always 1.
 
     """
@@ -897,7 +892,7 @@ def polydiv(u, v):
     n = len(v) - 1
     scale = 1. / v[0]
     q = NX.zeros((max(m - n + 1, 1),), w.dtype)
-    r = u.copy()
+    r = u.astype(w.dtype)
     for k in range(0, m-n+1):
         d = scale * r[k]
         q[k] = d

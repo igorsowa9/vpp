@@ -6,10 +6,10 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 0#3*int(60/5*24)
-ts_n = 1*int(60/5*24)  # number of timestamps of whole simulation
-tofile = True
-pdf = True
+ts_0 = 93#3*int(60/5*24)
+ts_n = 1#*int(60/5*24)  # number of timestamps of whole simulation
+tofile = False
+pdf = False
 
 start_datetime = "02/09/2017 00:00"
 
@@ -51,8 +51,8 @@ figsizeL = 12
 dso_green_price_increase_factor = 1.05
 
 opf1_verbose = 0
-opf1_prinpf = False
-opfe3_prinpf = False
+opf1_prinpf = True
+opfe3_prinpf = True
 opfe2_prinpf = False
 
 relax_e2 = 0.000  # relaxation of constraints in opf_e2
