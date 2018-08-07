@@ -3,20 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;&#10;check for opf1_save_balcost_all, why does not it show values in show_history()&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/original_elia/pvoutput_org/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/pvoutput_org/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/original_elia/pvoutput_org/html_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/pvoutput_org/html_parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/original_elia/pvoutput_org/login_page.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/pvoutput_org/login_page.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/case4_vpp2.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/case4_vpp2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/case4_vpp3.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/case4_vpp3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/case4_vpp4.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/case4_vpp4.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/other_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/other_agents.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/settings_4bus.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_4bus.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilities.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/vpp_ems_4bus.py" beforeDir="false" afterPath="$PROJECT_DIR$/vpp_ems_4bus.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -30,11 +21,11 @@
       <content type="file-editors">
         <state>
           <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-            <file pinned="false" current-in-tab="false">
+            <file pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="304">
-                    <caret line="16" column="28" selection-start-line="16" selection-start-column="22" selection-end-line="16" selection-end-column="28" />
+                  <state relative-caret-position="231">
+                    <caret line="62" selection-start-line="62" selection-end-line="62" />
                     <folding>
                       <element signature="e#0#11#0" expanded="true" />
                     </folding>
@@ -45,8 +36,8 @@
             <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/settings_4bus.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="190">
-                    <caret line="10" column="7" selection-start-line="10" selection-start-column="7" selection-end-line="10" selection-end-column="7" />
+                  <state relative-caret-position="437">
+                    <caret line="27" selection-start-line="27" selection-end-line="27" />
                     <folding>
                       <element signature="e#0#18#0" expanded="true" />
                     </folding>
@@ -54,11 +45,11 @@
                 </provider>
               </entry>
             </file>
-            <file pinned="false" current-in-tab="true">
+            <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/other_agents.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="364">
-                    <caret line="23" column="16" lean-forward="true" selection-start-line="23" selection-start-column="16" selection-end-line="23" selection-end-column="16" />
+                  <state relative-caret-position="3325">
+                    <caret line="189" column="27" selection-start-line="189" selection-start-column="27" selection-end-line="189" selection-end-column="27" />
                     <folding>
                       <element signature="e#0#25#0" expanded="true" />
                     </folding>
@@ -69,7 +60,7 @@
             <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/utilities.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="1208">
+                  <state relative-caret-position="7011">
                     <caret line="380" column="18" selection-start-line="380" selection-start-column="18" selection-end-line="380" selection-end-column="18" />
                     <folding>
                       <element signature="e#0#27#0" expanded="true" />
@@ -83,8 +74,8 @@
             <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/runML.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="779">
-                    <caret line="46" column="27" selection-start-line="46" selection-start-column="27" selection-end-line="46" selection-end-column="27" />
+                  <state relative-caret-position="114">
+                    <caret line="11" selection-start-line="11" selection-end-line="11" />
                   </state>
                 </provider>
               </entry>
@@ -92,11 +83,29 @@
             <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/data/pvoutput_org/html_parser.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="1210">
+                  <state relative-caret-position="2945">
                     <caret line="166" column="4" selection-start-line="166" selection-start-column="4" selection-end-line="166" selection-end-column="4" />
                     <folding>
                       <marker date="1533558768884" expanded="true" signature="4362:4364" ph="..." />
                     </folding>
+                  </state>
+                </provider>
+              </entry>
+            </file>
+            <file pinned="false" current-in-tab="false">
+              <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/osbrain/proxy.py">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="4807">
+                    <caret line="262" selection-start-line="262" selection-end-line="262" />
+                  </state>
+                </provider>
+              </entry>
+            </file>
+            <file pinned="false" current-in-tab="false">
+              <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/zmq/sugar/socket.py">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="703">
+                    <caret line="57" selection-start-line="57" selection-end-line="57" />
                   </state>
                 </provider>
               </entry>
@@ -110,61 +119,61 @@
     <session id="1762622434">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="7" />
+          <entry key="project.closed" value="8" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.open.time.10" value="2" />
-          <entry key="project.open.time.11" value="1" />
+          <entry key="project.open.time.11" value="3" />
           <entry key="project.open.time.12" value="1" />
           <entry key="project.open.time.18" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="8" />
+          <entry key="project.opened" value="10" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="json" value="77" />
-          <entry key="py" value="12594" />
+          <entry key="json" value="107" />
+          <entry key="py" value="12754" />
           <entry key="txt" value="480" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JSON" value="77" />
+          <entry key="JSON" value="107" />
           <entry key="PLAIN_TEXT" value="480" />
-          <entry key="Python" value="12594" />
+          <entry key="Python" value="12754" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="json" value="25" />
-          <entry key="py" value="45" />
+          <entry key="py" value="49" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="JSON" value="25" />
-          <entry key="Python" value="45" />
+          <entry key="Python" value="49" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="114">
-              <caret line="33" column="29" lean-forward="true" selection-start-line="33" selection-start-column="29" selection-end-line="33" selection-end-column="29" />
+            <state relative-caret-position="399">
+              <caret line="21" column="97" selection-start-line="21" selection-start-column="97" selection-end-line="21" selection-end-column="97" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="20" column="131" selection-start-line="20" selection-start-column="131" selection-end-line="20" selection-end-column="131" />
+            <state relative-caret-position="66">
+              <caret line="23" column="34" selection-start-line="23" selection-start-column="34" selection-end-line="23" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -172,8 +181,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="20" column="119" selection-start-line="20" selection-start-column="119" selection-end-line="20" selection-end-column="119" />
+            <state relative-caret-position="266">
+              <caret line="14" column="21" selection-start-line="14" selection-start-column="21" selection-end-line="14" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -181,8 +190,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="95">
-              <caret line="5" column="29" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="29" />
+            <state relative-caret-position="342">
+              <caret line="18" column="11" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -190,8 +199,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="54">
-              <caret line="18" column="33" selection-start-line="18" selection-start-column="33" selection-end-line="18" selection-end-column="33" />
+            <state relative-caret-position="475">
+              <caret line="25" column="36" selection-start-line="25" selection-start-column="36" selection-end-line="25" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -199,8 +208,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="433">
-              <caret line="40" column="24" selection-start-line="40" selection-start-column="24" selection-end-line="40" selection-end-column="24" />
+            <state relative-caret-position="456">
+              <caret line="24" column="6" selection-start-line="24" selection-start-column="6" selection-end-line="24" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -208,7 +217,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp3.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="482">
+            <state relative-caret-position="817">
               <caret line="43" column="22" selection-start-line="43" selection-start-column="22" selection-end-line="43" selection-end-column="22" />
             </state>
           </provider>
@@ -217,8 +226,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp4.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="58">
-              <caret line="22" column="38" selection-start-line="22" selection-start-column="38" selection-end-line="22" selection-end-column="38" />
+            <state relative-caret-position="722">
+              <caret line="38" column="40" selection-start-line="38" selection-start-column="40" selection-end-line="38" selection-end-column="40" />
             </state>
           </provider>
         </entry>
@@ -235,14 +244,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>total cost buying ds</find>
-      <find>gen_mod</find>
-      <find>global_time</find>
-      <find>print</find>
-      <find>opfd3pr</find>
-      <find>opfe3pr</find>
-      <find>i calculate prospective revenue</find>
-      <find>loadmod</find>
       <find>opfe3prin</find>
       <find>opf1_save_balcost_all</find>
       <find>opfe3_save_costs_all</find>
@@ -261,10 +262,18 @@
       <find>opfd3</find>
       <find>opfe3</find>
       <find>save_opfe3_history</find>
-      <find>show_results_history</find>
       <find>generators constraints fr</find>
+      <find>modify_from</find>
+      <find>show_results_history</find>
       <find>green_sources</find>
       <find>modify</find>
+      <find>load_data</find>
+      <find>osbrain</find>
+      <find>connect</find>
+      <find>inproc</find>
+      <find>price_curves_dict for this iteration</find>
+      <find>price_curve_handler</find>
+      <find>price_curve_handle</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -323,16 +332,16 @@
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json" />
         <option value="$PROJECT_DIR$/data/vpp4bus/case4_vpp2.py" />
         <option value="$PROJECT_DIR$/data/vpp4bus/case4_vpp3.py" />
-        <option value="$PROJECT_DIR$/vpp_ems_4bus.py" />
         <option value="$PROJECT_DIR$/utilities.py" />
         <option value="$PROJECT_DIR$/data/vpp4bus/case4_vpp4.py" />
-        <option value="$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py" />
-        <option value="$PROJECT_DIR$/other_agents.py" />
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json" />
         <option value="$PROJECT_DIR$/data/pvoutput_org/html_parser.py" />
+        <option value="$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py" />
+        <option value="$PROJECT_DIR$/other_agents.py" />
+        <option value="$PROJECT_DIR$/settings_4bus.py" />
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" />
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" />
-        <option value="$PROJECT_DIR$/settings_4bus.py" />
+        <option value="$PROJECT_DIR$/vpp_ems_4bus.py" />
       </list>
     </option>
   </component>
@@ -423,6 +432,14 @@
               <item name="data" type="462c0819:PsiDirectoryNode" />
               <item name="pvoutput_org" type="462c0819:PsiDirectoryNode" />
               <item name="min5" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="vpp" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+              <item name="pvoutput_org" type="462c0819:PsiDirectoryNode" />
+              <item name="min5" type="462c0819:PsiDirectoryNode" />
+              <item name="GfB_mbH_-_Westnetz_GmbH_29.610kW" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -627,13 +644,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1498654725175</updated>
-    </task>
-    <task id="LOCAL-00009" summary="next step:&#10;finish making requests with opf - missing excess values&#10;then,&#10;make price curves derivation functions based on system (by Exc)&#10;make bids derivation (by Def)&#10;make bids acceptance evaluation (by Exc)&#10;final acceptance (by Def)&#10;&#10;make other scenarios">
-      <created>1523462036163</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1523462036163</updated>
     </task>
     <task id="LOCAL-00010" summary="next step:&#10;&#10;finish price curves derivation functions based on system (by Exc)&#10;- see the error i.e. in v05 linke 78&#10;then,&#10;make bids derivation (by Def)&#10;make bids acceptance evaluation (by Exc)&#10;final acceptance (by Def)&#10;&#10;make other scenarios">
       <created>1523535319042</created>
@@ -971,7 +981,14 @@
       <option name="project" value="LOCAL" />
       <updated>1533308902288</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="next steps:&#10;&#10;check for opf1_save_balcost_all, why does not it show values in show_history()&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <created>1533560864593</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1533560864594</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1007,14 +1024,14 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="69" y="-4" width="1851" height="1084" extended-state="6" />
+    <frame x="68" y="-11" width="1853" height="1092" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23249453" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18271334" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32889345" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49972987" visible="true" weight="0.7782427" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49972987" visible="true" weight="0.73849374" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39856556" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -1090,9 +1107,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;check for opf1_save_balcost_all, why does not it show values in show_history()&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/data/german_load_profiles/min15/g4_sept17.csv">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file:///usr/lib/python3.6/json/decoder.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="147">
@@ -1140,13 +1154,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="513">
           <caret line="27" column="34" selection-start-line="27" selection-start-column="34" selection-end-line="27" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/osbrain/proxy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="215" selection-start-line="215" selection-end-line="215" />
         </state>
       </provider>
     </entry>
@@ -1208,78 +1215,98 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp4.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="58">
-          <caret line="22" column="38" selection-start-line="22" selection-start-column="38" selection-end-line="22" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/german_load_profiles/min5/g1_sept17.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp3.py">
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="482">
-          <caret line="43" column="22" selection-start-line="43" selection-start-column="22" selection-end-line="43" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="18" column="33" selection-start-line="18" selection-start-column="33" selection-end-line="18" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="433">
-          <caret line="40" column="24" selection-start-line="40" selection-start-column="24" selection-end-line="40" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="5" column="29" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="29" />
+        <state relative-caret-position="399">
+          <caret line="21" column="97" selection-start-line="21" selection-start-column="97" selection-end-line="21" selection-end-column="97" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="20" column="119" selection-start-line="20" selection-start-column="119" selection-end-line="20" selection-end-column="119" />
+        <state relative-caret-position="266">
+          <caret line="14" column="21" selection-start-line="14" selection-start-column="21" selection-end-line="14" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="18" column="11" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="475">
+          <caret line="25" column="36" selection-start-line="25" selection-start-column="36" selection-end-line="25" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="24" column="6" selection-start-line="24" selection-start-column="6" selection-end-line="24" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="817">
+          <caret line="43" column="22" selection-start-line="43" selection-start-column="22" selection-end-line="43" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp4.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="722">
+          <caret line="38" column="40" selection-start-line="38" selection-start-column="40" selection-end-line="38" selection-end-column="40" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="20" column="131" selection-start-line="20" selection-start-column="131" selection-end-line="20" selection-end-column="131" />
+        <state relative-caret-position="66">
+          <caret line="23" column="34" selection-start-line="23" selection-start-column="34" selection-end-line="23" selection-end-column="34" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/pvoutput_org/html_parser.py">
+    <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1210">
-          <caret line="166" column="4" selection-start-line="166" selection-start-column="4" selection-end-line="166" selection-end-column="4" />
+        <state relative-caret-position="231">
+          <caret line="62" selection-start-line="62" selection-end-line="62" />
           <folding>
-            <marker date="1533558768884" expanded="true" signature="4362:4364" ph="..." />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/runML.py">
+    <entry file="file://$PROJECT_DIR$/settings_4bus.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="779">
-          <caret line="46" column="27" selection-start-line="46" selection-start-column="27" selection-end-line="46" selection-end-column="27" />
+        <state relative-caret-position="437">
+          <caret line="27" selection-start-line="27" selection-end-line="27" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/other_agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3325">
+          <caret line="189" column="27" selection-start-line="189" selection-start-column="27" selection-end-line="189" selection-end-column="27" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/utilities.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1208">
+        <state relative-caret-position="7011">
           <caret line="380" column="18" selection-start-line="380" selection-start-column="18" selection-end-line="380" selection-end-column="18" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
@@ -1289,40 +1316,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
+    <entry file="file://$PROJECT_DIR$/runML.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="114">
-          <caret line="33" column="29" lean-forward="true" selection-start-line="33" selection-start-column="29" selection-end-line="33" selection-end-column="29" />
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/settings_4bus.py">
+    <entry file="file://$PROJECT_DIR$/data/pvoutput_org/html_parser.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="10" column="7" selection-start-line="10" selection-start-column="7" selection-end-line="10" selection-end-column="7" />
+        <state relative-caret-position="2945">
+          <caret line="166" column="4" selection-start-line="166" selection-start-column="4" selection-end-line="166" selection-end-column="4" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <marker date="1533558768884" expanded="true" signature="4362:4364" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vpp_ems_4bus.py">
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/osbrain/proxy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="16" column="28" selection-start-line="16" selection-start-column="22" selection-end-line="16" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="4807">
+          <caret line="262" selection-start-line="262" selection-end-line="262" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/other_agents.py">
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/zmq/sugar/socket.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="23" column="16" lean-forward="true" selection-start-line="23" selection-start-column="16" selection-end-line="23" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="703">
+          <caret line="57" selection-start-line="57" selection-end-line="57" />
         </state>
       </provider>
     </entry>

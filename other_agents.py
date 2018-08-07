@@ -509,9 +509,9 @@ class VPP_ext_agent(Agent):
                           '). I set consensus.')
             self.set_attr(consensus=True)
 
-    def sys_octave_test(self, mpc):
-        res = octave.rundcopf(mpc)
-        return res['success']
+    # def sys_octave_test(self, mpc):
+    #     res = octave.rundcopf(mpc)
+    #     return res['success']
 
     def sys_pypower_test(self, ppc):
         r = rundcopf(ppc)

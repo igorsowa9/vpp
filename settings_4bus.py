@@ -3,16 +3,15 @@ from data.vpp4bus.case5_vpp1 import case5_vpp1
 from data.vpp4bus.case4_vpp2 import case4_vpp2
 from data.vpp4bus.case4_vpp3 import case4_vpp3
 from data.vpp4bus.case4_vpp4 import case4_vpp4
-import time, datetime
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 0#*int(60/5*24)
-ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
-tofile = False
-pdf = False
+ts_0 = 0#3*int(60/5*24)
+ts_n = 1*int(60/5*24)  # number of timestamps of whole simulation
+tofile = True
+pdf = True
 
-start_datetime = "01/09/2017 00:00"
+start_datetime = "02/09/2017 00:00"
 
 max_iteration = 10
 negotiation = True  # if False, then only opf1 and requests
@@ -110,7 +109,7 @@ grey_sources = [11, 12, 13, 14, 15]
 # 13 atom - gray, controllable
 # 14 natural gas - gray, controllable
 
-######### OPFs for technical constraints of exporting power not for costs!
+# OPFs for technical constraints of exporting power not for costs!
 low_price = 0.1
 high_price = 1000
 

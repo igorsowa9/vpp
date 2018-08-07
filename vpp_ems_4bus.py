@@ -1,5 +1,6 @@
 import time
 import sys
+import osbrain
 from osbrain import run_agent
 from osbrain import run_nameserver
 from pprint import pprint as pp
@@ -532,7 +533,9 @@ def runOneTimestep():
 
 if __name__ == '__main__':
 
-    #print_data()
+    # SETTINGS OSBRAIN
+
+    # osbrain.config['TRANSPORT'] = 'tcp'
 
     ##### Initial Settings #####
     ns = run_nameserver()
