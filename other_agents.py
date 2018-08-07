@@ -99,7 +99,9 @@ class VPP_ext_agent(Agent):
         :param data:
         :return: balance needed at PCC, max possible excess, objf with subtracted virtual slack cost
         """
+
         ppc_t = self.modify_fromfile(t)
+        create_ppc_file(str(self.name) + "_fromOPF1", ppc_t)
         slack_idx = self.load_data(data_paths[data_names_dict[self.name]])['slack_idx']
         create_ppc_file(str(self.name)+"_fromOPF1", ppc_t)
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
@@ -380,24 +382,25 @@ class VPP_ext_agent(Agent):
         origin_opf1_resgen = self.get_attr('opf1_resgen')
 
         # max_generation from results of opf1, not from files
-        ppc_t = self.modify_fromfile(t, True, False, True)
-        slack_idx = self.load_data(data_paths[data_names_dict[self.name]])['slack_idx']
+        ppc_t = self.modify_fromfile(t)
+
+        # slack_idx = self.load_data(data_paths[data_names_dict[self.name]])['slack_idx']
         # ppc_t['gen'][0:, 8] = 0  # virtual slack generator removed
         # ppc_t['gen'][0:, 9] = 0
-        ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1] * (1 + relax_e3), 4)  # from OPF1, without slack
-        ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1] * (1 - relax_e3), 4)  # both bounds
-
-        for gen_idx in np.unique(all_bids_mod[:, 2]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
-
-            c1 = np.where(all_bids_mod[:, 2] == gen_idx)[0]  # rows where gen
-            p_bid = np.round(np.sum(all_bids_mod[c1, 3]), 4)  # total value of bidded power for generator
-
-            c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx)[0]
-            ppc_t['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
-            ppc_t['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
-
-            c3 = np.where(ppc_t['gen'][:, 0] == gen_idx)[0]
-            ppc_t['gen'][c3, [8, 9]] += np.round(p_bid, 4)  # add value from bidding, to Pmax,Pmin
+        # ppc_t['gen'][1:, 8] = np.round(origin_opf1_resgen[1:, 1] * (1 + relax_e3), 4)  # from OPF1, without slack
+        # ppc_t['gen'][1:, 9] = np.round(origin_opf1_resgen[1:, 1] * (1 - relax_e3), 4)  # both bounds
+        #
+        # for gen_idx in np.unique(all_bids_mod[:, 2]):  # loop through the generators from bids (1,2,3) there should be no slack - as constraints for OPF of same Pmin and Pmax
+        #
+        #     c1 = np.where(all_bids_mod[:, 2] == gen_idx)[0]  # rows where gen
+        #     p_bid = np.round(np.sum(all_bids_mod[c1, 3]), 4)  # total value of bidded power for generator
+        #
+        #     c2 = np.where(origin_opf1_resgen[:, 0] == gen_idx)[0]
+        #     ppc_t['gen'][c2, [8, 9]] = np.array([0, 0])  # make the value 0 before modification
+        #     ppc_t['gen'][c2, [8, 9]] += np.round(origin_opf1_resgen[c2, 1], 4)  # add value from opf1, to Pmax,Pmin
+        #
+        #     c3 = np.where(ppc_t['gen'][:, 0] == gen_idx)[0]
+        #     ppc_t['gen'][c3, [8, 9]] += np.round(p_bid, 4)  # add value from bidding, to Pmax,Pmin
 
         # modify the load at the pcc i.e. slack bus id:0 - same formulation for PF and OPF
         bids_sum = np.round(np.sum(all_bids_mod[:, 3]), 4)

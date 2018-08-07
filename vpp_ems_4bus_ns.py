@@ -18,6 +18,7 @@ message_id_bid_accept = 4
 message_id_bid_accept_modify = 41
 message_id_final_answer = 5
 
+
 def global_ns():
     global ns
     ns = run_nameserver()
@@ -237,7 +238,7 @@ def bid_offer_handler(self, message):
             # If all bid-per-gen sums are less then available gen powers then send accept
             # but do not set consensus yet, only when final accept is received
             if count == 0:
-                feasibility = self.runopf_e3(all_bids_nz, self.get_attr('agent_time'))
+                feasibility = self.runopf_e3(all_bids_nz, global_time)
 
                 if feasibility:
                     self.log_info('pf_e3 (1): feasibility check with the prepared bids: ' + str(feasibility) +
@@ -265,7 +266,7 @@ def bid_offer_handler(self, message):
                 all_bids_mod, new_pc = self.bids_alignment1(mypc0, all_bids_nz)
 
                 # opf should be checked if the transport of such a power is possible to the respective deficit vpps through the respective PCCs:
-                feasibility = self.runopf_e3(all_bids_mod, self.get_attr('agent_time'))
+                feasibility = self.runopf_e3(all_bids_mod, global_time)
 
                 if feasibility:
                     self.log_info('pf_e3 (2): feasibility check with the prepared bids: ' + str(feasibility) +
@@ -578,5 +579,5 @@ if __name__ == '__main__':
 
     time.sleep(small_wait)
 
-    save_learning_memory(ns, tofile)
-    show_results_history(ns, pdf)
+    # save_learning_memory(ns, tofile)
+    # show_results_history(ns, pdf)

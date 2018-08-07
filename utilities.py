@@ -223,7 +223,7 @@ def erase_timestep_memory(ns):
     for vpp_idx in range(vpp_n):
         a = ns.proxy(data_names[vpp_idx])
         a.set_attr(timestep_memory_mydeals=[])
-        a.set_attr(agent_time=-1)
+        # a.set_attr(agent_time=-1)
         a.set_attr(n_iteration=0)
         a.set_attr(n_requests=0)
         a.set_attr(n_bidoffers=0)
