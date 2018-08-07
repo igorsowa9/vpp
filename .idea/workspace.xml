@@ -1,14 +1,192 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;&#10;check for opf1_save_balcost_all, why does not it show values in show_history()&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;socket/files problem&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min15/g1_sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min15/g1_sept17.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min15/g4_sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min15/g4_sept17.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min15/h0_sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min15/h0_sept17.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min15/l1_sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min15/l1_sept17.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min5/g1_sept17.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min5/g4_sept17.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min5/h0_sept17.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/german_load_profiles/min5/l1_sept17.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_AIEG.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_AIEG_9_97.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_AIEG_9_97_Sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_AIEG_9_97_Sept17.xls" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_AIESH.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_AIESH_9_13.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_AIESH_9_13_Sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_AIESH_9_13_Sept17.xls" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_IVEG.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_IVEG_26_27.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_IVEG_26_27_Sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_IVEG_26_27_Sept17.xls" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Ores.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Ores_15_97.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Ores_15_97_Sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Ores_15_97_Sept17.xls" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_ReW_7_25_Sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_ReW_7_25_Sept17.xls" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Rew_7_25.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Sibelgas.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Sibelgas_21_34.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Sibelgas_21_34_Sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Sibelgas_21_34_Sept17.xls" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Tacteo_13_80.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Tecteo.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Tecteo_13_80_Sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_Tecteo_13_80_Sept17.xls" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_keys.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_keys.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/PV_testlist.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/win_offshore_ellia_877.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_OffShore_Elia_877_Sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_OffShore_Elia_877_Sept17.xls" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_OnShore_Elia_158_Sept17.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_OnShore_Elia_158_Sept17.xls" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_keys.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_keys.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_offshore.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_onshore.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_onshore_elia_158.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/in_use/min5/PV_AIEG_9_97.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/in_use/min5/PV_AIESH_9_13.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/in_use/min5/PV_IVEG_26_27.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/in_use/min5/PV_Ores_15_97.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/in_use/min5/PV_Rew_7_25.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/in_use/min5/PV_Sibelgas_21_34.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/in_use/min5/PV_Tacteo_13_80.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/in_use/min5/wind_offshore_elia_877.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/in_use/min5/wind_onshore_elia_158.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_18_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_19_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_01_07_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_18_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_19_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_20180618_20180624.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_20_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_21_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_22_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_23_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_24_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_25_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_26_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_27_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_28_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_29_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_30_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_01_07_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_18_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_19_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180618_20180619.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180618_20180624.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_21_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_22_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_23_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_24_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_25_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_26_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_27_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_28_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_29_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_30_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_01_07_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_18_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_19_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_20180618_20180624.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_20_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_21_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_22_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_23_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_24_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_25_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_26_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_27_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_28_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_29_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_30_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_01_07_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_18_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_19_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180618_20180624.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_21_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_22_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_23_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_24_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_25_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_26_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_27_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_28_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_29_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_30_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_01_07_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_18_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_19_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_20180618_20180624.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_20_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_21_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_22_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_23_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_24_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_25_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_26_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_27_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_28_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_29_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_30_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_01_07_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_18_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_19_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180618_20180624.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_21_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_22_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_23_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_24_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_25_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_26_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_27_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_28_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_29_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_30_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_01_07_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_18_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_19_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_20180618_20180624.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_20_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_21_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_22_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_23_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_24_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_25_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_26_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_27_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_28_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_29_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_30_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_01_07_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_18_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_19_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_20180618_20180624.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_20_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_21_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_22_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_23_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_24_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_25_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_26_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_27_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_28_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_29_06_18.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_30_06_18.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/other_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/other_agents.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings_4bus.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_4bus.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vpp_ems_4bus.py" beforeDir="false" afterPath="$PROJECT_DIR$/vpp_ems_4bus.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -119,40 +297,40 @@
     <session id="1762622434">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="8" />
+          <entry key="project.closed" value="9" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.open.time.10" value="2" />
           <entry key="project.open.time.11" value="3" />
-          <entry key="project.open.time.12" value="1" />
+          <entry key="project.open.time.12" value="2" />
           <entry key="project.open.time.18" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="10" />
+          <entry key="project.opened" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="json" value="107" />
           <entry key="py" value="12754" />
-          <entry key="txt" value="480" />
+          <entry key="txt" value="500" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="JSON" value="107" />
-          <entry key="PLAIN_TEXT" value="480" />
+          <entry key="PLAIN_TEXT" value="500" />
           <entry key="Python" value="12754" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="json" value="25" />
+          <entry key="json" value="26" />
           <entry key="py" value="49" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JSON" value="25" />
+          <entry key="JSON" value="26" />
           <entry key="Python" value="49" />
         </counts>
       </usages-collector>
@@ -172,8 +350,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="66">
-              <caret line="23" column="34" selection-start-line="23" selection-start-column="34" selection-end-line="23" selection-end-column="34" />
+            <state relative-caret-position="285">
+              <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
             </state>
           </provider>
         </entry>
@@ -357,6 +535,22 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="vpp" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="vpp" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -408,43 +602,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vpp" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vpp" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vpp" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="pvoutput_org" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vpp" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="pvoutput_org" type="462c0819:PsiDirectoryNode" />
-              <item name="min5" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vpp" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="pvoutput_org" type="462c0819:PsiDirectoryNode" />
-              <item name="min5" type="462c0819:PsiDirectoryNode" />
-              <item name="GfB_mbH_-_Westnetz_GmbH_29.610kW" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -464,7 +621,7 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="456" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="457" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="456" />
-    <property name="SearchEverywhereHistoryKey" value="setting&#9;ACTION&#9;ShowSettings&#10;settin&#9;ACTION&#9;ShowSettings&#10;sett&#9;ACTION&#9;WelcomeScreen.Settings&#10;settings&#9;ACTION&#9;WelcomeScreen.Settings&#10;setti&#9;ACTION&#9;ShowSettings&#10;import library&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="setting&#9;ACTION&#9;WelcomeScreen.Settings&#10;settin&#9;ACTION&#9;ShowSettings&#10;sett&#9;ACTION&#9;WelcomeScreen.Settings&#10;settings&#9;ACTION&#9;WelcomeScreen.Settings&#10;setti&#9;ACTION&#9;ShowSettings&#10;import library&#9;null&#9;null" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$2/Languages" value="Python" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../git_trialsites" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -644,13 +801,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1498654725175</updated>
-    </task>
-    <task id="LOCAL-00010" summary="next step:&#10;&#10;finish price curves derivation functions based on system (by Exc)&#10;- see the error i.e. in v05 linke 78&#10;then,&#10;make bids derivation (by Def)&#10;make bids acceptance evaluation (by Exc)&#10;final acceptance (by Def)&#10;&#10;make other scenarios">
-      <created>1523535319042</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1523535319042</updated>
     </task>
     <task id="LOCAL-00011" summary="next step:&#10;&#10;finish basic scenario with no internal opf:&#10; - see the bid offer handler as error says - might be that the vpp name/idx of sender/receive is missing when pushing between the agents.&#10;&#10;make other scenarios,&#10;where the ML?">
       <created>1523632275892</created>
@@ -988,7 +1138,14 @@
       <option name="project" value="LOCAL" />
       <updated>1533560864594</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <task id="LOCAL-00059" summary="next steps:&#10;socket/files problem&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <created>1533631298906</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1533631298906</updated>
+    </task>
+    <option name="localTasksCounter" value="60" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1025,13 +1182,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="68" y="-11" width="1853" height="1092" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18271334" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18271334" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32889345" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49972987" visible="true" weight="0.73849374" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49972987" weight="0.73849374" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39856556" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -1079,7 +1237,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/Notebooks/MachineLearningWithPython" />
     </ignored-roots>
-    <MESSAGE value="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;fix the showing deals at the end&#10;make secondary opf&#10;make other scenarios&#10;ML data and implementation, where, what." />
     <MESSAGE value="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;fix the showing deals at the end&#10;make secondary opf&#10;make other scenarios&#10;ML data and implementation, where, what.&#10;&#10;DATA in JSON uploaded - plan and import to OPF, pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs..." />
     <MESSAGE value="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;fix the showing deals at the end&#10;make secondary opf&#10;make other scenarios&#10;ML data and implementation, where, what.&#10;&#10;DATA in JSON uploaded - plan and import to OPF, pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10;&#10;solve printing of the upper constraint problem !!!!!!!!!!!!!!!" />
     <MESSAGE value="next steps:&#10;&#10;finish time 2 scenario with no secondary opf:&#10;- fix the showing deals at the end&#10;- make secondary opf&#10;- make other scenarios&#10;make &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.&#10;&#10;DATA in JSON uploaded - plan and import to OPF, pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs..." />
@@ -1104,7 +1261,8 @@
     <MESSAGE value="next steps:&#10;&#10;continue with memorising and then similarities, choosing proper records etc.&#10;&#10;step 120&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;step 120&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;check for opf1_save_balcost_all, why does not it show values in show_history()&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
-    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;check for opf1_save_balcost_all, why does not it show values in show_history()&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <MESSAGE value="next steps:&#10;socket/files problem&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;socket/files problem&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file:///usr/lib/python3.6/json/decoder.py">
@@ -1215,9 +1373,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/german_load_profiles/min5/g1_sept17.json">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="399">
@@ -1264,13 +1419,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="722">
           <caret line="38" column="40" selection-start-line="38" selection-start-column="40" selection-end-line="38" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="66">
-          <caret line="23" column="34" selection-start-line="23" selection-start-column="34" selection-end-line="23" selection-end-column="34" />
         </state>
       </provider>
     </entry>
@@ -1344,6 +1492,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="703">
           <caret line="57" selection-start-line="57" selection-end-line="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/german_load_profiles/min5/g1_sept17.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
         </state>
       </provider>
     </entry>
