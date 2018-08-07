@@ -101,6 +101,7 @@ class VPP_ext_agent(Agent):
         """
         ppc_t = self.modify_fromfile(t)
         slack_idx = self.load_data(data_paths[data_names_dict[self.name]])['slack_idx']
+        create_ppc_file(str(self.name)+"_fromOPF1", ppc_t)
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
         if opf1_prinpf:
             #printpf(res)
@@ -402,7 +403,7 @@ class VPP_ext_agent(Agent):
         bids_sum = np.round(np.sum(all_bids_mod[:, 3]), 4)
         ppc_t['bus'][0, 2] += bids_sum
 
-        create_ppc_file("fromOPF_e3", ppc_t)
+        create_ppc_file(str(self.name) + "_fromOPF_e3", ppc_t)
         # with bids updated, verify the power flow if feasible - must be opf in order to include e.g. thermal limits
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
 
