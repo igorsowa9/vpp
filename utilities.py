@@ -10,6 +10,8 @@ from time import gmtime, strftime
 import os
 import matplotlib.backends.backend_pdf
 import pandas as pd
+import time
+import pickle
 
 
 def system_printing_opf(mpc_t, t, data):
@@ -74,9 +76,11 @@ def print_data():
 
 
 def system_consensus_check(ns, global_time):
+    time.sleep(small_wait)
     n_consensus = 0
     for alias in ns.agents():
         a = ns.proxy(alias)
+        print(str(alias) + " consensus: " + str(a.get_attr('consensus')))
         if a.get_attr('consensus') == True:
             n_consensus = n_consensus + 1
 
@@ -136,7 +140,7 @@ def system_consensus_check(ns, global_time):
                 print("\t\t| vpp_idx (where selling generator is) "
                       "\n\t\t\t\t| gen_idx | value | price | ")
                 for bid in deal_vpp[1]:
-                    print("\t\t| " + str(bid[0]) + "\t| " +  str(bid[1]) + "\t| " + str(bid[2]) + "\t| " + str(bid[3]) + "\t| ")
+                    print("\t\t| " + str(bid[0]) + "\t| " + str(bid[1]) + "\t| " + str(bid[2]) + "\t| " + str(bid[3]) + "\t| ")
                 print("\n")
 
         print("##################")
@@ -146,13 +150,25 @@ def system_consensus_check(ns, global_time):
         #### saving for learning ####
         #############################
 
-        # for VPP3 with ML as excess agent
-        a = ns.proxy('vpp3')
-        deals_memory = a.get_attr('timestep_memory_mydeals')
+        # Memorize for all excess agents - ONLY SINGLE REQUESTS ASSUMED
+        for alias in ns.agents():
+            a = ns.proxy(alias)
 
-        # record from deals memory:
-        for d in deals_memory:
-            a.save_deal_to_memory(d, global_time)
+            if a.get_attr('opf1')['max_excess'] > 0:  # if I am excess agent in this round
+
+                if a.get_attr('requests'):  # if I am excess and I received requests
+                    requests = a.get_attr('requests')
+                    deals_memory = a.get_attr('timestep_memory_mydeals')
+                    for req in requests:
+                        req_alias = req['vpp_name']
+                        deal_exist = False
+                        for d in deals_memory:
+                            deal_alias = d[0]
+                            if deal_alias == req_alias:
+                                a.save_deal_to_memory(d, global_time, req_alias)
+                                deal_exist = True
+                        if not deal_exist:
+                            a.save_deal_to_memory(False, global_time, req_alias)
 
         print("\n\n##################")
         print("##################\n\n")
@@ -211,6 +227,7 @@ def erase_iteration_memory(ns):
         a.set_attr(iteration_memory_bid=[])
         a.set_attr(iteration_memory_bid_accept=[])
         a.set_attr(iteration_memory_bid_finalanswer=[])
+        a.set_attr(price_increase_factor=[])
         a.set_attr(n_bids=0)
         a.set_attr(opfe3=0)
         a.set_attr(opfd3=0)
@@ -237,11 +254,11 @@ def erase_timestep_memory(ns):
         a.set_attr(pc_memory_def=np.array([{} for _ in range(max_iteration)]))
 
 
-def erase_learning_memory(ns):
-    print('--- learning M erase ---')
+def erase_learning_memory(vpp_learn):  # <---------------- now to files
+    print('--- learning M erase (creating files) ---')
     for vpp_idx in vpp_learn:
-        a = ns.proxy(data_names[vpp_idx])
-        a.set_attr(learning_memory=pd.DataFrame({}))
+        mem = pd.DataFrame({})
+        mem.to_pickle(path_save + "temp_ln_" + str(vpp_idx) + ".pkl")
 
 
 def load_jsonfile(path):
@@ -249,6 +266,11 @@ def load_jsonfile(path):
         arr = json.load(f)
     return arr
 
+
+################ saving values to files #################
+
+if not os.path.exists(path_save):
+    os.makedirs(path_save)
 
 vpp_results = np.zeros((ts_n, vpp_n, 4))
 global_results = np.zeros((ts_n, 1))
@@ -261,20 +283,41 @@ def save_results_history(global_time, global_result, vpp_result):
 opf1_save_balcost_all = np.zeros((ts_n, vpp_n, 4))
 opf1_save_genload_all = np.zeros((ts_n, vpp_n, 5, 4))  # as deep list due to different number of buses
 opf1_save_prices_all = np.zeros((ts_n, vpp_n, 5))
+
+np.save(path_save + "opf1_save_balcost_all", opf1_save_balcost_all)
+np.save(path_save + "opf1_save_genload_all", opf1_save_genload_all)
+np.save(path_save + "opf1_save_prices_all", opf1_save_prices_all)
 def save_opf1_history(global_time, opf1_save_balcost, opf1_save_genload, opf1_save_prices):
+
+    opf1_save_balcost_all = np.load(path_save + "opf1_save_balcost_all.npy")
+    opf1_save_genload_all = np.load(path_save + "opf1_save_genload_all.npy")
+    opf1_save_prices_all = np.load(path_save + "opf1_save_prices_all.npy")
+
     opf1_save_balcost_all[global_time - ts_0, :, :] = opf1_save_balcost
     opf1_save_genload_all[global_time - ts_0, :, :, :] = opf1_save_genload
     opf1_save_prices_all[global_time - ts_0, :, :] = opf1_save_prices
+
+    np.save(path_save + "opf1_save_balcost_all", opf1_save_balcost_all)
+    np.save(path_save + "opf1_save_genload_all", opf1_save_genload_all)
+    np.save(path_save + "opf1_save_prices_all", opf1_save_prices_all)
     return
 
 
 opfe3_save_costs_all = np.zeros((ts_n, vpp_n, 1))
+np.save(path_save + "opfe3_save_costs_all", opfe3_save_costs_all)
 def save_opfe3_history(global_time, opf3_history):
+    opfe3_save_costs_all = np.load(path_save + "opfe3_save_costs_all.npy")
     opfe3_save_costs_all[global_time - ts_0, :, :] = opf3_history
+    np.save(path_save + "opfe3_save_costs_all", opfe3_save_costs_all)
     return
 
 
-def show_results_history(ns, pdf):
+def show_results_history(pdf):
+
+    opf1_save_balcost_all = np.load(path_save + "opf1_save_balcost_all.npy")
+    opf1_save_genload_all = np.load(path_save + "opf1_save_genload_all.npy")
+    opf1_save_prices_all = np.load(path_save + "opf1_save_prices_all.npy")
+    opfe3_save_costs_all = np.load(path_save + "opfe3_save_costs_all.npy")
 
     VPP_MAXEXC = 0   # max excess value
     VPP_PBAL = 1   # value to balance - deficit
@@ -292,8 +335,7 @@ def show_results_history(ns, pdf):
 
     figure_counter = 0
 
-    for alias in ns.agents():
-        a = ns.proxy(alias)
+    for alias in data_names:
         vpp_idx = data_names_dict[alias]
         figure_counter += 1
 
@@ -348,7 +390,10 @@ def show_results_history(ns, pdf):
                                   'Bus 1 is slack with no internal gens and loads.')
 
         n_bus = len(opf1_save_genload_all[0, vpp_idx, :, GEN_RES])
-        n_bus_real = a.load_data(data_paths[data_names_dict[alias]])['bus_n']
+        with open(data_paths[data_names_dict[alias]], 'r') as f:
+            arr = json.load(f)
+        n_bus_real = arr['bus_n']
+
 
         for g in range(0, n_bus_real):
             if g == 0:
@@ -370,10 +415,6 @@ def show_results_history(ns, pdf):
     plt.figure(figsize=(50, 50))
 
     if pdf:
-        path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + '/'
-        if not os.path.exists(path_save):
-            os.makedirs(path_save)
-
         pdf = matplotlib.backends.backend_pdf.PdfPages(path_save + 'all_figs.pdf')
         for fig in range(1, figure_counter + 1):
             pdf.savefig(fig)
@@ -382,19 +423,13 @@ def show_results_history(ns, pdf):
         plt.show()
 
 
-def save_learning_memory(ns, tofile):
-
-    path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + '/'
+def save_learning_memory(tocsv):
 
     for vpp_idx in vpp_learn:
-
-        agent = ns.proxy(data_names[vpp_idx])
-        agent.log_info("My memory: \n")
-
-        print(agent.get_attr("learning_memory"))
+        memory = pd.read_pickle(path_save + "temp_ln_" + str(vpp_idx) + ".pkl")
+        print("\n\nAgent (id: " + str(vpp_idx) + ") memory: ")
+        print(memory)
         print("\n\n\n")
 
-        if tofile:
-            if not os.path.exists(path_save):
-                os.makedirs(path_save)
-            agent.get_attr("learning_memory").to_csv(path_save + str(vpp_idx) + ".csv")
+        if tocsv:
+            memory.to_csv(path_save + str(vpp_idx) + ".csv")

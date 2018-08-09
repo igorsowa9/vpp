@@ -10,7 +10,8 @@
 	"slack_idx": 0,
 	"bus_n": 4,
 
-	"pc_matrix_price_increase_factor": 1.1,
+	"pc_matrix_price_increase_factor": [1.1, 1.5, 0.1],
+	"pc_matrix_price_increase_factor_period": 1,
 
 	"dso_price": 100,
 

@@ -7,6 +7,7 @@ from pprint import pprint as pp
 import copy
 import sys
 from create_ppc_file import create_ppc_file
+import pandas as pd
 
 from pypower.api import *
 from pypower_mod.rundcopf_noprint import rundcopf
@@ -103,7 +104,6 @@ class VPP_ext_agent(Agent):
         ppc_t = self.modify_fromfile(t)
         create_ppc_file(str(self.name) + "_fromOPF1", ppc_t)
         slack_idx = self.load_data(data_paths[data_names_dict[self.name]])['slack_idx']
-        create_ppc_file(str(self.name)+"_fromOPF1", ppc_t)
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose))
         if opf1_prinpf:
             #printpf(res)
@@ -179,11 +179,62 @@ class VPP_ext_agent(Agent):
         generation_type = np.array(self.load_data(data_paths[data_names_dict[self.name]])['generation_type'])
 
         n_iteration = self.get_attr("n_iteration")
+
         ######## build price curve according to pc_matrix_price_increase_factor (gen prices * increase factor)
+        # price increase factor modification should be calculated according to request number not to the timestamp
+        # i.e. if the last request was at previous X timestamps then modify the factor
+        price_increase_factor = self.load_data(data_paths[data_names_dict[self.name]])[
+            'pc_matrix_price_increase_factor']
+
+        if type(price_increase_factor) == list:
+
+            currmem = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
+            t_range = np.arange(t - max_ts_range_for_price_modification, t)
+
+            fulfilled = 0  # check if the time exist and if some conditions are fulfilled
+            for test_t in t_range:
+                if 't' in currmem.columns:
+                    test_row = currmem.loc[currmem['t'] == test_t]
+                    if not test_row.empty:
+                        if (currmem['t'] == test_t).any() and test_row.iloc[0]['success'] == 1:
+                            fulfilled += 1
+
+            if fulfilled == max_ts_range_for_price_modification:
+
+                previous_row = currmem.loc[currmem['t'] == t-1]  # take previous row
+                previous_mod = previous_row.iloc[0]['pcf']
+
+                if previous_mod < price_increase_factor[1]:
+                    price_increase_factor = previous_mod + price_increase_factor[2]
+                else:
+                    price_increase_factor = price_increase_factor[0]
+
+                # period = self.load_data(data_paths[data_names_dict[self.name]])[
+                # 'pc_matrix_price_increase_factor_period']
+                # mods0 = np.arange(price_increase_factor[0], price_increase_factor[1]+price_increase_factor[2],
+                #                  price_increase_factor[2])
+                # mods = np.array([])
+                # for mod in mods0:
+                #     mods = np.append(mods, np.array([mod] * period))
+                #
+                # mods_length = len(mods)
+                # ts_now = t - ts_0
+                # print("price_increase_factor2before: " + str(price_increase_factor))
+                # print(mods)
+                # print(ts_now, t, ts_0)
+                # print(ts_now % mods_length)
+                # price_increase_factor = np.round(mods[ts_now % mods_length], 4)
+                # print("price_increase_factor2: " + str(price_increase_factor))
+            else:  # if conditions not fulilled come back to the first value
+                price_increase_factor = price_increase_factor[0]
+
+        self.log_info("My runopf_e2 - price_increase_factor: " + str(price_increase_factor))
+        self.set_attr(price_increase_factor=price_increase_factor)
 
         if n_iteration == 0:  # if its 0 iteration, make according to pr_matrix_price_increase_factor (each vpp has own)
             pc_matrix_incr = copy.deepcopy(exc_matrix.T)
-            pc_matrix_incr[:, 2] = pc_matrix_incr[:, 2] * self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor']
+
+            pc_matrix_incr[:, 2] = pc_matrix_incr[:, 2] * price_increase_factor
             pc_matrix_incr = np.matrix(np.round(pc_matrix_incr, 4))
 
             self.log_info("OPFe2: PC matrix for requesters (i.e. exc_matrix increased): " + str(pc_matrix_incr))
@@ -192,7 +243,6 @@ class VPP_ext_agent(Agent):
         elif n_iteration > 0:
             if self.get_attr('pc_memory_exc')[n_iteration] == {}: # this should make PC for ALL if there is no particular PCs
                 price_curve = copy.deepcopy(self.get_attr('pc_memory_exc')[0]['all'])
-                price_increase_factor = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor']
                 # make a new pc according to "price increase policy" for now just linear increase for each vpp:
                 prices = price_curve[:, 2]
                 if type(prices) == np.float64:  # i.e. if there is only one excess generator, there is no list but float
@@ -262,6 +312,8 @@ class VPP_ext_agent(Agent):
             # relax thermal constr.
             ppc_tg['branch'][:, [5, 6, 7]] = ppc_tg['branch'][:, [5, 6, 7]] * (1 + relax_e2)
 
+            ppc_tg['gen'][:, 8][ppc_tg['gen'][:, 8] == 0] = 1e-6  # substitute generators upper bounds 0 with 1e-6
+            create_ppc_file(str(self.name) + "_fromOPF_e2_green", ppc_tg)
             res_g = rundcopf(ppc_tg, ppoption(VERBOSE=opf1_verbose, PDIPM_GRADTOL=PDIPM_GRADTOL_mod))
 
             show = np.array(
@@ -329,6 +381,8 @@ class VPP_ext_agent(Agent):
         # relax thermal constr.
         ppc_t['branch'][:, [5, 6, 7]] = ppc_t['branch'][:, [5, 6, 7]] * (1+relax_e2)
 
+        ppc_t['gen'][:, 8][ppc_t['gen'][:, 8] == 0] = 1e-6  # substitute generators upper bounds 0 with 1e-6
+        create_ppc_file(str(self.name) + "_fromOPF_e2_all", ppc_t)
         res = rundcopf(ppc_t, ppoption(VERBOSE=opf1_verbose, PDIPM_GRADTOL=PDIPM_GRADTOL_mod))
 
         show = np.array(np.concatenate((np.matrix(res['gen'][:, [0, 1, 8, 9]]), np.matrix(ppc_t['gencost'][:, 4]).T), axis=1))
@@ -421,7 +475,7 @@ class VPP_ext_agent(Agent):
 
         costs = np.round(res['f'] - bids_revenue, 4)  # costs of vpp as costs of operation (slackcost for E = 0) - revenue from bids
 
-        self.set_attr(opfe3={'objf_inclbidsrevenue': costs})
+        self.set_attr(opfe3={'objf_inclbidsrevenue': costs, 'bids_revenue': bids_revenue})
 
         return res['success']
 
@@ -499,7 +553,7 @@ class VPP_ext_agent(Agent):
         cost = np.round(cost, 4)
         self.set_attr(opfd3={'buybids_cost': cost})
 
-        self.log_info("opfd3print: " + str(self.get_attr("opfd3")))
+        # self.log_info("opfd3print: " + str(self.get_attr("opfd3")))
 
         # save_opf3_history(global_time, opf1_save_balcost, opf1_save_genload, opf1_save_prices)
 
@@ -588,9 +642,7 @@ class VPP_ext_agent(Agent):
 
         return all_bids_mod, pc_msg
 
-    def save_deal_to_memory(self, d, global_time):
-
-        # self, with_idx, success, n_it, n_ref, price, quantity, global_time, po_idx, ton):
+    def save_deal_to_memory(self, deal, global_time, req_alias):
         """
         "with_idx": memory based on the deal with this VPP
         "success": successful negotiation of failure, for deal is ofc successful
@@ -609,25 +661,29 @@ class VPP_ext_agent(Agent):
         """
         myself = self.name
 
-        deal_with = d[0]
+        self.log_info("save_deal_to_memory, d: " + str(deal))
+        self.log_info("save_deal_to_memory, req_alias: " + str(req_alias))
+
+        # memory = self.get_attr("learning_memory") <------------ now from file
+        memory = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
+
+        my_req = self.get_attr('requests')
+        for req in my_req:
+            if req['vpp_name'] == req_alias:
+                req_value = req['value']
 
         # define prospective opponents in case of such a deal
-        prospective_opponents_idx = np.where(np.array(adj_matrix[data_names_dict[deal_with]]) == True)
+        prospective_opponents_idx = np.where(np.array(adj_matrix[data_names_dict[req_alias]]) == True)
         po_idx = []
         for i in prospective_opponents_idx[0]:
-            if i == data_names_dict[myself] or i == data_names_dict[deal_with]:
+            if i == data_names_dict[myself] or i == data_names_dict[req_alias]:
                 continue
             po_idx.append(int(i))
-        gen_deals = d[1]
-
-        memory = self.get_attr("learning_memory")
 
         # convert timestamp to other times
         start_date = datetime.strptime(start_datetime, "%d/%m/%Y %H:%M")
-        global_delta = timedelta(minutes=global_time*5)
+        global_delta = timedelta(minutes=global_time * 5)
         current_time = start_date + global_delta
-
-        my_req = self.get_attr('requests')
 
         # download the weather forecast of the opponents
         # known:        installed generators' power and forecasted max power factors
@@ -648,9 +704,8 @@ class VPP_ext_agent(Agent):
                 gen_path = vpp_file['generation_profiles_paths'][idx]
                 if not gen_path == "":
                     d = self.load_data(gen_path)
-                    forecast = d[global_time][MEASURED]  # should be FORECASTED but for now 100% accuracy
-                    forecast_max_generation_factor[idx] = forecast + gen_mod_offset
-                    forecast_max_generation[idx] = np.round((forecast + gen_mod_offset) * max_generation0[idx], 4)
+                    forecast_max_generation_factor[idx] = d[global_time][MEASURED] + gen_mod_offset  # should be FORECASTED but for now 100% accuracy
+                    forecast_max_generation[idx] = np.round(forecast_max_generation_factor[idx] * max_generation0[idx], 4)
                 po_wf.update({vpp_idx: forecast_max_generation})
 
             generation_type = np.array(self.load_data(data_paths[vpp_idx])['generation_type'])
@@ -658,66 +713,102 @@ class VPP_ext_agent(Agent):
             stack = np.vstack((max_generation0, forecast_max_generation, generation_type))
             stack = stack[:, 1:].T
 
-            print("stack: " + str(stack))
+            # print("stack: " + str(stack))
 
             res_weather = 0
             max_res_weather = 0
             max_other = 0
             max = np.sum(stack[:, 0])
             for s in stack:
-                if s[2] in weather_dependant_sources:
+                if s[2] in weather_dependent_sources:
                     res_weather += s[1]
                     max_res_weather += s[0]
                 else:
                     max_other += s[0]
             res_installed_power_factor.update({vpp_idx: round(max_res_weather / max, 4)})
-
-            print(res_installed_power_factor)
-
             av_weather_factor.update({vpp_idx: round(res_weather / max_res_weather, 4)})
-            # print("stack: " + str(stack))
 
-        for req in my_req:
-            if req['vpp_name'] == deal_with:
-                req_value = req['value']
+        ton = "unknown"
 
-        ton = "tb calculated"
+        bids_saldo = 0
+        if self.get_attr('opfe3'):
+            bids_saldo = np.round(self.get_attr('opfe3')['bids_revenue'], 4)
+        elif self.get_attr('opfd3'):
+            bids_saldo = -1 * np.round(self.get_attr('opfd3')['buybids_cost'], 4)
 
-        if req_value == np.round(np.sum(np.abs(gen_deals[:, 2])), 3):
-            ton = []
+        if deal:  # if deal has happened
+            deal_with = deal[0]
+            gen_deals = deal[1]
 
-        # create the record
-        memory = memory.append({'with_idx_req': np.array([int(data_names_dict[deal_with]), req_value]),
-                                'success': True,   # its based on successful deals so far only
-                                'n_it': self.get_attr('n_iteration') + 1,
-                                'n_ref': "tbd",
-                                'price': gen_deals[:, 3],
-                                'quantity': np.round(np.abs(gen_deals[:, 2]), 3),
-                                'minute_t': int(current_time.hour * 60 + current_time.minute),
-                                'week_t': int(current_time.weekday()),
-                                'month_t': int(current_time.month),
-                                # 'po_idx': po_idx, # redundant, included in po_wf actually
-                                'po_wf': po_wf,
-                                # 'res_inst': res_installed_power_factor, # could be here, but it is constant
-                                'av_weather': av_weather_factor,
-                                'ton': ton
-                                }, ignore_index=True)
+            if req_value == np.round(np.sum(np.abs(gen_deals[:, 2])), 4):
+                ton = []
 
-        memory = memory[['with_idx_req',
-                         'success',
-                         'n_it',
-                         'n_ref',
-                         'price',
-                         'quantity',
-                         'minute_t',
+            # create the record
+            memory = memory.append({'with_idx_req': np.array([int(data_names_dict[deal_with]), req_value]),
+                                    'success': True,   # its based on successful deals so far only
+                                    'n_it': self.get_attr('n_iteration') + 1,
+                                    'n_ref': "tbd",
+                                    'price': gen_deals[:, 3],
+                                    'quantity': np.round(np.abs(gen_deals[:, 2]), 3),
+                                    'percent_req': np.round(np.sum(np.abs(gen_deals[:, 2])) / req_value, 4),
+                                    'bids_saldo': bids_saldo,
+                                    'pcf': self.get_attr('price_increase_factor'),
+                                    't': global_time,
+                                    'minute_t': int(current_time.hour * 60 + current_time.minute),
+                                    'week_t': int(current_time.weekday()),
+                                    'month_t': int(current_time.month),
+                                    # 'po_idx': po_idx, # redundant, included in po_wf actually
+                                    'po_wf': po_wf,
+                                    'res_inst': res_installed_power_factor,
+                                    'av_weather': av_weather_factor,
+                                    'ton': ton
+                                    }, ignore_index=True)
+
+        else:  # there were no deal on that request:
+
+            memory = memory.append({'with_idx_req': np.array([int(data_names_dict[req_alias]), req_value]),
+                                    'success': False,  # its based on successful deals so far only
+                                    'n_it': self.get_attr('n_iteration') + 1,
+                                    'n_ref': "tbd",
+                                    'price': 0,
+                                    'quantity': 0,
+                                    'percent_req': 0,
+                                    'bids_saldo': bids_saldo,
+                                    'pcf': self.get_attr('price_increase_factor'),
+                                    't': global_time,
+                                    'minute_t': int(current_time.hour * 60 + current_time.minute),
+                                    'week_t': int(current_time.weekday()),
+                                    'month_t': int(current_time.month),
+                                    # 'po_idx':
+                                    'po_wf': po_wf,
+                                    'res_inst': res_installed_power_factor,
+                                    'av_weather': av_weather_factor,
+                                    'ton': ton
+                                    }, ignore_index=True)
+
+        memory = memory[['with_idx_req',  # id of the vpp that we negotiate with and its request value
+                         'success',  # success 1 or 0 failure
+                         'n_it',  # number of iteration in the negotiation
+                         'n_ref',  # number of refuses during the negotiation
+                         'price',  # sell price(s) of particular generators
+                         'quantity',  # amount(s) sold from particular generators
+                         'percent_req',  # how much of the particular request was filled by my resources
+                         'bids_saldo',  # positive if revenue negative if have to be bought
+                         'pcf',  # price increase factor, that could be modified according to the vpp settings in json
+                         #  np.round(np.sum(np.array([gen_deals[:, 3] * np.round(np.abs(gen_deals[:, 2]), 3)])), 4),
+                         't',  # simple global time
+                         'minute_t',  # time in minutes of the day, weekday and month
                          'week_t',
                          'month_t',
-                         # 'po_idx',
-                         'po_wf',
-                         # 'res_inst',
-                         'av_weather',
-                         'ton']]
-        self.set_attr(learning_memory=memory)
-        self.log_info("My learning memory updated.")
+                         # 'po_idx',  # redundant, included in po_wf actually
+                         'po_wf',  # forecast numbers of the prospective opponents (all)
+                         'res_inst',    # it is constant for particular vpp, but can be used to derive "weight"
+                                        # of vpp in negotiation due to more or less RES
+                         'av_weather',  # factors based on installed power and forecasts
+                         'ton']]  # topology of negotiation
+
+        # self.set_attr(learning_memory=memory)
+        memory.to_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
+        self.log_info("My learning memory updated (saved to file)")
 
         return

@@ -1,9 +1,15 @@
-from pypower.api import *
-from data.vpp4bus.case4_vpp3 import case4_vpp
-from pypower_mod.rundcopf_noprint import rundcopf
+import numpy as np
+import pandas as pd
 
-ppc = case4_vpp()
-opt = ppoption(VERBOSE=1)
-r = rundcopf(ppc, opt)
+currmem = pd.read_pickle("/home/iso/Desktop/vpp_some_results/2018_0808_1604_7days_with_negotiation_allsaving/temp_ln_2.pkl")
+t = 151
 
-printpf(r)
+t_range = np.arange(t - 3, t)
+
+fulfilled = 0  # check if the time exist and if some conditions are fulfilled
+for test_t in t_range:
+    if 't' in currmem.columns:
+        test_row = currmem.loc[currmem['t'] == test_t]
+        if not test_row.empty:
+            if (currmem['t'] == test_t).any() and test_row.iloc[0]['success'] == 1:
+                fulfilled += 1

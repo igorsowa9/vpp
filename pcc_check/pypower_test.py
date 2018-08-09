@@ -1,9 +1,9 @@
 from pypower.api import *
-from fromOPF_e3 import fromOPF_e3
+from vpp1_fromOPF_e2_all import vpp1_fromOPF_e2_all
 import numpy as np
 from pprint import pprint as pp
 
-ppc = fromOPF_e3()
+ppc = vpp1_fromOPF_e2_all()
 
 r = rundcopf(ppc)
 

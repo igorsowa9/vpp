@@ -1,4 +1,5 @@
 import numpy as np
+from time import gmtime, strftime
 from data.vpp4bus.case5_vpp1 import case5_vpp1
 from data.vpp4bus.case4_vpp2 import case4_vpp2
 from data.vpp4bus.case4_vpp3 import case4_vpp3
@@ -6,17 +7,20 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 0#3*int(60/5*24)
-ts_n = 6*int(60/5*24)  # number of timestamps of whole simulation
-tofile = False
-pdf = False
+ts_0 = 0#120+3*int(60/5*24)
+ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
+tocsv = True
+pdf = True
+directory_tail = "multiNS_7days_price_increase"
+# directory_tail = "_test"
 
 start_datetime = "02/09/2017 00:00"
+path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
 
 max_iteration = 10
 negotiation = True  # if False, then only opf1 and requests
 
-vpp_learn = [2]
+vpp_learn = [0, 1, 2, 3]
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}
 vpp_n = len(data_names)
@@ -38,7 +42,7 @@ adj_matrix = [[True, True, False, False],
               [False, True, True, False],
               [False, True, False, True]]
 
-small_wait = 0.0  # waiting time to separate some steps, for testing
+small_wait = 0.1  # waiting time to separate some steps, for testing
 iteration_wait = 0.1
 
 # size of all the figures that are saved to the pdfs
@@ -52,11 +56,18 @@ dso_green_price_increase_factor = 1.05
 
 opf1_verbose = 0
 opf1_prinpf = False
-opfe3_prinpf = False
 opfe2_prinpf = False
+opfe3_prinpf = False
 
-relax_e2 = 0.000  # relaxation of constraints in opf_e2
-relax_e3 = 0.000  # relaxation of constraints in opf_e3
+
+# number of time periods that you check in the memory before the current timestamp in order to determine if the power
+# increase factor should be modified for exploitation or not. I.e. if successful negotiation happened in the previous #
+# of the timestamps, then change the modificator of the price to the next one.
+max_ts_range_for_price_modification = 2
+
+
+relax_e2 = 0.01  # relaxation of constraints in opf_e2
+relax_e3 = 0.01  # relaxation of constraints in opf_e3
 # modification of convergence condition, check:
 # http://rwl.github.io/PYPOWER/api/pypower.dcopf_solver-pysrc.html
 #         feastol = ppopt['PDIPM_FEASTOL']
@@ -91,7 +102,7 @@ PDIPM_GRADTOL_mod = 5*1e-6
 #       - contracts with DSO might be different for different VPPs (that could be learned by the other VPPs too)
 
 green_sources = [1, 2, 3, 4, 5]
-weather_dependant_sources = [1, 2, 3]
+weather_dependent_sources = [1, 2, 3]
 grey_sources = [11, 12, 13, 14, 15]
 
 # Generation types:

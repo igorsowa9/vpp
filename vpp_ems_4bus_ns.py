@@ -243,7 +243,7 @@ def bid_offer_handler(self, message):
                 if feasibility:
                     self.log_info('pf_e3 (1): feasibility check with the prepared bids: ' + str(feasibility) +
                                   ' . Own original costs (opf1): ' + str(self.get_attr('opf1')['objf']) +
-                                  ' . Costs if sold to DSO (opf1): ' + str(self.get_attr('opfe2')['objf_greentodso']) +
+                                  ' . Costs if sold to DSO (opf2): ' + str(self.get_attr('opfe2')['objf_greentodso']) +
                                   ' . Costs with bids revenue (opfe3-bid revenue): ' + str(self.get_attr('opfe3')['objf_inclbidsrevenue']))
                 else:
                     self.log_info('Unfeasibility in opf_e3 (' + str(self.name) + ')! Stop.')
@@ -256,7 +256,7 @@ def bid_offer_handler(self, message):
                         bid_answer_message = {'message_id': message_id_bid_accept, 'vpp_name': self.name,
                                               'bid': np.array(bid[:, 1:]),
                                               'str': "That's an accept message for the bid."}
-                        self.log_info("I send bid_answer_message to "+str(data_names[vpp_idx_1bid])+":")
+                        self.log_info("I send bid_answer_message to "+str(data_names[vpp_idx_1bid])+".")
                         myaddr = self.bind('PUSH', alias='bid_answer')
                         ns.proxy(data_names[vpp_idx_1bid]).connect(myaddr, handler=bid_answer_handler)
                         self.send('bid_answer', bid_answer_message)
@@ -388,7 +388,6 @@ def runOneTimestep():
                 neighbour = ns.proxy(data_names[n])
                 neighbour.connect(addr, handler={'request_topic'
                                                  : request_handler})  # only neighbours connect to the agent
-    erase_learning_memory(ns)
 
     """
     Should include all iterations of negotiations.
@@ -521,10 +520,9 @@ def runOneTimestep():
                         opf1 = agent.get_attr('opf1')
 
                     if opf1['power_balance'] == 0 and opf1['max_excess'] > 0:
-                        agent.log_info("I am excess")
                         agent.set_consensus_if_norequest()
                     elif opf1['power_balance'] == 0 and opf1['max_excess'] == 0:
-                        agent.log_info("I am balanced")
+                        agent.log_info("I am balanced. I set consensus.")
                         agent.set_attr(timestep_memory_mydeals=[])
                         agent.set_attr(consensus=True)
                     elif opf1['power_balance'] < 0 and opf1['max_excess'] == False:
@@ -572,6 +570,8 @@ if __name__ == '__main__':
     # osbrain.config['TRANSPORT'] = 'tcp'
     # ##### RUN the simulation
 
+    erase_learning_memory(vpp_learn)
+
     for t in range(ts_0, ts_0+ts_n):
 
         time.sleep(small_wait)
@@ -579,5 +579,5 @@ if __name__ == '__main__':
 
     time.sleep(small_wait)
 
-    # save_learning_memory(ns, tofile)
-    # show_results_history(ns, pdf)
+    save_learning_memory(tocsv)
+    show_results_history(pdf)
