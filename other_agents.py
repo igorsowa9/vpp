@@ -191,15 +191,15 @@ class VPP_ext_agent(Agent):
             currmem = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
             t_range = np.arange(t - max_ts_range_for_price_modification, t)
 
-            fulfilled = 0  # check if the time exist and if some conditions are fulfilled
+            previous_fulfilled = 0  # check if the time exist and if some conditions are fulfilled: success
             for test_t in t_range:
                 if 't' in currmem.columns:
                     test_row = currmem.loc[currmem['t'] == test_t]
                     if not test_row.empty:
                         if (currmem['t'] == test_t).any() and test_row.iloc[0]['success'] == 1:
-                            fulfilled += 1
+                            previous_fulfilled += 1
 
-            if fulfilled == max_ts_range_for_price_modification:
+            if previous_fulfilled == max_ts_range_for_price_modification:
 
                 previous_row = currmem.loc[currmem['t'] == t-1]  # take previous row
                 previous_mod = previous_row.iloc[0]['pcf']
@@ -209,22 +209,6 @@ class VPP_ext_agent(Agent):
                 else:
                     price_increase_factor = price_increase_factor[0]
 
-                # period = self.load_data(data_paths[data_names_dict[self.name]])[
-                # 'pc_matrix_price_increase_factor_period']
-                # mods0 = np.arange(price_increase_factor[0], price_increase_factor[1]+price_increase_factor[2],
-                #                  price_increase_factor[2])
-                # mods = np.array([])
-                # for mod in mods0:
-                #     mods = np.append(mods, np.array([mod] * period))
-                #
-                # mods_length = len(mods)
-                # ts_now = t - ts_0
-                # print("price_increase_factor2before: " + str(price_increase_factor))
-                # print(mods)
-                # print(ts_now, t, ts_0)
-                # print(ts_now % mods_length)
-                # price_increase_factor = np.round(mods[ts_now % mods_length], 4)
-                # print("price_increase_factor2: " + str(price_increase_factor))
             else:  # if conditions not fulilled come back to the first value
                 price_increase_factor = price_increase_factor[0]
 

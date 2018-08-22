@@ -11,8 +11,8 @@ ts_0 = 0#120+3*int(60/5*24)
 ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
 tocsv = True
 pdf = True
-directory_tail = "multiNS_7days_price_increase"
-# directory_tail = "_test"
+# directory_tail = "7days_unconstr_price_increase"
+directory_tail = "_test"
 
 start_datetime = "02/09/2017 00:00"
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
@@ -63,7 +63,7 @@ opfe3_prinpf = False
 # number of time periods that you check in the memory before the current timestamp in order to determine if the power
 # increase factor should be modified for exploitation or not. I.e. if successful negotiation happened in the previous #
 # of the timestamps, then change the modificator of the price to the next one.
-max_ts_range_for_price_modification = 2
+max_ts_range_for_price_modification = 3
 
 
 relax_e2 = 0.01  # relaxation of constraints in opf_e2

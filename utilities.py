@@ -12,6 +12,7 @@ import matplotlib.backends.backend_pdf
 import pandas as pd
 import time
 import pickle
+import csv
 
 
 def system_printing_opf(mpc_t, t, data):
@@ -432,4 +433,15 @@ def save_learning_memory(tocsv):
         print("\n\n\n")
 
         if tocsv:
-            memory.to_csv(path_save + str(vpp_idx) + ".csv")
+            memory.to_csv(path_save + str(vpp_idx) + "_" + directory_tail + ".csv")
+            # memory.to_csv(path_save + str(vpp_idx) + "_v2" + ".csv")
+            #
+            # in_file = open(path_save + str(vpp_idx) + ".csv", 'rb')
+            # reader = csv.reader(in_file)
+            # out_file = open(path_save + str(vpp_idx) + "_v2" + ".csv")
+            # writer = csv.writer(out_file)
+            # for row in reader:
+            #     row[0] = directory_tail
+            #     writer.writerow(row)
+            # in_file.close()
+            # out_file.close()

@@ -150,21 +150,22 @@ def pvoutput_org(basic_url, all_dates):
     print("Saving list to json (length(s): " + str(sh) + ", period: "+str(tval)+" min) to the file: \n" + path)
 
 
-all_dates = ["20180618", "20180619", "20180620", "20180621", "20180622", "20180623", "20180624"]#,
+all_dates = ["20170901", "20170902", "20170903", "20170904", "20170905", "20170906", "20170907"]#,
+# all_dates = ["20180625", "20180626", "20180627", "20180628", "20180629", "20180630", "20180701"]#,
              # "20180625", "20180626", "20180627", "20180628", "20180629", "20180630", "20180701",
              # "20180702", "20180703", "20180704", "20180705", "20180706", "20180707", "20180708",
              # "20180709", "20180710", "20180711", "20180712", "20180713", "20180714", "20180715",
              # "20180716", "20180717"]
 
 all_urls = [
-    # "https://pvoutput.org/intraday.jsp?id=33196&sid=30411&dt="  # GfB mbH - Westnetz GmbH 29.610kW
+    "https://pvoutput.org/intraday.jsp?id=33196&sid=30411&dt="  # GfB mbH - Westnetz GmbH 29.610kW
     # "https://pvoutput.org/intraday.jsp?id=6197&sid=4947&dt="    # HLB Sunnyfarm 19.500kW
     # "https://pvoutput.org/intraday.jsp?id=56577&sid=51073&dt="  # race|result 92.750kW
     # "https://pvoutput.org/intraday.jsp?id=59027&sid=52525&dt="  # Michiels Wegberg 27.900kW
     # "https://pvoutput.org/intraday.jsp?id=49073&sid=46276&dt="  # Freakycat 20.100kW
     # "https://pvoutput.org/intraday.jsp?id=26995&sid=24693&dt="  # WohnhausA1 20.240kW
     # "https://pvoutput.org/intraday.jsp?id=42740&sid=39044&dt="  # PV-Anlage dahoam 23.000kW
-    "https://pvoutput.org/intraday.jsp?id=66425&sid=59062&dt="   # SGjuk_12KW 29.000kW
+    # "https://pvoutput.org/intraday.jsp?id=66425&sid=59062&dt="   # SGjuk_12KW 29.000kW
     ]
 
 count = 0
