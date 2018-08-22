@@ -32,6 +32,17 @@ class MyHTMLParser(HTMLParser):
         print("Encountered some data  :", data)
 
 
+def load_data(path):
+    """
+    Loads data for VPP from file, from web, whatever necessary.
+    :param path:
+    :return:
+    """
+    with open(path, 'r') as f:
+        arr = json.load(f)
+    return arr
+
+
 def find_between(s, first, last ):
     try:
         start = s.index( first ) + len( first )
@@ -150,6 +161,37 @@ def pvoutput_org(basic_url, all_dates):
     print("Saving list to json (length(s): " + str(sh) + ", period: "+str(tval)+" min) to the file: \n" + path)
 
 
+def merge_jsons():
+
+    first = '_20180618_20180624.json'
+    second = '_20180625_20180701.json'
+    offset = 60*24 * 7
+    final = '_20180618_20180701.json'
+
+    # first = '_26_06_18.json'
+    # second = '_27_06_18.json'
+    # offset = 60 * 24
+    # final = '_2627test.json'
+
+    base_path = "/home/iso/PycharmProjects/vpp/data/pvoutput_org/min5/"
+    dirs = os.listdir(base_path)
+    for onedir in dirs:
+    # onedir = 'Freakycat_20.100kW'
+        first_path = base_path + onedir + '/' + onedir + first
+        second_path = base_path + onedir + '/' + onedir + second
+        final_path = base_path + onedir + '/' + onedir + final
+
+        f = np.array(load_data(first_path))
+        s = np.array(load_data(second_path))
+
+        s[:, 0] += offset
+        fin = np.vstack((f, s))
+        finl = fin.tolist()
+
+        with open(final_path, 'w') as outfile:
+            json.dump(finl, outfile)
+
+
 all_dates = ["20170901", "20170902", "20170903", "20170904", "20170905", "20170906", "20170907"]#,
 # all_dates = ["20180625", "20180626", "20180627", "20180628", "20180629", "20180630", "20180701"]#,
              # "20180625", "20180626", "20180627", "20180628", "20180629", "20180630", "20180701",
@@ -167,6 +209,9 @@ all_urls = [
     # "https://pvoutput.org/intraday.jsp?id=42740&sid=39044&dt="  # PV-Anlage dahoam 23.000kW
     # "https://pvoutput.org/intraday.jsp?id=66425&sid=59062&dt="   # SGjuk_12KW 29.000kW
     ]
+
+merge_jsons()
+sys.exit()
 
 count = 0
 for url in all_urls:

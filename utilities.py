@@ -133,7 +133,7 @@ def system_consensus_check(ns, global_time):
 
             print("Contracts/deals:")
             if data_names_dict[alias] in vpp_learn:
-                print("+++ Learning ON +++: ")
+                print("+++ Memorising ON +++: ")
 
             for deal_vpp in a.get_attr('timestep_memory_mydeals'):
                 print("\tWith: " + str(deal_vpp[0]))

@@ -17,8 +17,8 @@
 	"generation_profiles_paths": [
 		"",
 		"",
-		"/home/iso/PycharmProjects/vpp/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180618_20180624.json",
-		"/home/iso/PycharmProjects/vpp/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180618_20180624.json"
+		"/home/iso/PycharmProjects/vpp/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180618_20180701.json",
+		"/home/iso/PycharmProjects/vpp/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180618_20180701.json"
 	],
 
 	"fixed_load_profiles_paths": [

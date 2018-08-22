@@ -7,14 +7,14 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 0#120+3*int(60/5*24)
-ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_0 = 0#7*int(60/5*24)#120+3*int(60/5*24)
+ts_n = 14*int(60/5*24)-1  # number of timestamps of whole simulation
 tocsv = True
 pdf = True
-# directory_tail = "7days_unconstr_price_increase"
-directory_tail = "_test"
+directory_tail = "_week1-2"
+# directory_tail = "_test"
 
-start_datetime = "02/09/2017 00:00"
+start_datetime = "01/09/2017 00:00"
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
 
 max_iteration = 10

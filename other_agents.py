@@ -170,7 +170,7 @@ class VPP_ext_agent(Agent):
 
     def runopf_e2(self, t):
         """
-        Excess ageents calculations, before sending the price curves.
+        Excess agents' calculations, before sending the price curves.
         Derivation of the PC for this iteration step. From excess directly, or from memory.
         This include verification of transmitting the excess to the other vpps (only to the ones that send requests),
         but also to DSO.
@@ -754,8 +754,8 @@ class VPP_ext_agent(Agent):
                                     'success': False,  # its based on successful deals so far only
                                     'n_it': self.get_attr('n_iteration') + 1,
                                     'n_ref': "tbd",
-                                    'price': 0,
-                                    'quantity': 0,
+                                    'price': self.get_attr('pc_memory_exc')[self.get_attr('n_iteration')]['all'][:, 2],
+                                    'quantity': np.array(self.get_attr('pc_memory_exc')[self.get_attr('n_iteration')]['all'])[:, 1],
                                     'percent_req': 0,
                                     'bids_saldo': bids_saldo,
                                     'pcf': self.get_attr('price_increase_factor'),
