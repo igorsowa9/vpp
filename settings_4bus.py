@@ -7,12 +7,17 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 0#7*int(60/5*24)#120+3*int(60/5*24)
-ts_n = 14*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_0 = 2109#7*int(60/5*24)#120+3*int(60/5*24)
+ts_n = 1#14*int(60/5*24)-1  # number of timestamps of whole simulation
+
+# if you want to determine the prices based on the memory
+exploit = True
+
 tocsv = True
 pdf = True
-directory_tail = "_week1-2"
-# directory_tail = "_test"
+
+# directory_tail = "_week1-2"
+directory_tail = "_test"
 
 start_datetime = "01/09/2017 00:00"
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
@@ -20,7 +25,11 @@ path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmt
 max_iteration = 10
 negotiation = True  # if False, then only opf1 and requests
 
+# vpps that lear/memorize the history of negotiation
 vpp_learn = [0, 1, 2, 3]
+# vpps that utilize the memory to exploit
+vpp_exploit = ['vpp3']
+
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}
 vpp_n = len(data_names)
