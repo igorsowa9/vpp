@@ -964,7 +964,7 @@ class VPP_ext_agent(Agent):
                     ran = features_ranges[label]
 
                     # print("label: " + str(label))
-                    # print("now: " + str(now))
+                    # print("now: " + str(now))p
                     # print("mem: " + str(mem))
                     # print("weight: " + str(weight))
                     # print("range: " + str(ran))
@@ -989,19 +989,41 @@ class VPP_ext_agent(Agent):
                     sim1 = weight * (1 - ratio)
                     sim_sum += sim1
 
-                #     print("diff: " + str(diff))
-                #     print("ratio: " + str(ratio))
-                #     print("sim1: " + str(sim1))
-                #     print("\n")
-                #
+                    # print("diff: " + str(diff))
+                    # print("ratio: " + str(ratio))
+                    # print("sim1: " + str(sim1))
+                    # print("\n")
+
                 # print(sim_sum)
                 # print("\n\n")
 
                 fmem.at[index, 'sim'] = np.round(sim_sum, 4)
 
-            print("all sim assigned to tuples for r=" + str(r))
-            fmem.to_csv(path_save + "_temp_test.csv")
+            # print("all sim assigned to tuples for r=" + str(r))
 
-        # print(fmem['sim'])
-        sys.exit()
-        return 1
+            ### Choosing the best option and price for the proposal
+
+            # 0) save original memory to file
+            fmem.to_csv(path_save + "_temp_step0.csv")
+
+            # 1) exclude unsuccessful ones
+            select = fmem.index[fmem['bids_saldo'] == 0].tolist()
+            fmem_mod = fmem.drop(fmem.index[select])
+
+            # 2) select the ones with similarity more than treshold
+            fmem_mod = fmem_mod.loc[fmem_mod['sim'] > similarity_treshold]
+            fmem_mod = fmem_mod.sort_values(by=['sim'], ascending=False)
+
+            # 3) select top X in in bids_saldo
+            fmem_mod = fmem_mod.head(top_selection_quantity)
+
+            # 4) calculate average of pcfs of all selected cases with that similarity
+            pcfs = fmem_mod['pcf'].tolist()
+            pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
+
+            # print(fmem_mod[['bids_saldo', 'sim', 'pcf']])
+            # print(pcf_avg)
+
+            self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
+
+        return pcf_avg
