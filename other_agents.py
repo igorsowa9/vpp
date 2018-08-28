@@ -642,15 +642,15 @@ class VPP_ext_agent(Agent):
         my_deficit = self.get_attr('opf1')['power_balance']
         received_pc = self.get_attr('opfd2')['received_pc']
 
-        memory = memory.append({'my_deficit': my_deficit,
+        memory = memory.append({'t': global_time,
+                                'my_deficit': my_deficit,
                                 'received_pc': np.array(received_pc),
-                                't': global_time,
                                 'final_deals': self.get_attr('timestep_memory_mydeals')
                                 }, ignore_index=True)
 
-        memory = memory[['my_deficit',
+        memory = memory[['t',
+                         'my_deficit',
                          'received_pc',  # all received original price curves by the excess agents as response to request
-                         't',
                          'final_deals']]
 
         # self.set_attr(learning_memory=memory)
@@ -772,6 +772,7 @@ class VPP_ext_agent(Agent):
                                     'percent_req': np.round(np.sum(np.abs(gen_deals[:, 2])) / req_value, 4),
                                     'bids_saldo': bids_saldo,
                                     'pcf': self.get_attr('price_increase_factor'),
+                                    'sim_cases': self.get_attr('similar_cases_chosen'),
                                     'my_excess': self.get_attr('opf1')['exc_matrix'].T,
                                     't': global_time,
                                     'minute_t': int(current_time.hour * 60 + current_time.minute),
@@ -795,6 +796,7 @@ class VPP_ext_agent(Agent):
                                     'percent_req': 0,
                                     'bids_saldo': bids_saldo,
                                     'pcf': self.get_attr('price_increase_factor'),
+                                    'sim_cases': self.get_attr('similar_cases_chosen'),
                                     'my_excess': self.get_attr('opf1')['exc_matrix'].T,
                                     't': global_time,
                                     'minute_t': int(current_time.hour * 60 + current_time.minute),
@@ -816,6 +818,7 @@ class VPP_ext_agent(Agent):
                          'percent_req',  # how much of the particular request was filled by my resources
                          'bids_saldo',  # positive if revenue negative if have to be bought
                          'pcf',  # price increase factor, that could be modified according to the vpp settings in json
+                         'sim_cases',
                          'my_excess',
                          #  np.round(np.sum(np.array([gen_deals[:, 3] * np.round(np.abs(gen_deals[:, 2]), 3)])), 4),
                          't',  # simple global time
@@ -974,7 +977,7 @@ class VPP_ext_agent(Agent):
             fmem['sim'] = 0.0
 
             # loop for each tuple in memory
-            fmem = fmem.drop(fmem.index[[range(2, 333)]])
+            # fmem = fmem.drop(fmem.index[[range(2, 333)]])
 
             for mem_row in fmem.itertuples():
                 index = int(mem_row.Index)
@@ -1035,14 +1038,16 @@ class VPP_ext_agent(Agent):
 
             # 2) select the ones with similarity more than treshold
             fmem_mod = fmem_mod.loc[fmem_mod['sim'] > similarity_treshold]
-            fmem_mod = fmem_mod.sort_values(by=['sim'], ascending=False)
-
+            fmem_mod = fmem_mod.sort_values(by=[order_by], ascending=False)
+            self.get_attr("similar_cases_chosen").update({deficit_agent: fmem_mod.shape[0]})
             # 3) select top X in in bids_saldo
             fmem_mod = fmem_mod.head(top_selection_quantity)
-
             # 4) calculate average of pcfs of all selected cases with that similarity
-            pcfs = fmem_mod['pcf'].tolist()
-            pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
+            if fmem_mod.empty:
+                pcf_avg = 1.1
+            else:
+                pcfs = fmem_mod['pcf'].tolist()
+                pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
 
             # ### ALTERNATIVE:
             # # select top 30 revenue and choose the most similar one
@@ -1052,7 +1057,7 @@ class VPP_ext_agent(Agent):
             # pcf_avg = np.round(fmem_mod['pcf'].tolist()[0], 4)
 
             # print(fmem_mod[['bids_saldo', 'sim', 'pcf']])
-            # print(pcf_avg)
+            # print("pcf_avg: " + str(pcf_avg))
 
             self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
 

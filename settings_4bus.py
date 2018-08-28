@@ -8,17 +8,17 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 np.set_printoptions(suppress=True)
 
 ts_0 = 7*int(60/5*24)
-start_datetime = "08/09/2017 00:00"
 ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
 
+start_datetime = "08/09/2017 00:00"  # start of the file! then ts_0 already introduces the offset!
 # if you want to determine the prices based on the memory
 exploit = True
 
 tocsv = True
 pdf = True
 
-directory_tail = "_week2_exploit_deficit_is_saving"
-# directory_tail = "_test"
+# directory_tail = "_week2_exploit_deficit_is_saving"
+directory_tail = "_week2exploit_sim0.75_ordersim_top10"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
 
@@ -32,6 +32,7 @@ vpp_learn = [0, 1, 2, 3]
 vpp_exploit = ['vpp3']
 similarity_treshold = 0.75
 top_selection_quantity = 10
+order_by = 'sim'
 
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}

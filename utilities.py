@@ -257,6 +257,7 @@ def erase_timestep_memory(ns):
         a.set_attr(pc_memory_exc=np.array([{} for _ in range(max_iteration)]))
         a.set_attr(opfe2=0)  # this is set only once, refers to pc_memory_exc, that's why it's here for now
         a.set_attr(pc_memory_def=np.array([{} for _ in range(max_iteration)]))
+        a.set_attr(similar_cases_chosen={})
 
 
 def erase_learning_memory(vpp_learn):  # <---------------- now to files
