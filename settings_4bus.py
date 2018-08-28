@@ -8,6 +8,7 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 np.set_printoptions(suppress=True)
 
 ts_0 = 7*int(60/5*24)
+start_datetime = "08/09/2017 00:00"
 ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
 
 # if you want to determine the prices based on the memory
@@ -16,10 +17,9 @@ exploit = True
 tocsv = True
 pdf = True
 
-directory_tail = "_week2_reverse_benchmark_learning_logic"
+directory_tail = "_week2_exploit_deficit_is_saving"
 # directory_tail = "_test"
 
-start_datetime = "01/09/2017 00:00"
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
 
 max_iteration = 10
@@ -30,7 +30,7 @@ vpp_learn = [0, 1, 2, 3]
 
 # vpps that utilize the memory to exploit
 vpp_exploit = ['vpp3']
-similarity_treshold = 0.70
+similarity_treshold = 0.75
 top_selection_quantity = 10
 
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]

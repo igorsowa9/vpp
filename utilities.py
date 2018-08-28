@@ -171,6 +171,10 @@ def system_consensus_check(ns, global_time):
                         if not deal_exist:
                             a.save_deal_to_memory(False, global_time, req_alias)
 
+            else:# a.get_attr('opf1')['max_excess'] == 0 and a.get_attr('opf1')['power_balance'] > 0:  # if I am deficit agent
+
+                a.save_if_deficit(global_time)
+
         print("\n\n##################")
         print("##################\n\n")
 

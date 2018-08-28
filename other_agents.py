@@ -493,6 +493,7 @@ class VPP_ext_agent(Agent):
                                    mem["price_curve"][gn, 1],
                                    mem["price_curve"][gn, 2]])
         sorted_pc = sorted(all_pc, key=lambda price: price[3])
+        self.set_attr(opfd2={"received_pc": sorted_pc})
         self.log_info("All current price curves together: " + "\n" + str(np.array(sorted_pc)) + " I need: " + str(need))
         bids = []
         for pc in sorted_pc:
@@ -521,7 +522,8 @@ class VPP_ext_agent(Agent):
         self.log_info("All chosen price curves to be sent as bids (during n_iteration = " +
                       str(self.get_attr("n_iteration")) +
                       "): " + "\n" + str(np.array(bids)))
-        self.set_attr(opfd2={"bids": bids})  # set attribute instead of return
+        # self.set_attr(opfd2={"bids": bids})  # set attribute instead of return
+        self.get_attr('opfd2').update({'bids': bids})
         return
 
     def runopf_d3(self):
@@ -633,6 +635,32 @@ class VPP_ext_agent(Agent):
 
         return all_bids_mod, pc_msg
 
+    def save_if_deficit(self, global_time):
+
+        memory = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
+
+        my_deficit = self.get_attr('opf1')['power_balance']
+        received_pc = self.get_attr('opfd2')['received_pc']
+
+        memory = memory.append({'my_deficit': my_deficit,
+                                'received_pc': np.array(received_pc),
+                                't': global_time,
+                                'final_deals': self.get_attr('timestep_memory_mydeals')
+                                }, ignore_index=True)
+
+        memory = memory[['my_deficit',
+                         'received_pc',  # all received original price curves by the excess agents as response to request
+                         't',
+                         'final_deals']]
+
+        # self.set_attr(learning_memory=memory)
+        memory.to_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
+        self.log_info("My learning memory updated (saved to file)")
+
+        return
+
+
+
     def save_deal_to_memory(self, deal, global_time, req_alias):
         """
         "with_idx": memory based on the deal with this VPP
@@ -652,8 +680,8 @@ class VPP_ext_agent(Agent):
         """
         myself = self.name
 
-        self.log_info("save_deal_to_memory, d: " + str(deal))
-        self.log_info("save_deal_to_memory, req_alias: " + str(req_alias))
+        # self.log_info("save_deal_to_memory, d: " + str(deal))
+        # self.log_info("save_deal_to_memory, req_alias: " + str(req_alias))
 
         # memory = self.get_attr("learning_memory") <------------ now from file
         memory = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
@@ -744,6 +772,7 @@ class VPP_ext_agent(Agent):
                                     'percent_req': np.round(np.sum(np.abs(gen_deals[:, 2])) / req_value, 4),
                                     'bids_saldo': bids_saldo,
                                     'pcf': self.get_attr('price_increase_factor'),
+                                    'my_excess': self.get_attr('opf1')['exc_matrix'].T,
                                     't': global_time,
                                     'minute_t': int(current_time.hour * 60 + current_time.minute),
                                     'week_t': int(current_time.weekday()),
@@ -766,6 +795,7 @@ class VPP_ext_agent(Agent):
                                     'percent_req': 0,
                                     'bids_saldo': bids_saldo,
                                     'pcf': self.get_attr('price_increase_factor'),
+                                    'my_excess': self.get_attr('opf1')['exc_matrix'].T,
                                     't': global_time,
                                     'minute_t': int(current_time.hour * 60 + current_time.minute),
                                     'week_t': int(current_time.weekday()),
@@ -786,6 +816,7 @@ class VPP_ext_agent(Agent):
                          'percent_req',  # how much of the particular request was filled by my resources
                          'bids_saldo',  # positive if revenue negative if have to be bought
                          'pcf',  # price increase factor, that could be modified according to the vpp settings in json
+                         'my_excess',
                          #  np.round(np.sum(np.array([gen_deals[:, 3] * np.round(np.abs(gen_deals[:, 2]), 3)])), 4),
                          't',  # simple global time
                          'minute_t',  # time in minutes of the day, weekday and month
@@ -931,13 +962,6 @@ class VPP_ext_agent(Agent):
                 "month_t": month_t_now,
                 "mem_av_weather": res_now_power_all}
 
-            features_idx_in_memory = {
-                "mem_requests": 18,
-                "minute_t": 11,
-                "mem_week_t": 20,
-                "month_t": 13,
-                "mem_av_weather": 21}
-
             features_ranges = {
                 "mem_requests": np.round(np.abs(fmem['mem_requests'].max() - fmem['mem_requests'].min()), 4),
                 "minute_t": 24 * 60 / 2,
@@ -950,21 +974,20 @@ class VPP_ext_agent(Agent):
             fmem['sim'] = 0.0
 
             # loop for each tuple in memory
-            # fmem = fmem.drop(fmem.index[[range(2, 333)]])
+            fmem = fmem.drop(fmem.index[[range(2, 333)]])
 
             for mem_row in fmem.itertuples():
                 index = int(mem_row.Index)
 
                 sim_sum = 0
                 for label in features_weights.keys():
-
                     now = features_now[label]
-                    mem = mem_row[features_idx_in_memory[label]]
+                    mem = mem_row[fmem.columns.get_loc(label)+1]
                     weight = features_weights[label]
                     ran = features_ranges[label]
 
                     # print("label: " + str(label))
-                    # print("now: " + str(now))p
+                    # print("now: " + str(now))
                     # print("mem: " + str(mem))
                     # print("weight: " + str(weight))
                     # print("range: " + str(ran))
@@ -989,11 +1012,11 @@ class VPP_ext_agent(Agent):
                     sim1 = weight * (1 - ratio)
                     sim_sum += sim1
 
-                    # print("diff: " + str(diff))
-                    # print("ratio: " + str(ratio))
-                    # print("sim1: " + str(sim1))
-                    # print("\n")
-
+                #     print("diff: " + str(diff))
+                #     print("ratio: " + str(ratio))
+                #     print("sim1: " + str(sim1))
+                #     print("\n")
+                #
                 # print(sim_sum)
                 # print("\n\n")
 
@@ -1010,23 +1033,23 @@ class VPP_ext_agent(Agent):
             select = fmem.index[fmem['bids_saldo'] == 0].tolist()
             fmem_mod = fmem.drop(fmem.index[select])
 
-            # # 2) select the ones with similarity more than treshold
-            # fmem_mod = fmem_mod.loc[fmem_mod['sim'] > similarity_treshold]
-            # fmem_mod = fmem_mod.sort_values(by=['sim'], ascending=False)
-            #
-            # # 3) select top X in in bids_saldo
-            # fmem_mod = fmem_mod.head(top_selection_quantity)
-            #
-            # # 4) calculate average of pcfs of all selected cases with that similarity
-            # pcfs = fmem_mod['pcf'].tolist()
-            # pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
-
-            ### ALTERNATIVE:
-            # select top 30 revenue and choose the most similar one
-            fmem_mod = fmem_mod.sort_values(by=['bids_saldo'], ascending=False)
-            fmem_mod = fmem_mod.head(30)
+            # 2) select the ones with similarity more than treshold
+            fmem_mod = fmem_mod.loc[fmem_mod['sim'] > similarity_treshold]
             fmem_mod = fmem_mod.sort_values(by=['sim'], ascending=False)
-            pcf_avg = np.round(fmem_mod['pcf'].tolist()[0], 4)
+
+            # 3) select top X in in bids_saldo
+            fmem_mod = fmem_mod.head(top_selection_quantity)
+
+            # 4) calculate average of pcfs of all selected cases with that similarity
+            pcfs = fmem_mod['pcf'].tolist()
+            pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
+
+            # ### ALTERNATIVE:
+            # # select top 30 revenue and choose the most similar one
+            # fmem_mod = fmem_mod.sort_values(by=['bids_saldo'], ascending=False)
+            # fmem_mod = fmem_mod.head(30)
+            # fmem_mod = fmem_mod.sort_values(by=['sim'], ascending=False)
+            # pcf_avg = np.round(fmem_mod['pcf'].tolist()[0], 4)
 
             # print(fmem_mod[['bids_saldo', 'sim', 'pcf']])
             # print(pcf_avg)
