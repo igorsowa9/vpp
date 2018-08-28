@@ -1010,16 +1010,23 @@ class VPP_ext_agent(Agent):
             select = fmem.index[fmem['bids_saldo'] == 0].tolist()
             fmem_mod = fmem.drop(fmem.index[select])
 
-            # 2) select the ones with similarity more than treshold
-            fmem_mod = fmem_mod.loc[fmem_mod['sim'] > similarity_treshold]
+            # # 2) select the ones with similarity more than treshold
+            # fmem_mod = fmem_mod.loc[fmem_mod['sim'] > similarity_treshold]
+            # fmem_mod = fmem_mod.sort_values(by=['sim'], ascending=False)
+            #
+            # # 3) select top X in in bids_saldo
+            # fmem_mod = fmem_mod.head(top_selection_quantity)
+            #
+            # # 4) calculate average of pcfs of all selected cases with that similarity
+            # pcfs = fmem_mod['pcf'].tolist()
+            # pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
+
+            ### ALTERNATIVE:
+            # select top 30 revenue and choose the most similar one
+            fmem_mod = fmem_mod.sort_values(by=['bids_saldo'], ascending=False)
+            fmem_mod = fmem_mod.head(30)
             fmem_mod = fmem_mod.sort_values(by=['sim'], ascending=False)
-
-            # 3) select top X in in bids_saldo
-            fmem_mod = fmem_mod.head(top_selection_quantity)
-
-            # 4) calculate average of pcfs of all selected cases with that similarity
-            pcfs = fmem_mod['pcf'].tolist()
-            pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
+            pcf_avg = np.round(fmem_mod['pcf'].tolist()[0], 4)
 
             # print(fmem_mod[['bids_saldo', 'sim', 'pcf']])
             # print(pcf_avg)

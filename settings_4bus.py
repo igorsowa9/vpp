@@ -11,12 +11,12 @@ ts_0 = 7*int(60/5*24)
 ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
 
 # if you want to determine the prices based on the memory
-exploit = False
+exploit = True
 
 tocsv = True
 pdf = True
 
-directory_tail = "_week2_flat_price1.1"
+directory_tail = "_week2_reverse_benchmark_learning_logic"
 # directory_tail = "_test"
 
 start_datetime = "01/09/2017 00:00"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper?&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/german_load_profiles/min15/g1_sept17.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/german_load_profiles/min15/g1_sept17.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/german_load_profiles/min15/g4_sept17.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/german_load_profiles/min15/g4_sept17.json" afterDir="false" />
@@ -27,6 +27,20 @@
       <change beforePath="$PROJECT_DIR$/data/original_elia/archive/wind_offshore.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_offshore.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/original_elia/archive/wind_onshore.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_onshore.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/original_elia/archive/wind_onshore_elia_158.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/original_elia/archive/wind_onshore_elia_158.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/other_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/other_agents.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_all.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_green.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_green.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp2_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp2_fromOPF1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e2_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e2_all.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e2_green.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e2_green.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e3.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e3.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e2_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e2_all.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e2_green.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e2_green.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e3.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e3.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings_4bus.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_4bus.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -39,11 +53,11 @@
       <content type="file-editors">
         <state>
           <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-            <file pinned="false" current-in-tab="true">
+            <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/settings_4bus.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="646">
-                    <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
+                  <state relative-caret-position="627">
+                    <caret line="33" column="27" lean-forward="true" selection-start-line="33" selection-start-column="27" selection-end-line="33" selection-end-column="27" />
                     <folding>
                       <element signature="e#0#18#0" expanded="true" />
                     </folding>
@@ -54,8 +68,8 @@
             <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/vpp_ems_4bus_ns.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="185">
-                    <caret line="100" column="50" lean-forward="true" selection-start-line="100" selection-start-column="50" selection-end-line="100" selection-end-column="50" />
+                  <state relative-caret-position="671">
+                    <caret line="172" column="35" selection-start-line="172" selection-start-column="30" selection-end-line="172" selection-end-column="35" />
                     <folding>
                       <element signature="e#0#11#0" expanded="true" />
                     </folding>
@@ -75,11 +89,11 @@
                 </provider>
               </entry>
             </file>
-            <file pinned="false" current-in-tab="false">
+            <file pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/other_agents.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="136">
-                    <caret line="183" column="71" selection-start-line="183" selection-start-column="58" selection-end-line="183" selection-end-column="71" />
+                  <state relative-caret-position="489">
+                    <caret line="522" column="57" lean-forward="true" selection-start-line="522" selection-start-column="57" selection-end-line="522" selection-end-column="57" />
                     <folding>
                       <element signature="e#0#25#0" expanded="true" />
                     </folding>
@@ -112,15 +126,15 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="json" value="173" />
-          <entry key="py" value="27909" />
-          <entry key="txt" value="1294" />
+          <entry key="py" value="28180" />
+          <entry key="txt" value="1414" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="JSON" value="173" />
-          <entry key="PLAIN_TEXT" value="1294" />
-          <entry key="Python" value="27909" />
+          <entry key="PLAIN_TEXT" value="1414" />
+          <entry key="Python" value="28180" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -162,8 +176,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="183">
-              <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+            <state relative-caret-position="278">
+              <caret line="18" column="11" lean-forward="true" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -225,8 +239,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>i will app</find>
-      <find>n_requests</find>
       <find>reques</find>
       <find>'request</find>
       <find>get_att</find>
@@ -252,9 +264,11 @@
       <find>all sim assi</find>
       <find>price_increa</find>
       <find>price_increase</find>
-      <find>price_increas</find>
-      <find>get_attr('requests')</find>
       <find>exploit</find>
+      <find>get_attr('requests')</find>
+      <find>price_increas</find>
+      <find>opfd2</find>
+      <find>all chosen price</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -320,8 +334,8 @@
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json" />
         <option value="$PROJECT_DIR$/utilities.py" />
         <option value="$PROJECT_DIR$/similarity.py" />
-        <option value="$PROJECT_DIR$/other_agents.py" />
         <option value="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" />
+        <option value="$PROJECT_DIR$/other_agents.py" />
         <option value="$PROJECT_DIR$/settings_4bus.py" />
       </list>
     </option>
@@ -615,13 +629,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1498654725175</updated>
-    </task>
-    <task id="LOCAL-00021" summary="next steps:&#10;&#10;normal negotiation:&#10;- define where more opfs are necessary&#10;- integrate batteries&#10;- where in the details of the negotiation, some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
-      <created>1525684136965</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1525684136965</updated>
     </task>
     <task id="LOCAL-00022" summary="next steps:&#10;&#10;normal negotiation:&#10;- build other block from the chart&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
       <created>1525789797127</created>
@@ -959,7 +966,14 @@
       <option name="project" value="LOCAL" />
       <updated>1535380573429</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="next steps:&#10;&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper?&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <created>1535384245781</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1535384245782</updated>
+    </task>
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1059,7 +1073,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/Notebooks/MachineLearningWithPython" />
     </ignored-roots>
-    <MESSAGE value="next steps:&#10;&#10;fix the cost comparison (in order to sell to DSO, the power needs to be produced too !!!!)&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;opf_d2 should return such bids so that the agents sends also refuse messages to the excess vpp that gave price curves&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;checking feasibility of selling green to DSO or/and execess to other VPPs&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
@@ -1084,7 +1097,8 @@
     <MESSAGE value="next steps:&#10;&#10;continue similarity of calculating av_weather value.&#10;&#10;run cases for second week without learning and with learning: CBR based on features + choosing the best revenue one - taking that price&#10;(OR/AND based on memory - estimating the marginal prices?)&#10;&#10;check counting of iteration... it does not work&#10;&#10;run for fixed pcf&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;continue similarity: make choosing the best options for current request&#10;&#10;run cases for second week without learning and with learning: CBR based on features + choosing the best revenue one - taking that price&#10;(OR/AND based on memory - estimating the marginal prices?)&#10;&#10;check counting of iteration... it does not work&#10;&#10;run for fixed pcf&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
-    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <MESSAGE value="next steps:&#10;&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper?&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper?&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW_29_06_18.json" />
@@ -1318,16 +1332,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/other_agents.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="183" column="71" selection-start-line="183" selection-start-column="58" selection-end-line="183" selection-end-column="71" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="316">
@@ -1345,30 +1349,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vpp_ems_4bus_ns.py">
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
-          <caret line="100" column="50" lean-forward="true" selection-start-line="100" selection-start-column="50" selection-end-line="100" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="278">
+          <caret line="18" column="11" lean-forward="true" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/settings_4bus.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
+        <state relative-caret-position="627">
+          <caret line="33" column="27" lean-forward="true" selection-start-line="33" selection-start-column="27" selection-end-line="33" selection-end-column="27" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
+    <entry file="file://$PROJECT_DIR$/vpp_ems_4bus_ns.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+        <state relative-caret-position="671">
+          <caret line="172" column="35" selection-start-line="172" selection-start-column="30" selection-end-line="172" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/other_agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="489">
+          <caret line="522" column="57" lean-forward="true" selection-start-line="522" selection-start-column="57" selection-end-line="522" selection-end-column="57" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
