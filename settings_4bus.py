@@ -17,8 +17,8 @@ exploit = True
 tocsv = True
 pdf = True
 
-# directory_tail = "_week2_exploit_deficit_is_saving"
-directory_tail = "_week2exploit_sim0.75_ordersim_top10"
+# directory_tail = "_test"
+directory_tail = "_week2exploit_sim0.75_ordersim_top10_plusplot"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
 

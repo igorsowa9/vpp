@@ -642,16 +642,23 @@ class VPP_ext_agent(Agent):
         my_deficit = self.get_attr('opf1')['power_balance']
         received_pc = self.get_attr('opfd2')['received_pc']
 
+        marginal_price = 0
+        for deal in self.get_attr('timestep_memory_mydeals'):
+            if np.max(deal[1][:, 3]) > marginal_price:
+                marginal_price = np.max(deal[1][:, 3])
+
         memory = memory.append({'t': global_time,
                                 'my_deficit': my_deficit,
                                 'received_pc': np.array(received_pc),
-                                'final_deals': self.get_attr('timestep_memory_mydeals')
+                                'final_deals': self.get_attr('timestep_memory_mydeals'),
+                                'marginal_price': marginal_price
                                 }, ignore_index=True)
 
         memory = memory[['t',
                          'my_deficit',
                          'received_pc',  # all received original price curves by the excess agents as response to request
-                         'final_deals']]
+                         'final_deals',
+                         'marginal_price']]
 
         # self.set_attr(learning_memory=memory)
         memory.to_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
@@ -774,11 +781,12 @@ class VPP_ext_agent(Agent):
                                     'pcf': self.get_attr('price_increase_factor'),
                                     'sim_cases': self.get_attr('similar_cases_chosen'),
                                     'my_excess': self.get_attr('opf1')['exc_matrix'].T,
+                                    'exc_cost_range': [np.min(self.get_attr('opf1')['exc_matrix'][2, :]),
+                                                       np.max(self.get_attr('opf1')['exc_matrix'][2, :])],
                                     't': global_time,
                                     'minute_t': int(current_time.hour * 60 + current_time.minute),
                                     'week_t': int(current_time.weekday()),
                                     'month_t': int(current_time.month),
-                                    # 'po_idx': po_idx, # redundant, included in po_wf actually
                                     'po_wf': po_wf,
                                     'res_inst': res_installed_power_factor,
                                     'av_weather': av_weather_factor,
@@ -798,11 +806,12 @@ class VPP_ext_agent(Agent):
                                     'pcf': self.get_attr('price_increase_factor'),
                                     'sim_cases': self.get_attr('similar_cases_chosen'),
                                     'my_excess': self.get_attr('opf1')['exc_matrix'].T,
+                                    'exc_cost_range': [np.min(self.get_attr('opf1')['exc_matrix'][2, :]),
+                                                       np.max(self.get_attr('opf1')['exc_matrix'][2, :])],
                                     't': global_time,
                                     'minute_t': int(current_time.hour * 60 + current_time.minute),
                                     'week_t': int(current_time.weekday()),
                                     'month_t': int(current_time.month),
-                                    # 'po_idx':
                                     'po_wf': po_wf,
                                     'res_inst': res_installed_power_factor,
                                     'av_weather': av_weather_factor,
@@ -818,14 +827,13 @@ class VPP_ext_agent(Agent):
                          'percent_req',  # how much of the particular request was filled by my resources
                          'bids_saldo',  # positive if revenue negative if have to be bought
                          'pcf',  # price increase factor, that could be modified according to the vpp settings in json
-                         'sim_cases',
-                         'my_excess',
-                         #  np.round(np.sum(np.array([gen_deals[:, 3] * np.round(np.abs(gen_deals[:, 2]), 3)])), 4),
+                         'sim_cases',  # quantity of the similar cases chosen from the memory before benchmark
+                         'my_excess',  # matrix of excess generators from opf1
+                         'exc_cost_range',  # the cheapest generation cost of excess generators
                          't',  # simple global time
                          'minute_t',  # time in minutes of the day, weekday and month
                          'week_t',
                          'month_t',
-                         # 'po_idx',  # redundant, included in po_wf actually
                          'po_wf',  # forecast numbers of the prospective opponents (all)
                          'res_inst',    # it is constant for particular vpp, but can be used to derive "weight"
                                         # of vpp in negotiation due to more or less RES
@@ -840,8 +848,8 @@ class VPP_ext_agent(Agent):
 
     def similarity(self, t):
         """
-        Calculates the best price increase factor according to the existing memory.
-        :return:
+        Calculates price increase factor according to the existing memory and assumption at the end of the function.
+        :return: pcf
         """
 
         features_weights = {"mem_requests": 0.15,

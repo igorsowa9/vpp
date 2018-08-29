@@ -341,6 +341,7 @@ def show_results_history(pdf):
 
     figure_counter = 0
 
+    # figures for different VPPs
     for alias in data_names:
         vpp_idx = data_names_dict[alias]
         figure_counter += 1
@@ -418,7 +419,40 @@ def show_results_history(pdf):
             pb = plt.plot(opf1_save_genload_all[:, vpp_idx, g, GEN_LOW])
             plt.setp(pb, 'color', 'b', 'linewidth', 1.0, dashes=[6, 2])
 
-    plt.figure(figsize=(50, 50))
+    ############################
+    # Other figures for analysis
+    ############################
+    figure_counter += 1
+
+    plt.figure(figure_counter, figsize=(figsizeH, figsizeL))
+    m_vpp3 = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict['vpp3']) + ".pkl")
+    m_vpp2 = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict['vpp2']) + ".pkl")
+
+    p1 = np.array(m_vpp3['exc_cost_range'].tolist())
+    p1a = plt.plot(p1[:, 0])
+    p1b = plt.plot(p1[:, 1])
+    p2 = plt.plot(m_vpp2['marginal_price'].tolist())
+    p3 = np.array(m_vpp3['price'].tolist())
+    p3a = plt.plot(p3[:, 0])
+
+    plt.title('vpp3 (excess - learning) vs vpp2 (deficit - dumb)')
+    # plt.subplot(211)
+    # plt.suptitle('vpp3 cheapest generation excess (green) vs vpp2 marginal price in deals (blue)')
+
+    plt.setp(p1a, 'color', 'lime', 'linewidth', 2.0)
+    plt.setp(p1b, 'color', 'darkgreen', 'linewidth', 2.0)
+    plt.setp(p2, 'color', 'b', 'linewidth', 2.0)
+    plt.setp(p3a, 'color', 'purple', 'linewidth', 2.0)
+
+    # plt.ylabel('prices')
+    # plt.axhline(0, color='black')
+    # plt.xlabel('time in minutes')
+
+    # plt.subplot(212)
+    # plt.suptitle('bids saldo of vpp3 (excess - learning)')
+    # p4 = plt.plot(m_vpp3['bids_saldo'].tolist())
+    # plt.setp(p4, 'color', 'orange', 'linewidth', 2.0)
+
 
     if pdf:
         pdf = matplotlib.backends.backend_pdf.PdfPages(path_save + 'all_figs.pdf')
