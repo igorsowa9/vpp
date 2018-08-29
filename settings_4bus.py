@@ -7,8 +7,8 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 7*int(60/5*24)
-ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_0 = 3861#7*int(60/5*24)
+ts_n = 20#7*int(60/5*24)-1  # number of timestamps of whole simulation
 
 start_datetime = "08/09/2017 00:00"  # start of the file! then ts_0 already introduces the offset!
 # if you want to determine the prices based on the memory
@@ -17,8 +17,8 @@ exploit = True
 tocsv = True
 pdf = True
 
-# directory_tail = "_test"
-directory_tail = "_week2exploit_sim0.75_ordersim_top10_plusplot"
+directory_tail = "_test"
+# directory_tail = "_week2exploit_sim0.75_ordersim_top10_plusplot"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
 
@@ -59,7 +59,7 @@ small_wait = 0.1  # waiting time to separate some steps, for testing
 iteration_wait = 0.1
 
 # size of all the figures that are saved to the pdfs
-figsizeH = 12
+figsizeH = 24
 figsizeL = 12
 
 # the excess agents increase the original production prices when publishing the price curve, increase by 10%
