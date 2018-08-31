@@ -190,19 +190,24 @@ class VPP_ext_agent(Agent):
         if type(price_increase_factor) == list:
 
             currmem = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
-            t_range = np.arange(t - max_ts_range_for_price_modification, t)
+            # t_range = np.arange(t - max_ts_range_for_price_modification, t)
+            rows_range = currmem.tail(max_ts_range_for_price_modification)
 
             previous_fulfilled = 0  # check if the time exist and if some conditions are fulfilled: success
-            for test_t in t_range:
-                if 't' in currmem.columns:
-                    test_row = currmem.loc[currmem['t'] == test_t]
-                    if not test_row.empty:
-                        if (currmem['t'] == test_t).any() and test_row.iloc[0]['success'] == 1:
-                            previous_fulfilled += 1
+            if not rows_range.empty:
+                previous_fulfilled = np.sum(rows_range['success'].tolist())
+
+            # for test_t in t_range:
+            #     if 't' in currmem.columns:
+            #         test_row = currmem.loc[currmem['t'] == test_t]
+            #         if not test_row.empty:
+            #             if (currmem['t'] == test_t).any() and test_row.iloc[0]['success'] == 1:
+            #                 previous_fulfilled += 1
 
             if previous_fulfilled == max_ts_range_for_price_modification:
 
-                previous_row = currmem.loc[currmem['t'] == t-1]  # take previous row
+                # previous_row = currmem.loc[currmem['t'] == t-1]  # take previous row
+                previous_row = rows_range.tail(1)
                 previous_mod = previous_row.iloc[0]['pcf']
 
                 if previous_mod < price_increase_factor[1]:
@@ -211,7 +216,22 @@ class VPP_ext_agent(Agent):
                     price_increase_factor = price_increase_factor[0]
 
             else:  # if conditions not fulilled come back to the first value
-                price_increase_factor = price_increase_factor[0]
+                if not constant_environment:
+                    price_increase_factor = price_increase_factor[0]
+
+                else:  # if we assume exploration in a constant environment...
+                    test_row = currmem.tail(1)
+                    if not test_row.empty:
+                        previous_mod = test_row.iloc[0]['pcf']
+                        if test_row.iloc[0]['success'] == 1:
+                            if previous_mod < price_increase_factor[1]:
+                                price_increase_factor = previous_mod + price_increase_factor[2]
+                            else:
+                                price_increase_factor = price_increase_factor[0]
+                        else:
+                            price_increase_factor = price_increase_factor[0]
+                    else:
+                        price_increase_factor = price_increase_factor[0]
 
         a = 'OFF'
         if exploit and self.name in vpp_exploit:
@@ -795,12 +815,14 @@ class VPP_ext_agent(Agent):
 
         else:  # there were no deal on that request:
 
+            price_minimum = min(self.get_attr('pc_memory_exc')[self.get_attr('n_iteration')]['all'][:, 2])
+
             memory = memory.append({'with_idx_req': np.array([int(data_names_dict[req_alias]), req_value]),
                                     'success': False,  # its based on successful deals so far only
                                     'n_it': self.get_attr('n_iteration') + 1,
                                     'n_ref': "tbd",
-                                    'price': self.get_attr('pc_memory_exc')[self.get_attr('n_iteration')]['all'][:, 2],
-                                    'quantity': np.array(self.get_attr('pc_memory_exc')[self.get_attr('n_iteration')]['all'])[:, 1],
+                                    'price': np.array([price_minimum]),
+                                    'quantity': np.array([self.get_attr('pc_memory_exc')[self.get_attr('n_iteration')]['all'][np.argmin(price_minimum), 1]]),
                                     'percent_req': 0,
                                     'bids_saldo': bids_saldo,
                                     'pcf': self.get_attr('price_increase_factor'),

@@ -572,8 +572,15 @@ if __name__ == '__main__':
 
     erase_learning_memory(vpp_learn)
 
-    for t in range(ts_0, ts_0+ts_n):
+    if not constant_environment:
+        timeline = range(ts_0, ts_0+ts_n)
+        if explore_multi_oneshot > 1:
+            timeline = [i for i in range(ts_0, ts_0 + ts_n) for _ in range(explore_multi_oneshot)]
+    else:
+        timeline = ts_0*np.ones(ts_n)
+        timeline = timeline.astype(int).tolist()
 
+    for t in timeline:
         time.sleep(small_wait)
         runOneTimestep()
 

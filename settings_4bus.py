@@ -7,18 +7,22 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 3861#7*int(60/5*24)
-ts_n = 20#7*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_0 = 0#7*int(60/5*24)
+constant_environment = False
+ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
 
 start_datetime = "08/09/2017 00:00"  # start of the file! then ts_0 already introduces the offset!
 # if you want to determine the prices based on the memory
-exploit = True
+
+exploit = False
+
+explore_multi_oneshot = 10
 
 tocsv = True
 pdf = True
 
-directory_tail = "_test"
-# directory_tail = "_week2exploit_sim0.75_ordersim_top10_plusplot"
+# directory_tail = "_test"
+directory_tail = "_week1_multi_oneshot_10"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
 
@@ -76,7 +80,7 @@ opfe3_prinpf = False
 # number of time periods that you check in the memory before the current timestamp in order to determine if the power
 # increase factor should be modified for exploitation or not. I.e. if successful negotiation happened in the previous #
 # of the timestamps, then change the modificator of the price to the next one.
-max_ts_range_for_price_modification = 3
+max_ts_range_for_price_modification = 2
 
 
 relax_e2 = 0.01  # relaxation of constraints in opf_e2
