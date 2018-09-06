@@ -7,25 +7,34 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 0#7*int(60/5*24)
+ts_0 = 3861#7*int(60/5*24)
 constant_environment = False
-ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_n = 20#7*int(60/5*24)-1  # number of timestamps of whole simulation
 
-start_datetime = "08/09/2017 00:00"  # start of the file! then ts_0 already introduces the offset!
+start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already introduces the offset!
 # if you want to determine the prices based on the memory
 
-exploit = False
+# explit means that you want to determine price increase factor by the similarity method,
+# and if you want to include the negotiation from already exploit (i.e. the most optimal) in the next negotiation already
+exploit = True
+update_during_exploit = True
+# the path to the folder where the exploration results are saved:
+path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0830_1544_week1_multi_oneshot_10/'
 
-explore_multi_oneshot = 10
+# if set to more then 1, during the exploration, the learning agent has more than one try to propose an offer with the
+# exactly same conditions of environment, i.e. explore the opponent / environemnt better
+explore_multi_oneshot = 1
 
+# if you want to save the files to the .CSV and the plots to PDF instead of showing them
 tocsv = True
 pdf = True
 
-# directory_tail = "_test"
-directory_tail = "_week1_multi_oneshot_10"
+directory_tail = "_test"
+# directory_tail = "_week2_exploit_basedon_10shots"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
 
+# maximum rounds of the negotiations between the agents
 max_iteration = 10
 negotiation = True  # if False, then only opf1 and requests
 

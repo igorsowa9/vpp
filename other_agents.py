@@ -879,51 +879,20 @@ class VPP_ext_agent(Agent):
                             "mem_week_t": 0.15,
                             "month_t": 0.1,
                             "mem_av_weather": 0.3}
-
         my_idx = data_names_dict[self.name]
 
-        # Load history
-        path_dir = '/home/iso/Desktop/vpp_some_results/2018_0822_1555_week1-2/'
-        path_pickle = path_dir + "temp_ln_" + str(my_idx) + ".pkl"
-        f = pd.read_pickle(path_pickle)
-        learn_memory = f.iloc[0:333, :]  # only the first week as learning
-        learn_memory_mod = copy.deepcopy(learn_memory)
+        ### Prepare initial memory - change values in cells for the needs (only once)
+        # choose only one if there are more negotiation for the same timestep! (e.g. the highest revenue one)
+        path_initial_memory = path_dir_history + "memory_ln_" + str(my_idx) + ".pkl"
 
-        ### Prepare memory - change values in cells for the needs (only once)
-        path_memory = path_dir + "memory_ln_" + str(my_idx) + ".pkl"
-
-        if not os.path.isfile(path_memory):  # if memory file has not been prepared so far
-            # new columns:
-            learn_memory_mod['mem_requests'] = learn_memory_mod.with_idx_req.apply(lambda x: x[1])
-            learn_memory_mod['mem_requesters'] = learn_memory_mod.with_idx_req.apply(lambda x: x[0])
-            learn_memory_mod['mem_week_t'] = learn_memory_mod.week_t.apply(lambda x: x + 1)
-            # week and month are ready in original version
-            learn_memory_mod['mem_av_weather'] = ""
-
-            for index, row in learn_memory_mod.iterrows():
-
-                res_now_power_all = 0  # potencial renewable power of all opponents together in Watts
-                av_weather = row.loc['av_weather']
-                for vpp_idx in av_weather.keys():
-                    vpp_file = self.load_data(data_paths[vpp_idx])
-                    ppc0 = cases[vpp_file['case']]()
-                    installed_power = np.round(np.sum(ppc0['gen'][1:, 8]), 4)
-
-                    res_inst = row['res_inst'][vpp_idx]
-                    av_weather_onevpp = row['av_weather'][vpp_idx]
-                    res_now_power = installed_power * res_inst * av_weather_onevpp
-                    res_now_power_all += res_now_power
-
-                row['mem_av_weather'] = res_now_power_all
-                learn_memory_mod.iloc[index] = row
-
-            learn_memory_mod.to_pickle(path_memory)
-            self.log_info("Memory prepared and saved.")
+        if not os.path.isfile(path_initial_memory):  # if memory file has not been prepared so far
+            self.prepare_initial_memory(t, path_initial_memory)
+            self.log_info("Initial memory prepared and saved.")
         else:
-            self.log_info("Memory has been already prepared before.")
+            self.log_info("Initial memory has been already prepared before.")
 
-        ### Calculate range of values values necessary for similarity
-        fmem = pd.read_pickle(path_memory)
+        ### Calculate similarity
+        fmem = pd.read_pickle(path_initial_memory)
 
         # weather data (necessary for the similarity calculation) should be downloaded from the public data:
         start_date = datetime.strptime(start_datetime, "%d/%m/%Y %H:%M")
@@ -1086,9 +1055,70 @@ class VPP_ext_agent(Agent):
             # fmem_mod = fmem_mod.sort_values(by=['sim'], ascending=False)
             # pcf_avg = np.round(fmem_mod['pcf'].tolist()[0], 4)
 
-            # print(fmem_mod[['bids_saldo', 'sim', 'pcf']])
+            print(fmem_mod[['t', 'bids_saldo', 'sim', 'pcf']])
             # print("pcf_avg: " + str(pcf_avg))
 
             self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
-
         return pcf_avg
+
+    def prepare_initial_memory(self, t, path_initial_memory):
+
+        my_idx = data_names_dict[self.name]
+
+        # Load history
+        path_pickle = path_dir_history + "temp_ln_" + str(my_idx) + ".pkl"
+        learn_memory = pd.read_pickle(path_pickle)
+        # learn_memory = f.iloc[0:333, :]  # selection if necessary for example if only the first week as learning
+        learn_memory_mod = copy.deepcopy(learn_memory)
+
+        # # TBD: mark the probable marginal prices (mp) through the mp_occurance_factor!!
+        # change_of_deal
+        # print(learn_memory)
+        # sys.exit()
+
+        # new columns:
+        learn_memory_mod['mem_requests'] = np.array(learn_memory_mod.with_idx_req.tolist())[:, 1]
+        learn_memory_mod['mem_requesters'] = np.array(learn_memory_mod.with_idx_req.tolist())[:, 0]
+        learn_memory_mod['mem_week_t'] = [x + 1 for x in learn_memory_mod.week_t.tolist()]
+
+        # week and month are ready in original version
+        learn_memory_mod['mem_av_weather'] = ""
+
+        for index, row in learn_memory_mod.iterrows():
+
+            # calculating the potencial renewable power of all opponents together in Watts
+            res_now_power_all = 0
+            av_weather = row.loc['av_weather']
+            for vpp_idx in av_weather.keys():
+                vpp_file = self.load_data(data_paths[vpp_idx])
+                ppc0 = cases[vpp_file['case']]()
+                installed_power = np.round(np.sum(ppc0['gen'][1:, 8]), 4)
+
+                res_inst = row['res_inst'][vpp_idx]
+                av_weather_onevpp = row['av_weather'][vpp_idx]
+                res_now_power = installed_power * res_inst * av_weather_onevpp
+                res_now_power_all += res_now_power
+
+            row['mem_av_weather'] = res_now_power_all
+            learn_memory_mod.iloc[index] = row
+
+
+        # select only one for each timestep i.e. when more timesteps exist
+        selection_idx = []
+        for tt in learn_memory_mod['t'].unique():
+            a = learn_memory_mod.loc[learn_memory_mod['t'] == tt]
+            max_bidsaldo_idx = a['bids_saldo'].idxmax()
+            if learn_memory_mod.iloc[max_bidsaldo_idx]['bids_saldo'] == 0:
+                max_bidsaldo_idx += 1
+            selection_idx.append(max_bidsaldo_idx)
+        learn_memory_mod = learn_memory_mod.iloc[selection_idx]
+        learn_memory_mod = learn_memory_mod.reset_index()
+
+        print(learn_memory_mod)
+        sys.exit()
+
+        # save to pickle and csv
+        learn_memory_mod.to_pickle(path_initial_memory)
+        learn_memory_mod.to_csv(path_dir_history + "memory_ln_" + str(my_idx) + "_view.csv") # change it as the path_initial_memory!!!!!!!!!!
+
+        return
