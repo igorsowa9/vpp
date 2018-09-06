@@ -1068,13 +1068,8 @@ class VPP_ext_agent(Agent):
         # Load history
         path_pickle = path_dir_history + "temp_ln_" + str(my_idx) + ".pkl"
         learn_memory = pd.read_pickle(path_pickle)
-        # learn_memory = f.iloc[0:333, :]  # selection if necessary for example if only the first week as learning
+        learn_memory = learn_memory.iloc[0:100, :]  # selection if necessary for example if only the first week as learning
         learn_memory_mod = copy.deepcopy(learn_memory)
-
-        # # TBD: mark the probable marginal prices (mp) through the mp_occurance_factor!!
-        # change_of_deal
-        # print(learn_memory)
-        # sys.exit()
 
         # new columns:
         learn_memory_mod['mem_requests'] = np.array(learn_memory_mod.with_idx_req.tolist())[:, 1]
@@ -1083,6 +1078,7 @@ class VPP_ext_agent(Agent):
 
         # week and month are ready in original version
         learn_memory_mod['mem_av_weather'] = ""
+        learn_memory_mod['mp_factor'] = ""
 
         for index, row in learn_memory_mod.iterrows():
 
@@ -1102,6 +1098,24 @@ class VPP_ext_agent(Agent):
             row['mem_av_weather'] = res_now_power_all
             learn_memory_mod.iloc[index] = row
 
+            ### TBD: mark the probable marginal prices (mp) through the mp_factor!!
+            if not index == 0:
+                # change of deal factor
+                codf = abs(learn_memory_mod.iloc[index]['percent_req'] - learn_memory_mod.iloc[index-1]['percent_req'])
+                # environment change factor
+                ecf =
+
+
+
+
+                row['mp_factor'] = codf
+            else:
+                row['mp_factor'] = 0
+
+            learn_memory_mod.iloc[index] = row
+
+        print(learn_memory_mod[['t', 'bids_saldo', 'pcf', 'mp_factor']])
+        sys.exit()
 
         # select only one for each timestep i.e. when more timesteps exist
         selection_idx = []
@@ -1114,8 +1128,7 @@ class VPP_ext_agent(Agent):
         learn_memory_mod = learn_memory_mod.iloc[selection_idx]
         learn_memory_mod = learn_memory_mod.reset_index()
 
-        print(learn_memory_mod)
-        sys.exit()
+
 
         # save to pickle and csv
         learn_memory_mod.to_pickle(path_initial_memory)
