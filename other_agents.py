@@ -887,13 +887,12 @@ class VPP_ext_agent(Agent):
 
         if not os.path.isfile(path_initial_memory):  # if memory file has not been prepared so far
             self.prepare_initial_memory(t, path_initial_memory)
-            self.log_info("Initial memory prepared and saved.")
+            self.log_info("Initial memory prepared and saved. Marginal prices (their pcfs) estimated.")
         else:
-            self.log_info("Initial memory has been already prepared before.")
+            self.log_info("Initial memory and marginal prices pcfs have been already prepared before.")
 
-        ### Calculate similarity
         fmem = pd.read_pickle(path_initial_memory)
-
+        ### Calculate similarity - prepare other data then memory
         # weather data (necessary for the similarity calculation) should be downloaded from the public data:
         start_date = datetime.strptime(start_datetime, "%d/%m/%Y %H:%M")
         global_delta = timedelta(minutes=t*5)
@@ -917,13 +916,13 @@ class VPP_ext_agent(Agent):
                 po_idx.append(int(i))
             # download the weather forecasts of the prospective opponents
             po_wf = {}
-            res_now_power_all = 0
-            max_res_weather_all = 0
+            res_now_power_all = 0  # like below but for
+            max_res_weather_all = 0  # sums installed (max) power of the RESs in all prospective opponents (to calculate what's the RES weight of single opponent agent)
             for vpp_idx in po_idx:
                 vpp_file = self.load_data(data_paths[vpp_idx])
 
                 ppc0 = cases[vpp_file['case']]()
-                max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])
+                max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])  # this one is as a vector including slack bus
 
                 forecast_max_generation_factor = np.zeros(vpp_file['bus_n'])
                 forecast_max_generation = np.zeros(vpp_file['bus_n'])
@@ -939,10 +938,11 @@ class VPP_ext_agent(Agent):
 
                 stack = np.vstack((max_generation0, forecast_max_generation, generation_type))
                 stack = stack[:, 1:].T
-                res_weather = 0
-                max_res_weather = 0
-                max_other = 0
-                maxp = np.sum(stack[:, 0])
+
+                res_weather = 0  # current sum of RES(weather dependant) production
+                max_res_weather = 0  # installed sum of RES(weather dependant)
+                max_other = 0  # installed sum of non-RES(weather dependant)
+                installed_power = np.sum(stack[:, 0])  # total installed power RES(weather dependant) and non-RES(weather dependant)
                 for s in stack:
                     if s[2] in weather_dependent_sources:
                         res_weather += s[1]
@@ -950,8 +950,8 @@ class VPP_ext_agent(Agent):
                     else:
                         max_other += s[0]
 
-                installed_power = np.round(np.sum(ppc0['gen'][1:, 8]), 4)
-                res_inst = max_res_weather / maxp
+                # installed_power = np.round(np.sum(max_generation0[1:]), 4)
+                res_inst = max_res_weather / installed_power
                 av_weather_onevpp = res_weather / max_res_weather
                 res_now_power = np.round(installed_power * res_inst * av_weather_onevpp, 4)
                 res_now_power_all += res_now_power
@@ -969,7 +969,8 @@ class VPP_ext_agent(Agent):
                 "minute_t": 24 * 60 / 2,
                 "mem_week_t": 1,
                 "month_t": 12 / 2,
-                "mem_av_weather": max_res_weather_all}
+                # "mem_av_weather": max_res_weather_all}
+                "mem_av_weather": np.round(np.abs(fmem['mem_av_weather'].max() - fmem['mem_av_weather'].min()), 4)}
 
             ### calculate similarity for each tuple in the memory:
             # make new column for similarity with zeros:
@@ -1048,16 +1049,6 @@ class VPP_ext_agent(Agent):
                 pcfs = fmem_mod['pcf'].tolist()
                 pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
 
-            # ### ALTERNATIVE:
-            # # select top 30 revenue and choose the most similar one
-            # fmem_mod = fmem_mod.sort_values(by=['bids_saldo'], ascending=False)
-            # fmem_mod = fmem_mod.head(30)
-            # fmem_mod = fmem_mod.sort_values(by=['sim'], ascending=False)
-            # pcf_avg = np.round(fmem_mod['pcf'].tolist()[0], 4)
-
-            print(fmem_mod[['t', 'bids_saldo', 'sim', 'pcf']])
-            # print("pcf_avg: " + str(pcf_avg))
-
             self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
         return pcf_avg
 
@@ -1078,11 +1069,15 @@ class VPP_ext_agent(Agent):
 
         # week and month are ready in original version
         learn_memory_mod['mem_av_weather'] = ""
-        learn_memory_mod['mp_factor'] = ""
 
+        learn_memory_mod['codf'] = ""
+        learn_memory_mod['esf'] = ""
+        learn_memory_mod['mp_factor'] = ""
+        # learn_memory_mod['mp_factor'] = learn_memory_mod['mp_factor'].astype(object)
+
+        # calculating the potential renewable power of all opponents together in Watts
         for index, row in learn_memory_mod.iterrows():
 
-            # calculating the potencial renewable power of all opponents together in Watts
             res_now_power_all = 0
             av_weather = row.loc['av_weather']
             for vpp_idx in av_weather.keys():
@@ -1098,26 +1093,48 @@ class VPP_ext_agent(Agent):
             row['mem_av_weather'] = res_now_power_all
             learn_memory_mod.iloc[index] = row
 
-            ### TBD: mark the probable marginal prices (mp) through the mp_factor!!
-            if not index == 0:
-                # change of deal factor
+        # calculate margina price factors and estimate the marginap prices factors/probabilites
+        min_pcf = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]
+        for index, row in learn_memory_mod.iterrows():
+            if index != 0 and row['pcf'] != min_pcf:
+                # change of deal factor:
                 codf = abs(learn_memory_mod.iloc[index]['percent_req'] - learn_memory_mod.iloc[index-1]['percent_req'])
-                # environment change factor
-                ecf =
-
-
-
-
-                row['mp_factor'] = codf
+                # environment similarity factor (discount):
+                esf = self.environment_similarity_factor(learn_memory_mod, index)
+                mp_factor = np.round(codf * esf, 4)
             else:
-                row['mp_factor'] = 0
-
+                mp_factor = -1
+                codf = -1
+                esf = -1
+            row['mp_factor'] = mp_factor
+            row['codf'] = codf
+            row['esf'] = esf
             learn_memory_mod.iloc[index] = row
 
-        print(learn_memory_mod[['t', 'bids_saldo', 'pcf', 'mp_factor']])
-        sys.exit()
+        learn_memory_mod = learn_memory_mod.sort_values(by='mp_factor', ascending=False)
+        print(learn_memory_mod[['pcf', 'mp_factor']])
 
-        # select only one for each timestep i.e. when more timesteps exist
+        prices_list = np.round(sorted(learn_memory_mod['pcf'].unique()), 4)
+        print(prices_list)
+        # sum for each price
+
+        mp_factor_allsum = np.round(np.sum(learn_memory_mod[learn_memory_mod['mp_factor']>0]['mp_factor'].tolist()), 4)
+
+        # for price in prices_list[0]:
+        mp_factor_price = learn_memory_mod[learn_memory_mod['pcf'] == prices_list[0]]
+        print(mp_factor_price)
+
+        #############################
+        #############################
+        #############################
+        #############################
+        #############################
+
+        sys.exit()
+        # print(learn_memory_mod[['t', 'pcf', 'mem_av_weather', 'codf', 'esf', 'mp_factor']])
+        # sys.exit()
+
+        ### Select only one for each timestep i.e. when more timesteps exist
         selection_idx = []
         for tt in learn_memory_mod['t'].unique():
             a = learn_memory_mod.loc[learn_memory_mod['t'] == tt]
@@ -1128,10 +1145,106 @@ class VPP_ext_agent(Agent):
         learn_memory_mod = learn_memory_mod.iloc[selection_idx]
         learn_memory_mod = learn_memory_mod.reset_index()
 
-
-
         # save to pickle and csv
         learn_memory_mod.to_pickle(path_initial_memory)
         learn_memory_mod.to_csv(path_dir_history + "memory_ln_" + str(my_idx) + "_view.csv") # change it as the path_initial_memory!!!!!!!!!!
 
         return
+
+    def environment_similarity_factor(self, learn_memory_mod, index):
+        """
+        Function should calculate the "difference in the environment" between the t timestep and the t-1 timestep.
+        The environment features are taken the same one like in the similarity calculations for price increase factor
+        :param t:
+        :return:
+        """
+
+        features_weights_esim = {"mem_requests": 0.1,
+                                 "minute_t": 0.15,
+                                 "mem_week_t": 0.15,
+                                 "month_t": 0.0,
+                                 "mem_av_weather": 0.6}
+
+        ##### this part redundant >>>
+        my_idx = data_names_dict[self.name]
+        for r in range(int(self.get_attr('n_requests'))):
+            request_value = self.get_attr("requests")[r]['value']
+            deficit_agent = self.get_attr("requests")[r]['vpp_name']
+            prospective_opponents_idx = np.where(np.array(adj_matrix[data_names_dict[deficit_agent]]) == True)
+            po_idx = []
+            for i in prospective_opponents_idx[0]:
+                if i == my_idx or i == data_names_dict[deficit_agent]:
+                    continue
+                po_idx.append(int(i))
+
+            features_ranges_esim  = {
+                "mem_requests": np.round(np.abs(learn_memory_mod['mem_requests'].max() - learn_memory_mod['mem_requests'].min()), 4),
+                "minute_t": 24 * 60 / 2,
+                "mem_week_t": 1,
+                "month_t": 12 / 2,
+                "mem_av_weather": np.round(np.abs(learn_memory_mod['mem_av_weather'].max() - learn_memory_mod['mem_av_weather'].min()), 4)}
+
+        ##### <<< this part redundant (but shorter)
+
+            features_now = {
+                "mem_requests": learn_memory_mod.iloc[index]['mem_requests'],
+                "minute_t": learn_memory_mod.iloc[index]['minute_t'],
+                "mem_week_t": learn_memory_mod.iloc[index]['mem_week_t'],
+                "month_t": learn_memory_mod.iloc[index]['month_t'],
+                "mem_av_weather": learn_memory_mod.iloc[index]['mem_av_weather']}
+
+            features_before = {
+                "mem_requests": learn_memory_mod.iloc[index-1]['mem_requests'],
+                "minute_t": learn_memory_mod.iloc[index-1]['minute_t'],
+                "mem_week_t": learn_memory_mod.iloc[index-1]['mem_week_t'],
+                "month_t": learn_memory_mod.iloc[index-1]['month_t'],
+                "mem_av_weather": learn_memory_mod.iloc[index-1]['mem_av_weather']}
+
+            # print(features_now)
+            # print(features_before)
+
+            ### calculate similarity for each tuple in the memory:
+
+            sim_sum = 0
+            for label in features_weights_esim.keys():
+                now = features_now[label]
+                mem = features_before[label]
+                weight = features_weights_esim[label]
+                ran = features_ranges_esim[label]
+
+                # print("label: " + str(label))
+                # print("now: " + str(now))
+                # print("mem: " + str(mem))
+                # print("weight: " + str(weight))
+                # print("range: " + str(ran))
+
+                if label == "minute_t":
+                    diff = min(min(now, mem) + 60 * 24 - max(now, mem), abs(now - mem))
+                elif label == "mem_week_t":
+                    if (now in [1, 2, 3, 4, 5] and mem in [6, 7]) or (now in [6, 7] and mem in [1, 2, 3, 4, 5]):
+                        diff = 1
+                    elif (now == 6 and mem == 7) or (now == 6 and mem == 7):
+                        diff = 0.2
+                    elif now == mem:
+                        diff = 0
+                    else:
+                        diff = 0.1
+                elif label == "month_t":
+                    diff = min(min(now, mem) + 12 - max(now, mem), abs(now - mem))
+                else:
+                    diff = abs(now - mem)
+
+                ratio = diff / ran
+                sim1 = weight * (1 - ratio)
+                sim_sum += sim1
+
+            #     print("diff: " + str(diff))
+            #     print("ratio: " + str(ratio))
+            #     print("sim1: " + str(sim1))
+            #     print("\n")
+            #
+            # print(sim_sum)
+            # print("\n\n")
+
+            return sim_sum
+
