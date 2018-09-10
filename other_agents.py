@@ -190,6 +190,7 @@ class VPP_ext_agent(Agent):
         if type(price_increase_factor) == list:
 
             currmem = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
+
             # t_range = np.arange(t - max_ts_range_for_price_modification, t)
             rows_range = currmem.tail(max_ts_range_for_price_modification)
 
@@ -236,6 +237,8 @@ class VPP_ext_agent(Agent):
         a = 'OFF'
         if exploit and self.name in vpp_exploit:
             self.log_info("I will apply memory through similarity.")
+            if update_during_exploit:
+                self.log_info("Live update_during_exploit is on!")
             price_increase_factor = self.similarity(t)
             a = 'ON'
 
@@ -658,10 +661,8 @@ class VPP_ext_agent(Agent):
     def save_if_deficit(self, global_time):
 
         memory = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
-
         my_deficit = self.get_attr('opf1')['power_balance']
         received_pc = self.get_attr('opfd2')['received_pc']
-
         marginal_price = 0
         for deal in self.get_attr('timestep_memory_mydeals'):
             if np.max(deal[1][:, 3]) > marginal_price:
@@ -673,22 +674,19 @@ class VPP_ext_agent(Agent):
                                 'final_deals': self.get_attr('timestep_memory_mydeals'),
                                 'marginal_price': marginal_price
                                 }, ignore_index=True)
-
         memory = memory[['t',
                          'my_deficit',
                          'received_pc',  # all received original price curves by the excess agents as response to request
                          'final_deals',
                          'marginal_price']]
 
-        # self.set_attr(learning_memory=memory)
         memory.to_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
         self.log_info("My learning memory updated (saved to file)")
 
         return
 
 
-
-    def save_deal_to_memory(self, deal, global_time, req_alias):
+    def save_deal_to_memory(self, deal, global_time, req_alias, memory_update=False):
         """
         "with_idx": memory based on the deal with this VPP
         "success": successful negotiation of failure, for deal is ofc successful
@@ -706,9 +704,6 @@ class VPP_ext_agent(Agent):
         :return:
         """
         myself = self.name
-
-        # self.log_info("save_deal_to_memory, d: " + str(deal))
-        # self.log_info("save_deal_to_memory, req_alias: " + str(req_alias))
 
         # memory = self.get_attr("learning_memory") <------------ now from file
         memory = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
@@ -732,8 +727,6 @@ class VPP_ext_agent(Agent):
         current_time = start_date + global_delta
 
         # download the weather forecast of the opponents
-        # known:        installed generators' power and forecasted max power factors
-        # not known:    loads, prices, topology
 
         po_wf = {}
         res_installed_power_factor = {}
@@ -790,7 +783,7 @@ class VPP_ext_agent(Agent):
                 ton = []
 
             # create the record
-            memory = memory.append({'with_idx_req': np.array([int(data_names_dict[deal_with]), req_value]),
+            to_append = {'with_idx_req': np.array([int(data_names_dict[deal_with]), req_value]),
                                     'success': True,   # its based on successful deals so far only
                                     'n_it': self.get_attr('n_iteration') + 1,
                                     'n_ref': "tbd",
@@ -811,13 +804,51 @@ class VPP_ext_agent(Agent):
                                     'res_inst': res_installed_power_factor,
                                     'av_weather': av_weather_factor,
                                     'ton': ton
-                                    }, ignore_index=True)
+                                    }
+
+            if memory_update and self.name in vpp_exploit:  # if it is update of the memory, during exploitation, after initial preparation
+
+                res_now_power_all = 0
+                for vpp_idx in av_weather_factor.keys():
+                    vpp_file = self.load_data(data_paths[vpp_idx])
+                    ppc0 = cases[vpp_file['case']]()
+                    installed_power = np.round(np.sum(ppc0['gen'][1:, 8]), 4)
+
+                    res_inst = res_installed_power_factor[vpp_idx]
+                    av_weather_onevpp = av_weather_factor[vpp_idx]
+                    res_now_power = installed_power * res_inst * av_weather_onevpp
+                    res_now_power_all += res_now_power
+
+                # for index, row in learn_memory_mod.iterrows():
+                #     if index != 0 and row['pcf'] != min_pcf:
+                #         # change of deal factor:
+                #         codf = abs(learn_memory_mod.iloc[index]['percent_req'] - learn_memory_mod.iloc[index - 1][
+                #             'percent_req'])
+                #         # environment similarity factor (discount):
+                #         esf = self.environment_similarity_factor(learn_memory_mod, index)
+                #         mp_factor = np.round(codf * esf, 4)
+                #     else:
+                #         mp_factor = -1
+                #         codf = -1
+                #         esf = -1
+                #     row['mp_factor'] = mp_factor
+                #     row['codf'] = codf
+                #     row['esf'] = esf
+
+                to_append.update({'mem_requests': req_value,
+                                    'mem_requesters': int(data_names_dict[deal_with]),
+                                    'mem_week_t': int(current_time.weekday()) + 1,
+                                    'mem_av_weather': res_now_power_all,
+                                    'codf': 1,
+                                    'esf': 1,
+                                    'mp_factor': 1
+                                  })
 
         else:  # there were no deal on that request:
 
             price_minimum = min(self.get_attr('pc_memory_exc')[self.get_attr('n_iteration')]['all'][:, 2])
 
-            memory = memory.append({'with_idx_req': np.array([int(data_names_dict[req_alias]), req_value]),
+            to_append = {'with_idx_req': np.array([int(data_names_dict[req_alias]), req_value]),
                                     'success': False,  # its based on successful deals so far only
                                     'n_it': self.get_attr('n_iteration') + 1,
                                     'n_ref': "tbd",
@@ -838,8 +869,31 @@ class VPP_ext_agent(Agent):
                                     'res_inst': res_installed_power_factor,
                                     'av_weather': av_weather_factor,
                                     'ton': ton
-                                    }, ignore_index=True)
+                                    }
 
+            if memory_update and self.name in vpp_exploit:  # if it is update of the memory, during exploitation, after initial preparation
+
+                res_now_power_all = 0
+                for vpp_idx in av_weather_factor.keys():
+                    vpp_file = self.load_data(data_paths[vpp_idx])
+                    ppc0 = cases[vpp_file['case']]()
+                    installed_power = np.round(np.sum(ppc0['gen'][1:, 8]), 4)
+
+                    res_inst = res_installed_power_factor[vpp_idx]
+                    av_weather_onevpp = av_weather_factor[vpp_idx]
+                    res_now_power = installed_power * res_inst * av_weather_onevpp
+                    res_now_power_all += res_now_power
+
+                to_append.update({'mem_requests': req_value,
+                                    'mem_requesters': int(data_names_dict[req_alias]),
+                                    'mem_week_t': int(current_time.weekday()) + 1,
+                                    'mem_av_weather': res_now_power_all,
+                                    'codf': -1,
+                                    'esf': -1,
+                                    'mp_factor': -1
+                                  })
+
+        memory = memory.append(to_append, ignore_index=True)
         memory = memory[['with_idx_req',  # id of the vpp that we negotiate with and its request value
                          'success',  # success 1 or 0 failure
                          'n_it',  # number of iteration in the negotiation
@@ -862,10 +916,20 @@ class VPP_ext_agent(Agent):
                          'av_weather',  # factors based on installed power and forecasts
                          'ton']]  # topology of negotiation
 
-        # self.set_attr(learning_memory=memory)
         memory.to_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
-        self.log_info("My learning memory updated (saved to file)")
+        self.log_info("My learning memory updated (with exploration negotiation)")
 
+        if memory_update and self.name in vpp_exploit:
+            updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
+            if not os.path.isfile(updated_memory_path):
+                initial_history = pd.read_pickle(path_dir_history + "memory_ln_" + str(data_names_dict[self.name]) + ".pkl")
+                initial_history.to_pickle(updated_memory_path)
+            else:
+                updated_memory = pd.read_pickle(updated_memory_path)
+                updated_memory = updated_memory.append(to_append, ignore_index=True)
+                updated_memory.to_pickle(updated_memory_path)
+                updated_memory.to_csv(path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + "_view.csv")
+                self.log_info("My learning memory (updated_memory) updated with current (exploitation) negotiation.")
         return
 
     def similarity(self, t):
@@ -1060,7 +1124,7 @@ class VPP_ext_agent(Agent):
         # Load history
         path_pickle = path_dir_history + "temp_ln_" + str(my_idx) + ".pkl"
         learn_memory = pd.read_pickle(path_pickle)
-        # learn_memory = learn_memory.iloc[0:200, :]  # selection if necessary for example if only the first week as learning
+        # learn_memory = learn_memory.iloc[0:333, :]  # selection if necessary for example if only the first week as learning
         learn_memory_mod = copy.deepcopy(learn_memory)
 
         # new columns:
@@ -1096,7 +1160,7 @@ class VPP_ext_agent(Agent):
 
         # calculate margina price factors and estimate the marginap prices factors/probabilites
         min_pcf = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]
-        min_pcf = 1.1
+        # min_pcf = 1.1
         print("MIN_PCF=" + str(min_pcf) + ". If different then in the learning memory then should be adjusted !!!")
         for index, row in learn_memory_mod.iterrows():
             if index != 0 and row['pcf'] != min_pcf:
@@ -1114,17 +1178,12 @@ class VPP_ext_agent(Agent):
             row['esf'] = esf
             learn_memory_mod.iloc[index] = row
 
-        learn_memory_mod = learn_memory_mod.sort_values(by='mp_factor', ascending=False)
-        print(learn_memory_mod[['pcf', 'mp_factor']])
-
-        # prices_list = sorted(learn_memory_mod['pcf'].unique())
-        # print(prices_list)
-        # sum for each price
+        # learn_memory_mod = learn_memory_mod.sort_values(by='mp_factor', ascending=False)
+        # print(learn_memory_mod[['pcf', 'mp_factor']])
 
         mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
-        print("SUM: " + str(mp_factors_allsum))
+        # print("SUM: " + str(mp_factors_allsum))
         pcfs_list = learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['pcf'].unique()  # only pcf where mp_factor is >0 in whole set
-        # print(pcfs_list)
 
         pcfs_column = []
         mp_factor_avg_column = []
@@ -1140,36 +1199,27 @@ class VPP_ext_agent(Agent):
             # print(str(mp_factor_forpcf['pcf'].unique()) + ":  " + str(mp_factor_wight))
 
         mpf_frame = pd.DataFrame(data={'pcfs_column': pcfs_column, 'mp_factor_avg_column': mp_factor_avg_column})
-        mpf_frame = mpf_frame.sort_values(by=['mp_factor_avg_column'], ascending=False)
+        # mpf_frame = mpf_frame.sort_values(by=['mp_factor_avg_column'], ascending=False)
+        # print(mpf_frame)
+        # mpf_frame.to_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
+        mpf_frame.to_csv(path_dir_history + "mp_belief_ln_" + str(my_idx) + "_view.csv")
 
-        print(mpf_frame)
-
-
-        #############################
-        #############################
-        #############################
-        #############################
-        #############################
-
-        sys.exit()
-        # print(learn_memory_mod[['t', 'pcf', 'mem_av_weather', 'codf', 'esf', 'mp_factor']])
-        # sys.exit()
-
-        ### Select only one for each timestep i.e. when more timesteps exist
-        selection_idx = []
-        for tt in learn_memory_mod['t'].unique():
-            a = learn_memory_mod.loc[learn_memory_mod['t'] == tt]
-            max_bidsaldo_idx = a['bids_saldo'].idxmax()
-            if learn_memory_mod.iloc[max_bidsaldo_idx]['bids_saldo'] == 0:
-                max_bidsaldo_idx += 1
-            selection_idx.append(max_bidsaldo_idx)
-        learn_memory_mod = learn_memory_mod.iloc[selection_idx]
-        learn_memory_mod = learn_memory_mod.reset_index()
+        # ### Select only one for each timestep i.e. when more timesteps exist
+        # selection_idx = []
+        # for tt in learn_memory_mod['t'].unique():
+        #     a = learn_memory_mod.loc[learn_memory_mod['t'] == tt]
+        #     max_bidsaldo_idx = a['bids_saldo'].idxmax()
+        #     if learn_memory_mod.iloc[max_bidsaldo_idx]['bids_saldo'] == 0:
+        #         max_bidsaldo_idx += 1
+        #     selection_idx.append(max_bidsaldo_idx)
+        # print(selection_idx)
+        # learn_memory_mod = learn_memory_mod.iloc[selection_idx]
+        # learn_memory_mod = learn_memory_mod.reset_index()
 
         # save to pickle and csv
         learn_memory_mod.to_pickle(path_initial_memory)
         learn_memory_mod.to_csv(path_dir_history + "memory_ln_" + str(my_idx) + "_view.csv") # change it as the path_initial_memory!!!!!!!!!!
-
+        sys.exit()
         return
 
     def environment_similarity_factor(self, learn_memory_mod, index):

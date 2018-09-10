@@ -166,10 +166,10 @@ def system_consensus_check(ns, global_time):
                         for d in deals_memory:
                             deal_alias = d[0]
                             if deal_alias == req_alias:
-                                a.save_deal_to_memory(d, global_time, req_alias)
+                                a.save_deal_to_memory(d, global_time, req_alias, update_during_exploit)
                                 deal_exist = True
                         if not deal_exist:
-                            a.save_deal_to_memory(False, global_time, req_alias)
+                            a.save_deal_to_memory(False, global_time, req_alias, update_during_exploit)
 
             else:# a.get_attr('opf1')['max_excess'] == 0 and a.get_attr('opf1')['power_balance'] > 0:  # if I am deficit agent
 
@@ -472,14 +472,4 @@ def save_learning_memory(tocsv):
 
         if tocsv:
             memory.to_csv(path_save + str(vpp_idx) + "_" + directory_tail + ".csv")
-            # memory.to_csv(path_save + str(vpp_idx) + "_v2" + ".csv")
-            #
-            # in_file = open(path_save + str(vpp_idx) + ".csv", 'rb')
-            # reader = csv.reader(in_file)
-            # out_file = open(path_save + str(vpp_idx) + "_v2" + ".csv")
-            # writer = csv.writer(out_file)
-            # for row in reader:
-            #     row[0] = directory_tail
-            #     writer.writerow(row)
-            # in_file.close()
-            # out_file.close()
+
