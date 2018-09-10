@@ -19,8 +19,8 @@ start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already 
 exploit = True
 update_during_exploit = True
 # the path to the folder where the exploration results are saved:
-path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0830_1544_week1_multi_oneshot_10/'
-# path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0822_1555_week1-2/'
+# path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0830_1544_week1_multi_oneshot_10/'
+path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0822_1555_week1-2/'
 
 # if set to more then 1, during the exploration, the learning agent has more than one try to propose an offer with the
 # exactly same conditions of environment, i.e. explore the opponent / environemnt better

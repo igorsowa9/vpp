@@ -1044,7 +1044,8 @@ class VPP_ext_agent(Agent):
             fmem_mod = fmem_mod.head(top_selection_quantity)
             # 4) calculate average of pcfs of all selected cases with that similarity
             if fmem_mod.empty:
-                pcf_avg = 1.1
+                pcf_avg = self.load_data(data_paths[data_names_dict[self.name]])[
+            'pc_matrix_price_increase_factor'][0]
             else:
                 pcfs = fmem_mod['pcf'].tolist()
                 pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
@@ -1059,7 +1060,7 @@ class VPP_ext_agent(Agent):
         # Load history
         path_pickle = path_dir_history + "temp_ln_" + str(my_idx) + ".pkl"
         learn_memory = pd.read_pickle(path_pickle)
-        learn_memory = learn_memory.iloc[0:100, :]  # selection if necessary for example if only the first week as learning
+        # learn_memory = learn_memory.iloc[0:200, :]  # selection if necessary for example if only the first week as learning
         learn_memory_mod = copy.deepcopy(learn_memory)
 
         # new columns:
@@ -1095,6 +1096,8 @@ class VPP_ext_agent(Agent):
 
         # calculate margina price factors and estimate the marginap prices factors/probabilites
         min_pcf = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]
+        min_pcf = 1.1
+        print("MIN_PCF=" + str(min_pcf) + ". If different then in the learning memory then should be adjusted !!!")
         for index, row in learn_memory_mod.iterrows():
             if index != 0 and row['pcf'] != min_pcf:
                 # change of deal factor:
@@ -1114,15 +1117,33 @@ class VPP_ext_agent(Agent):
         learn_memory_mod = learn_memory_mod.sort_values(by='mp_factor', ascending=False)
         print(learn_memory_mod[['pcf', 'mp_factor']])
 
-        prices_list = np.round(sorted(learn_memory_mod['pcf'].unique()), 4)
-        print(prices_list)
+        # prices_list = sorted(learn_memory_mod['pcf'].unique())
+        # print(prices_list)
         # sum for each price
 
-        mp_factor_allsum = np.round(np.sum(learn_memory_mod[learn_memory_mod['mp_factor']>0]['mp_factor'].tolist()), 4)
+        mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
+        print("SUM: " + str(mp_factors_allsum))
+        pcfs_list = learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['pcf'].unique()  # only pcf where mp_factor is >0 in whole set
+        # print(pcfs_list)
 
-        # for price in prices_list[0]:
-        mp_factor_price = learn_memory_mod[learn_memory_mod['pcf'] == prices_list[0]]
-        print(mp_factor_price)
+        pcfs_column = []
+        mp_factor_avg_column = []
+        for pcf in pcfs_list:
+
+            mp_factor_forpcf = learn_memory_mod[learn_memory_mod['pcf'] == pcf]
+            mp_factor_forpcf_sum = np.sum(mp_factor_forpcf['mp_factor'])
+            mp_factor_wight = np.round((mp_factor_forpcf_sum / mp_factors_allsum), 4)
+
+            pcfs_column.append(pcf)
+            mp_factor_avg_column.append(mp_factor_wight)
+
+            # print(str(mp_factor_forpcf['pcf'].unique()) + ":  " + str(mp_factor_wight))
+
+        mpf_frame = pd.DataFrame(data={'pcfs_column': pcfs_column, 'mp_factor_avg_column': mp_factor_avg_column})
+        mpf_frame = mpf_frame.sort_values(by=['mp_factor_avg_column'], ascending=False)
+
+        print(mpf_frame)
+
 
         #############################
         #############################
