@@ -923,13 +923,15 @@ class VPP_ext_agent(Agent):
             updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
             if not os.path.isfile(updated_memory_path):
                 initial_history = pd.read_pickle(path_dir_history + "memory_ln_" + str(data_names_dict[self.name]) + ".pkl")
-                initial_history.to_pickle(updated_memory_path)
+                updated_memory = initial_history.append(to_append, ignore_index=True)
+                updated_memory.to_pickle(updated_memory_path)
+                updated_memory.to_csv(path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + "_view.csv")
             else:
                 updated_memory = pd.read_pickle(updated_memory_path)
                 updated_memory = updated_memory.append(to_append, ignore_index=True)
                 updated_memory.to_pickle(updated_memory_path)
                 updated_memory.to_csv(path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + "_view.csv")
-                self.log_info("My learning memory (updated_memory) updated with current (exploitation) negotiation.")
+            self.log_info("My learning memory (updated_memory) updated with current (exploitation) negotiation.")
         return
 
     def similarity(self, t):
@@ -948,14 +950,25 @@ class VPP_ext_agent(Agent):
         ### Prepare initial memory - change values in cells for the needs (only once)
         # choose only one if there are more negotiation for the same timestep! (e.g. the highest revenue one)
         path_initial_memory = path_dir_history + "memory_ln_" + str(my_idx) + ".pkl"
+        updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
 
         if not os.path.isfile(path_initial_memory):  # if memory file has not been prepared so far
             self.prepare_initial_memory(t, path_initial_memory)
             self.log_info("Initial memory prepared and saved. Marginal prices (their pcfs) estimated.")
+            fmem = pd.read_pickle(path_initial_memory)
         else:
             self.log_info("Initial memory and marginal prices pcfs have been already prepared before.")
+            if not os.path.isfile(updated_memory_path):
+                initial_history = pd.read_pickle(path_initial_memory)
+                initial_history.to_pickle(updated_memory_path)
+                initial_history.to_csv(path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + "_view.csv")
+                fmem = pd.read_pickle(updated_memory_path)
+            else:
+                fmem = pd.read_pickle(updated_memory_path)
 
-        fmem = pd.read_pickle(path_initial_memory)
+        print("TAIL: ")
+        print(fmem.tail(5))
+
         ### Calculate similarity - prepare other data then memory
         # weather data (necessary for the similarity calculation) should be downloaded from the public data:
         start_date = datetime.strptime(start_datetime, "%d/%m/%Y %H:%M")
@@ -1106,6 +1119,8 @@ class VPP_ext_agent(Agent):
             self.get_attr("similar_cases_chosen").update({deficit_agent: fmem_mod.shape[0]})
             # 3) select top X in in bids_saldo
             fmem_mod = fmem_mod.head(top_selection_quantity)
+            print("SIM HEAD: ")
+            print(fmem_mod[['t', 'sim', 'pcf']])
             # 4) calculate average of pcfs of all selected cases with that similarity
             if fmem_mod.empty:
                 pcf_avg = self.load_data(data_paths[data_names_dict[self.name]])[
@@ -1115,6 +1130,7 @@ class VPP_ext_agent(Agent):
                 pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
 
             self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
+            print("pcf_avg: " + str(pcf_avg) + "\n\n")
         return pcf_avg
 
     def prepare_initial_memory(self, t, path_initial_memory):
@@ -1124,7 +1140,7 @@ class VPP_ext_agent(Agent):
         # Load history
         path_pickle = path_dir_history + "temp_ln_" + str(my_idx) + ".pkl"
         learn_memory = pd.read_pickle(path_pickle)
-        # learn_memory = learn_memory.iloc[0:333, :]  # selection if necessary for example if only the first week as learning
+        # learn_memory = learn_memory.iloc[0:100, :]  # selection if necessary for example if only the first week as learning
         learn_memory_mod = copy.deepcopy(learn_memory)
 
         # new columns:
@@ -1179,10 +1195,8 @@ class VPP_ext_agent(Agent):
             learn_memory_mod.iloc[index] = row
 
         # learn_memory_mod = learn_memory_mod.sort_values(by='mp_factor', ascending=False)
-        # print(learn_memory_mod[['pcf', 'mp_factor']])
 
         mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
-        # print("SUM: " + str(mp_factors_allsum))
         pcfs_list = learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['pcf'].unique()  # only pcf where mp_factor is >0 in whole set
 
         pcfs_column = []
@@ -1196,30 +1210,27 @@ class VPP_ext_agent(Agent):
             pcfs_column.append(pcf)
             mp_factor_avg_column.append(mp_factor_wight)
 
-            # print(str(mp_factor_forpcf['pcf'].unique()) + ":  " + str(mp_factor_wight))
-
         mpf_frame = pd.DataFrame(data={'pcfs_column': pcfs_column, 'mp_factor_avg_column': mp_factor_avg_column})
         # mpf_frame = mpf_frame.sort_values(by=['mp_factor_avg_column'], ascending=False)
         # print(mpf_frame)
         # mpf_frame.to_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
         mpf_frame.to_csv(path_dir_history + "mp_belief_ln_" + str(my_idx) + "_view.csv")
 
-        # ### Select only one for each timestep i.e. when more timesteps exist
-        # selection_idx = []
-        # for tt in learn_memory_mod['t'].unique():
-        #     a = learn_memory_mod.loc[learn_memory_mod['t'] == tt]
-        #     max_bidsaldo_idx = a['bids_saldo'].idxmax()
-        #     if learn_memory_mod.iloc[max_bidsaldo_idx]['bids_saldo'] == 0:
-        #         max_bidsaldo_idx += 1
-        #     selection_idx.append(max_bidsaldo_idx)
-        # print(selection_idx)
-        # learn_memory_mod = learn_memory_mod.iloc[selection_idx]
-        # learn_memory_mod = learn_memory_mod.reset_index()
+        ### Select only one for each timestep i.e. when more timesteps exist
+        selection_idx = []
+        for tt in learn_memory_mod['t'].unique():
+            a = learn_memory_mod.loc[learn_memory_mod['t'] == tt]
+            max_bidsaldo_idx = a['bids_saldo'].idxmax()
+            if learn_memory_mod.iloc[max_bidsaldo_idx]['bids_saldo'] == 0:
+                max_bidsaldo_idx += 1
+            selection_idx.append(max_bidsaldo_idx)
+        print(selection_idx)
+        learn_memory_mod = learn_memory_mod.iloc[selection_idx]
+        learn_memory_mod = learn_memory_mod.reset_index()
 
         # save to pickle and csv
         learn_memory_mod.to_pickle(path_initial_memory)
         learn_memory_mod.to_csv(path_dir_history + "memory_ln_" + str(my_idx) + "_view.csv") # change it as the path_initial_memory!!!!!!!!!!
-        sys.exit()
         return
 
     def environment_similarity_factor(self, learn_memory_mod, index):
