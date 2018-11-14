@@ -839,8 +839,8 @@ class VPP_ext_agent(Agent):
                                     'mem_requesters': int(data_names_dict[deal_with]),
                                     'mem_week_t': int(current_time.weekday()) + 1,
                                     'mem_av_weather': res_now_power_all,
-                                    'codf': 1,
-                                    'esf': 1,
+                                    'codf': 1,  # change of deal factor -> there is no deal now to compare with
+                                    'esf': 1,  # environment similarity factor (discount)
                                     'mp_factor': 1
                                   })
 
@@ -1046,8 +1046,8 @@ class VPP_ext_agent(Agent):
                 "minute_t": 24 * 60 / 2,
                 "mem_week_t": 1,
                 "month_t": 12 / 2,
-                # "mem_av_weather": max_res_weather_all}
-                "mem_av_weather": np.round(np.abs(fmem['mem_av_weather'].max() - fmem['mem_av_weather'].min()), 4)}
+                "mem_av_weather": max_res_weather_all}
+                # "mem_av_weather": np.round(np.abs(fmem['mem_av_weather'].max() - fmem['mem_av_weather'].min()), 4)}
 
             ### calculate similarity for each tuple in the memory:
             # make new column for similarity with zeros:
@@ -1107,7 +1107,7 @@ class VPP_ext_agent(Agent):
             ### Choosing the best option and price for the proposal
 
             # 0) save original memory to file
-            fmem.to_csv(path_save + "_temp_step0.csv")
+            fmem.to_csv(path_save + "_temp_pre-sorting_memory.csv")
 
             # 1) exclude unsuccessful ones
             select = fmem.index[fmem['bids_saldo'] == 0].tolist()
@@ -1117,10 +1117,12 @@ class VPP_ext_agent(Agent):
             fmem_mod = fmem_mod.loc[fmem_mod['sim'] > similarity_treshold]
             fmem_mod = fmem_mod.sort_values(by=[order_by], ascending=False)
             self.get_attr("similar_cases_chosen").update({deficit_agent: fmem_mod.shape[0]})
+
             # 3) select top X in in bids_saldo
             fmem_mod = fmem_mod.head(top_selection_quantity)
             print("SIM HEAD: ")
             print(fmem_mod[['t', 'sim', 'pcf']])
+
             # 4) calculate average of pcfs of all selected cases with that similarity
             if fmem_mod.empty:
                 pcf_avg = self.load_data(data_paths[data_names_dict[self.name]])[
@@ -1128,6 +1130,14 @@ class VPP_ext_agent(Agent):
             else:
                 pcfs = fmem_mod['pcf'].tolist()
                 pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
+
+            # 5) check the belief about the marginal prices
+            mp_factor_table = pd.read_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
+            mp_belief_treshold = 0.05
+            mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg_column'] > mp_belief_treshold]
+            mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg_column'], ascending=False)
+            print("mp_factor_table: ")
+            print(mp_factor_table[['pcfs_column', 'mp_factor_avg_column']])
 
             self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
             print("pcf_avg: " + str(pcf_avg) + "\n\n")
@@ -1174,7 +1184,7 @@ class VPP_ext_agent(Agent):
             row['mem_av_weather'] = res_now_power_all
             learn_memory_mod.iloc[index] = row
 
-        # calculate margina price factors and estimate the marginap prices factors/probabilites
+        # calculate margina price factors and estimate the marginal prices factors/probabilites
         min_pcf = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]
         # min_pcf = 1.1
         print("MIN_PCF=" + str(min_pcf) + ". If different then in the learning memory then should be adjusted !!!")
@@ -1213,7 +1223,7 @@ class VPP_ext_agent(Agent):
         mpf_frame = pd.DataFrame(data={'pcfs_column': pcfs_column, 'mp_factor_avg_column': mp_factor_avg_column})
         # mpf_frame = mpf_frame.sort_values(by=['mp_factor_avg_column'], ascending=False)
         # print(mpf_frame)
-        # mpf_frame.to_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
+        mpf_frame.to_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
         mpf_frame.to_csv(path_dir_history + "mp_belief_ln_" + str(my_idx) + "_view.csv")
 
         ### Select only one for each timestep i.e. when more timesteps exist
