@@ -965,9 +965,9 @@ class VPP_ext_agent(Agent):
                 fmem = pd.read_pickle(updated_memory_path)
             else:
                 fmem = pd.read_pickle(updated_memory_path)
-
-        print("TAIL: ")
-        print(fmem.tail(5))
+        sys.exit()
+        # print("TAIL: ")
+        # print(fmem.tail(5))
 
         ### Calculate similarity - prepare other data then memory
         # weather data (necessary for the similarity calculation) should be downloaded from the public data:
@@ -1132,15 +1132,41 @@ class VPP_ext_agent(Agent):
                 pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
 
             # 5) check the belief about the marginal prices
-            mp_factor_table = pd.read_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
-            mp_belief_treshold = 0.05
-            mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg_column'] > mp_belief_treshold]
-            mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg_column'], ascending=False)
-            print("mp_factor_table: ")
-            print(mp_factor_table[['pcfs_column', 'mp_factor_avg_column']])
+            if do_not_exceed_mp_belief:
+                print("mp_factor_table limits matter! ")
+                print("pcf_avg before considering MP limits: " + str(pcf_avg))
 
-            self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
-            print("pcf_avg: " + str(pcf_avg) + "\n\n")
+                mp_factor_table = pd.read_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
+                mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg_column'] > mp_belief_treshold]
+                mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg_column'], ascending=False)
+
+                # print("mp_factor_table: ")
+                # print(mp_factor_table[['pcfs_column', 'mp_factor_avg_column']])
+
+                mp_limits = np.round(mp_factor_table['pcfs_column'].tolist(), 4)
+                # print("mp_limits: " + str(mp_limits))
+
+                for mp_limit in mp_limits:
+                    if exceeding_or_vicinity == True: # see the settings description
+                        mpl_down = mp_limit  # THE price is the limit
+                    else:
+                        mpl_down = np.round(mp_limit*(1-mp_belief_range), 4)  # see the settings description
+
+                    mpl_up = np.round(mp_limit*(1+mp_belief_range), 4)
+                    print("Consideration limits: " + str(mpl_down) + "; " + str(mpl_up))
+
+                    if pcf_avg>=mpl_down and pcf_avg<=mpl_up:
+                        pcf_resolution = np.round(self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]-1,4)
+                        print("pcf_avg in the range of considered MP limits!")
+                        print("pcf_resolution: " + str(pcf_resolution))
+                        new_pcf = mp_limit - pcf_resolution
+                        print("pcf_avg after considering MP limits: " + str(new_pcf))
+                        pcf_avg = np.round(new_pcf, 4)
+                        break
+
+                self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
+                print("pcf_avg: " + str(pcf_avg) + "\n\n")
+
         return pcf_avg
 
     def prepare_initial_memory(self, t, path_initial_memory):
@@ -1166,6 +1192,15 @@ class VPP_ext_agent(Agent):
         learn_memory_mod['mp_factor'] = ""
         # learn_memory_mod['mp_factor'] = learn_memory_mod['mp_factor'].astype(object)
 
+
+        # additional factors:
+        # 1) if percent_request increases
+        # 2) if we sell anyway 100% of our excess, it is not MP
+        learn_memory_mod['percent_of_excess_sold'] = ""
+        # 3) if the decrease of request and decrease of deal are the same, ration ~1, it is not due to MP
+        learn_memory_mod['change_of_request_to_change_of_deal'] = ""
+
+
         # calculating the potential renewable power of all opponents together in Watts
         for index, row in learn_memory_mod.iterrows():
 
@@ -1184,41 +1219,70 @@ class VPP_ext_agent(Agent):
             row['mem_av_weather'] = res_now_power_all
             learn_memory_mod.iloc[index] = row
 
-        # calculate margina price factors and estimate the marginal prices factors/probabilites
+        #### Calculate margina price factors (mp_factor) and estimate the marginal prices factors/probabilites
+
         min_pcf = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]
         # min_pcf = 1.1
         print("MIN_PCF=" + str(min_pcf) + ". If different then in the learning memory then should be adjusted !!!")
         for index, row in learn_memory_mod.iterrows():
             if index != 0 and row['pcf'] != min_pcf:
-                # change of deal factor:
-                codf = abs(learn_memory_mod.iloc[index]['percent_req'] - learn_memory_mod.iloc[index-1]['percent_req'])
-                # environment similarity factor (discount):
+
+                # change of (successful) deal factor:
+                codf = -1*(learn_memory_mod.iloc[index]['percent_req'] - learn_memory_mod.iloc[index-1]['percent_req'])
+
+                my_excess = np.sum(np.array(learn_memory_mod.iloc[index]['my_excess'])[:, 1])
+                percent_of_excess_sold = learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']/my_excess
+
+                change_of_request_to_change_of_deal = (learn_memory_mod.iloc[index]['mem_requests']-learn_memory_mod.iloc[index-1]['mem_requests'])/\
+                                         (learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']-
+                                          learn_memory_mod.iloc[index-1]['percent_req']*learn_memory_mod.iloc[index-1]['mem_requests'])
+
+                # environment similarity factor (discount of codf due to the change of environment):
                 esf = self.environment_similarity_factor(learn_memory_mod, index)
                 mp_factor = np.round(codf * esf, 4)
+
+                if codf < 0:
+                    mp_factor = -1
+
+                if percent_of_excess_sold > 0.99 and percent_of_excess_sold < 1.01:
+                    mp_factor = -1
+
+                if change_of_request_to_change_of_deal > 0.99 and change_of_request_to_change_of_deal < 1.01:
+                    mp_factor = -1
+
             else:
                 mp_factor = -1
                 codf = -1
                 esf = -1
+                change_of_request_to_change_of_deal = -1
+                percent_of_excess_sold = -1
+
             row['mp_factor'] = mp_factor
             row['codf'] = codf
             row['esf'] = esf
+            row['change_of_request_to_change_of_deal'] = change_of_request_to_change_of_deal
+            row['percent_of_excess_sold'] = percent_of_excess_sold
+
             learn_memory_mod.iloc[index] = row
 
         # learn_memory_mod = learn_memory_mod.sort_values(by='mp_factor', ascending=False)
 
+        ### Make a belief table based on mp_factors
         mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
         pcfs_list = learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['pcf'].unique()  # only pcf where mp_factor is >0 in whole set
 
         pcfs_column = []
         mp_factor_avg_column = []
         for pcf in pcfs_list:
-
+            print(pcf)
             mp_factor_forpcf = learn_memory_mod[learn_memory_mod['pcf'] == pcf]
-            mp_factor_forpcf_sum = np.sum(mp_factor_forpcf['mp_factor'])
-            mp_factor_wight = np.round((mp_factor_forpcf_sum / mp_factors_allsum), 4)
+            mp_factor_forpcf_positive = mp_factor_forpcf[mp_factor_forpcf['mp_factor'] > 0]
+            print(mp_factor_forpcf_positive['mp_factor'])
+            mp_factor_forpcf_sum = np.sum(mp_factor_forpcf_positive['mp_factor'])
+            mp_factor_weight = np.round((mp_factor_forpcf_sum / mp_factors_allsum), 4)
 
             pcfs_column.append(pcf)
-            mp_factor_avg_column.append(mp_factor_wight)
+            mp_factor_avg_column.append(mp_factor_weight)
 
         mpf_frame = pd.DataFrame(data={'pcfs_column': pcfs_column, 'mp_factor_avg_column': mp_factor_avg_column})
         # mpf_frame = mpf_frame.sort_values(by=['mp_factor_avg_column'], ascending=False)
@@ -1227,6 +1291,12 @@ class VPP_ext_agent(Agent):
         mpf_frame.to_csv(path_dir_history + "mp_belief_ln_" + str(my_idx) + "_view.csv")
 
         ### Select only one for each timestep i.e. when more timesteps exist
+
+        # save to pickle and csv - REDUCED memory
+        learn_memory_mod.to_pickle(path_initial_memory)
+        learn_memory_mod.to_csv(path_dir_history + "memory_ln_full_" + str(
+            my_idx) + "_view.csv")
+
         selection_idx = []
         for tt in learn_memory_mod['t'].unique():
             a = learn_memory_mod.loc[learn_memory_mod['t'] == tt]
@@ -1238,9 +1308,9 @@ class VPP_ext_agent(Agent):
         learn_memory_mod = learn_memory_mod.iloc[selection_idx]
         learn_memory_mod = learn_memory_mod.reset_index()
 
-        # save to pickle and csv
+        # save to pickle and csv - REDUCED memory
         learn_memory_mod.to_pickle(path_initial_memory)
-        learn_memory_mod.to_csv(path_dir_history + "memory_ln_" + str(my_idx) + "_view.csv") # change it as the path_initial_memory!!!!!!!!!!
+        learn_memory_mod.to_csv(path_dir_history + "memory_ln_reduced_" + str(my_idx) + "_view.csv") # change it as the path_initial_memory!!!!!!!!!!
         return
 
     def environment_similarity_factor(self, learn_memory_mod, index):
@@ -1251,11 +1321,11 @@ class VPP_ext_agent(Agent):
         :return:
         """
 
-        features_weights_esim = {"mem_requests": 0.1,
-                                 "minute_t": 0.15,
-                                 "mem_week_t": 0.15,
+        features_weights_esim = {"mem_requests": 0.3,
+                                 "minute_t": 0.1,
+                                 "mem_week_t": 0.1,
                                  "month_t": 0.0,
-                                 "mem_av_weather": 0.6}
+                                 "mem_av_weather": 0.5}
 
         ##### this part redundant >>>
         my_idx = data_names_dict[self.name]
