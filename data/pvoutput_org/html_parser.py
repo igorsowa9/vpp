@@ -202,12 +202,12 @@ def merge_jsons():
 # all_dates = ["20180709", "20180710", "20180711", "20180712", "20180713", "20180714", "20180715"]
 # all_dates = ["20180716", "20180717", "20180718", "20180719", "20180720", "20180721", "20180722"]
 # all_dates = ["20180723", "20180724", "20180725", "20180726", "20180727", "20180728", "20180729"]
-
+#
 # all_dates = ["20180730", "20180731", "20180801", "20180802", "20180803", "20180804", "20180805"]
 # all_dates = ["20180806", "20180807", "20180808", "20180809", "20180810", "20180811", "20180812"]
 # all_dates = ["20180813", "20180814", "20180815", "20180816", "20180817", "20180818", "20180819"]
 # all_dates = ["20180820", "20180821", "20180822", "20180823", "20180824", "20180825", "20180826"]
-
+#
 # all_dates = ["20180827", "20180828", "20180829", "20180830", "20180831", "20180901", "20180902"]
 # all_dates = ["20180903", "20180904", "20180905", "20180906", "20180907", "20180908", "20180909"]
 # all_dates = ["20180910", "20180911", "20180912", "20180913", "20180914", "20180915", "20180916"]
@@ -223,14 +223,14 @@ all_dates = ["20180924", "20180925", "20180926", "20180927", "20180928", "201809
              # "20180716", "20180717"]
 
 all_urls = [
-    "https://pvoutput.org/intraday.jsp?id=33196&sid=30411&dt="  # GfB mbH - Westnetz GmbH 29.610kW
+    # "https://pvoutput.org/intraday.jsp?id=33196&sid=30411&dt="  # GfB mbH - Westnetz GmbH 29.610kW
     # "https://pvoutput.org/intraday.jsp?id=6197&sid=4947&dt="    # HLB Sunnyfarm 19.500kW
     # "https://pvoutput.org/intraday.jsp?id=56577&sid=51073&dt="  # race|result 92.750kW
     # "https://pvoutput.org/intraday.jsp?id=59027&sid=52525&dt="  # Michiels Wegberg 27.900kW
     # "https://pvoutput.org/intraday.jsp?id=49073&sid=46276&dt="  # Freakycat 20.100kW
     # "https://pvoutput.org/intraday.jsp?id=26995&sid=24693&dt="  # WohnhausA1 20.240kW
     # "https://pvoutput.org/intraday.jsp?id=42740&sid=39044&dt="  # PV-Anlage dahoam 23.000kW
-    # "https://pvoutput.org/intraday.jsp?id=66425&sid=59062&dt="   # SGjuk_12KW 29.000kW
+    "https://pvoutput.org/intraday.jsp?id=66425&sid=59062&dt="   # SGjuk_12KW 29.000kW
     ]
 
 # merge_jsons()

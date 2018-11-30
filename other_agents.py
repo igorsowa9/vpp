@@ -965,7 +965,7 @@ class VPP_ext_agent(Agent):
                 fmem = pd.read_pickle(updated_memory_path)
             else:
                 fmem = pd.read_pickle(updated_memory_path)
-        sys.exit()
+
         # print("TAIL: ")
         # print(fmem.tail(5))
 
@@ -1239,7 +1239,8 @@ class VPP_ext_agent(Agent):
 
                 # environment similarity factor (discount of codf due to the change of environment):
                 esf = self.environment_similarity_factor(learn_memory_mod, index)
-                mp_factor = np.round(codf * esf, 4)
+                esf2 = esf*esf
+                mp_factor = np.round(codf * esf2, 4)
 
                 if codf < 0:
                     mp_factor = -1
@@ -1253,13 +1254,13 @@ class VPP_ext_agent(Agent):
             else:
                 mp_factor = -1
                 codf = -1
-                esf = -1
+                esf2 = -1
                 change_of_request_to_change_of_deal = -1
                 percent_of_excess_sold = -1
 
             row['mp_factor'] = mp_factor
             row['codf'] = codf
-            row['esf'] = esf
+            row['esf'] = esf2
             row['change_of_request_to_change_of_deal'] = change_of_request_to_change_of_deal
             row['percent_of_excess_sold'] = percent_of_excess_sold
 
@@ -1322,10 +1323,10 @@ class VPP_ext_agent(Agent):
         """
 
         features_weights_esim = {"mem_requests": 0.3,
-                                 "minute_t": 0.1,
-                                 "mem_week_t": 0.1,
+                                 "minute_t": 0.0,
+                                 "mem_week_t": 0.0,
                                  "month_t": 0.0,
-                                 "mem_av_weather": 0.5}
+                                 "mem_av_weather": 0.7}
 
         ##### this part redundant >>>
         my_idx = data_names_dict[self.name]
