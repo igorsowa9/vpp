@@ -1200,6 +1200,20 @@ class VPP_ext_agent(Agent):
         # 3) if the decrease of request and decrease of deal are the same, ration ~1, it is not due to MP
         learn_memory_mod['change_of_request_to_change_of_deal'] = ""
 
+        # factors per generator
+
+        print(self.get_attr("opf1_ppct")["gen"])
+        print(self.get_attr("opf1_res")["gen"])
+
+        for gen_idx in self.get_attr("opf1_ppct")["gen"][:, 0]:
+            if gen_idx == 0:
+                continue
+            col_name = "g"+str(int(gen_idx))+"_excess"
+            learn_memory_mod[col_name] = ""
+
+            #XXXXXXXXXXXXXXXXXXXXXXXXXXX
+            #XXXXXXXXXXXXXXXXXXXXXXXXXXX
+            #XXXXXXXXXXXXXXXXXXXXXXXXXXX
 
         # calculating the potential renewable power of all opponents together in Watts
         for index, row in learn_memory_mod.iterrows():
