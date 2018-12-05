@@ -28,9 +28,10 @@ exceeding_or_vicinity = True  # modify in case of a pcf exceeding the probable M
 update_mp_belief = False  # not yet there at all, update during negotiation
 
 # the path to the folder where the exploration results are saved, ALSO: belief about the marginal price is saved in that folder:
-path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0830_1544_week1_multi_oneshot_10/'
+# path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0830_1544_week1_multi_oneshot_10/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1201_0721_week2_multi_oneshot_10/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0822_1555_week1-2/'
+path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1204_1723_week1_multi_oneshot_10_withdeal/'
 
 # if set to more then 1, during the exploration, the learning agent has more than one try to propose an offer with the
 # exactly same conditions of environment, i.e. explore the opponent / environemnt better
@@ -40,7 +41,7 @@ explore_multi_oneshot = 1
 tocsv = True
 pdf = True
 
-# directory_tail = "_week2_oldmemavweather_no_update_belief_0.1_0.10_exceeding"
+# directory_tail = "_week1_multi_oneshot_10_withdeal"
 directory_tail = "_test"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'

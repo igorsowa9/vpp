@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;&#10;-&gt; convert concept of one pfc into prices per excess generator&#10;-&gt; weight of request memory&#10;&#10;live update causes decrease of price because of the last, 10th similarity row, that is excluded after update.&#10;integarte marginal price belief:&#10;- change the mp_factor calculation from full table, not from the boiled down one. I think. - DONE&#10;How to better detect marginal prices e.g. 1,85?&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??) - found!&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+    <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;&#10;-&gt; data structure for more time, more exploration and explotation&#10;-&gt; convert concept of one pfc into prices per excess generator&#10;-&gt; weight of request memory&#10;&#10;live update causes decrease of price because of the last, 10th similarity row, that is excluded after update.&#10;integarte marginal price belief:&#10;- change the mp_factor calculation from full table, not from the boiled down one. I think. - DONE&#10;How to better detect marginal prices e.g. 1,85?&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??) - found!&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_18_06_18.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/original_elia/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_19_06_18.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/pvoutput_org/html_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/pvoutput_org/html_parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/other_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/other_agents.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_all.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_green.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_green.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e3.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e3.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pcc_check/vpp2_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp2_fromOPF1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e2_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e2_all.py" afterDir="false" />
@@ -32,11 +30,11 @@
       <content type="file-editors">
         <state>
           <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-            <file pinned="false" current-in-tab="true">
+            <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/settings_4bus.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="114">
-                    <caret line="11" column="7" selection-start-line="11" selection-start-column="7" selection-end-line="11" selection-end-column="7" />
+                  <state relative-caret-position="209">
+                    <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
                   </state>
                 </provider>
               </entry>
@@ -44,8 +42,8 @@
             <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/vpp_ems_4bus_ns.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="562">
-                    <caret line="577" column="96" selection-start-line="577" selection-start-column="75" selection-end-line="577" selection-end-column="96" />
+                  <state relative-caret-position="307">
+                    <caret line="79" selection-start-line="79" selection-end-line="79" />
                   </state>
                 </provider>
               </entry>
@@ -53,8 +51,8 @@
             <file pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/utilities.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="345">
-                    <caret line="439" column="72" lean-forward="true" selection-start-line="439" selection-start-column="72" selection-end-line="439" selection-end-column="72" />
+                  <state relative-caret-position="649">
+                    <caret line="168" column="53" selection-start-line="168" selection-start-column="34" selection-end-line="168" selection-end-column="53" />
                     <folding>
                       <element signature="e#0#27#0" expanded="true" />
                     </folding>
@@ -62,23 +60,14 @@
                 </provider>
               </entry>
             </file>
-            <file pinned="false" current-in-tab="false">
+            <file pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/other_agents.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="307">
-                    <caret line="921" column="53" selection-start-line="921" selection-start-column="53" selection-end-line="921" selection-end-column="53" />
+                  <state relative-caret-position="394">
+                    <caret line="1275" lean-forward="true" selection-start-line="1275" selection-end-line="1275" />
                     <folding>
                       <element signature="e#0#25#0" expanded="true" />
                     </folding>
-                  </state>
-                </provider>
-              </entry>
-            </file>
-            <file pinned="false" current-in-tab="false">
-              <entry file="file://$PROJECT_DIR$/results_preparation.py">
-                <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="57">
-                    <caret line="3" column="14" selection-start-line="3" selection-start-column="14" selection-end-line="3" selection-end-column="14" />
                   </state>
                 </provider>
               </entry>
@@ -94,7 +83,7 @@
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="247">
-              <caret line="13" column="31" lean-forward="true" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="31" />
+              <caret line="13" column="31" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -102,8 +91,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="18" column="11" lean-forward="true" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
+            <state relative-caret-position="190">
+              <caret line="10" column="15" lean-forward="true" selection-start-line="10" selection-start-column="15" selection-end-line="10" selection-end-column="15" />
             </state>
           </provider>
         </entry>
@@ -112,7 +101,7 @@
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="361">
-              <caret line="19" column="11" lean-forward="true" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
+              <caret line="19" column="11" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -121,7 +110,16 @@
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="570">
-              <caret line="30" column="29" lean-forward="true" selection-start-line="30" selection-start-column="29" selection-end-line="30" selection-end-column="29" />
+              <caret line="30" column="29" selection-start-line="30" selection-start-column="29" selection-end-line="30" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp2.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="342">
+              <caret line="18" column="77" selection-start-line="18" selection-start-column="77" selection-end-line="18" selection-end-column="77" />
             </state>
           </provider>
         </entry>
@@ -129,8 +127,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/pvoutput_org/html_parser.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="204" column="1" lean-forward="true" selection-start-line="204" selection-start-column="1" selection-end-line="204" selection-end-column="1" />
+            <state relative-caret-position="3667">
+              <caret line="204" column="1" selection-start-line="204" selection-start-column="1" selection-end-line="204" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -138,7 +136,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="456">
+            <state relative-caret-position="570">
               <caret line="30" column="27" selection-start-line="30" selection-start-column="27" selection-end-line="30" selection-end-column="27" />
             </state>
           </provider>
@@ -157,7 +155,7 @@
         <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp4.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="399">
-              <caret line="21" column="76" lean-forward="true" selection-start-line="21" selection-start-column="76" selection-end-line="21" selection-end-column="76" />
+              <caret line="21" column="76" selection-start-line="21" selection-start-column="76" selection-end-line="21" selection-end-column="76" />
             </state>
           </provider>
         </entry>
@@ -174,36 +172,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>consideration</find>
-      <find>all time variables set to:</find>
-      <find>shoul</find>
-      <find>initial memo</find>
-      <find>min_</find>
-      <find>MIN_PCF=</find>
-      <find>MIN_PCF</find>
-      <find>should be</find>
-      <find>similarity</find>
-      <find>mem_requests</find>
-      <find>request_value</find>
-      <find>mp_fact</find>
-      <find>mp_fac</find>
-      <find>system1</find>
-      <find>codf</find>
-      <find>saving list to</find>
-      <find>prepare_initial_memory</find>
-      <find>sys.e</find>
-      <find>environment sim</find>
-      <find>environment</find>
-      <find>environment_similarity_factor</find>
-      <find>'es</find>
-      <find>esf2</find>
       <find>esf'</find>
       <find>modify_fromfile</find>
       <find>exploit</find>
       <find>vpp_exploit</find>
+      <find>explore_multi_oneshot</find>
+      <find>similarity</find>
       <find>prepare_ini</find>
       <find>costs generation excess (light</find>
-      <find>explore_multi_oneshot</find>
+      <find>opf1_ppct</find>
+      <find>_excess</find>
+      <find>change_of</find>
+      <find>max_bidsaldo_idx</find>
+      <find>bids_saldo</find>
+      <find>deal</find>
+      <find>deal = 0</find>
+      <find>percent_re</find>
+      <find>save_deal_to_memory</find>
+      <find>deal type</find>
+      <find>test2</find>
+      <find>codaf: 0.</find>
+      <find>codaf: 0.0</find>
+      <find>coe2cod</find>
+      <find>change_of_request_to_change_of_deal</find>
+      <find>cor2cod</find>
+      <find>environmen</find>
+      <find>codrf</find>
+      <find>_codrf</find>
+      <find>codf</find>
+      <find>sys.ex</find>
+      <find>codaf</find>
     </findStrings>
     <replaceStrings>
       <replace>30</replace>
@@ -270,16 +268,16 @@
         <option value="$PROJECT_DIR$/data/pvoutput_org/html_parser.py" />
         <option value="$PROJECT_DIR$/util/__init__.py" />
         <option value="$PROJECT_DIR$/util/modifyfromfile.py" />
-        <option value="$PROJECT_DIR$/other_agents.py" />
         <option value="$PROJECT_DIR$/settings_4bus.py" />
+        <option value="$PROJECT_DIR$/other_agents.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="73" />
-    <option name="y" value="24" />
-    <option name="width" value="926" />
-    <option name="height" value="1056" />
+    <option name="x" value="81" />
+    <option name="y" value="428" />
+    <option name="width" value="922" />
+    <option name="height" value="1040" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -287,6 +285,28 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="vpp" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="vpp" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="vpp" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+              <item name="vpp4bus" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -333,17 +353,6 @@
               <item name="lib" type="cbb8eebc:String" user="lib" />
               <item name="python3.6" type="cbb8eebc:String" user="python3.6" />
               <item name="site-packages" type="cbb8eebc:String" user="site-packages" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vpp" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -548,13 +557,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1498654725175</updated>
-    </task>
-    <task id="LOCAL-00035" summary="next steps:&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;!!! thermal limits were removed!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
-      <created>1528272032282</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1528272032282</updated>
     </task>
     <task id="LOCAL-00036" summary="next steps:&#10;&#10;DEBUG&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;!!! thermal limits were removed!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
       <created>1528306329595</created>
@@ -892,7 +894,14 @@
       <option name="project" value="LOCAL" />
       <updated>1543507684185</updated>
     </task>
-    <option name="localTasksCounter" value="84" />
+    <task id="LOCAL-00084" summary="next steps:&#10;&#10;-&gt; data structure for more time, more exploration and explotation&#10;-&gt; convert concept of one pfc into prices per excess generator&#10;-&gt; weight of request memory&#10;&#10;live update causes decrease of price because of the last, 10th similarity row, that is excluded after update.&#10;integarte marginal price belief:&#10;- change the mp_factor calculation from full table, not from the boiled down one. I think. - DONE&#10;How to better detect marginal prices e.g. 1,85?&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??) - found!&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <created>1543593372706</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1543593372706</updated>
+    </task>
+    <option name="localTasksCounter" value="85" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -937,20 +946,20 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="69" y="-4" width="1851" height="1084" extended-state="6" />
+    <frame x="69" y="428" width="1851" height="1084" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.32877463" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20295405" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32845187" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49835888" visible="true" weight="0.39289448" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49781182" visible="true" weight="0.5778474" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39853558" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3294979" />
-      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.50164115" side_tool="true" weight="0.5753138" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5021882" side_tool="true" weight="0.39289448" />
       <window_info anchor="bottom" id="Python Console" order="8" weight="0.32889345" />
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.3294979" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.32889345" />
@@ -1024,7 +1033,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/Notebooks/MachineLearningWithPython" />
     </ignored-roots>
-    <MESSAGE value="next steps:&#10;&#10;step 100, fix the basic negotiation and run saving to memory similarieties, learning etc.&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;continue with memorising and then similarities, choosing proper records etc.&#10;&#10;step 120&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;step 120&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;check for opf1_save_balcost_all, why does not it show values in show_history()&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
@@ -1049,7 +1057,8 @@
     <MESSAGE value="next steps:&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??)&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;live update causes decrease of price because of the last, 10th similarity row, that is excluded after update.&#10;integarte marginal price belief:&#10;- change the mp_factor calculation from full table, not from the boiled down one. I think.&#10;How to better detect marginal prices e.g. 1,85?&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??)&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
     <MESSAGE value="next steps:&#10;&#10;-&gt; convert concept of one pfc into prices per excess generator&#10;-&gt; weight of request memory&#10;&#10;live update causes decrease of price because of the last, 10th similarity row, that is excluded after update.&#10;integarte marginal price belief:&#10;- change the mp_factor calculation from full table, not from the boiled down one. I think. - DONE&#10;How to better detect marginal prices e.g. 1,85?&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??) - found!&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
-    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;-&gt; convert concept of one pfc into prices per excess generator&#10;-&gt; weight of request memory&#10;&#10;live update causes decrease of price because of the last, 10th similarity row, that is excluded after update.&#10;integarte marginal price belief:&#10;- change the mp_factor calculation from full table, not from the boiled down one. I think. - DONE&#10;How to better detect marginal prices e.g. 1,85?&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??) - found!&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <MESSAGE value="next steps:&#10;&#10;-&gt; data structure for more time, more exploration and explotation&#10;-&gt; convert concept of one pfc into prices per excess generator&#10;-&gt; weight of request memory&#10;&#10;live update causes decrease of price because of the last, 10th similarity row, that is excluded after update.&#10;integarte marginal price belief:&#10;- change the mp_factor calculation from full table, not from the boiled down one. I think. - DONE&#10;How to better detect marginal prices e.g. 1,85?&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??) - found!&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
+    <option name="LAST_COMMIT_MESSAGE" value="next steps:&#10;&#10;-&gt; data structure for more time, more exploration and explotation&#10;-&gt; convert concept of one pfc into prices per excess generator&#10;-&gt; weight of request memory&#10;&#10;live update causes decrease of price because of the last, 10th similarity row, that is excluded after update.&#10;integarte marginal price belief:&#10;- change the mp_factor calculation from full table, not from the boiled down one. I think. - DONE&#10;How to better detect marginal prices e.g. 1,85?&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??) - found!&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/data/__init__.py">
@@ -1211,13 +1220,60 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180702_20180702.json">
-      <provider selected="true" editor-type-id="text-editor" />
+    <entry file="file://$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180702_20180702.json" />
+    <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/min5/PV_Rew_7_25.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-35639" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/util/__init__.py" />
+    <entry file="file://$PROJECT_DIR$/util/modifyfromfile.py" />
+    <entry file="file://$PROJECT_DIR$/results_preparation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="3" column="14" selection-start-line="3" selection-start-column="14" selection-end-line="3" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="13" column="31" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="19" column="11" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="30" column="29" selection-start-line="30" selection-start-column="29" selection-end-line="30" selection-end-column="29" />
+        </state>
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="456">
-          <caret line="24" column="6" selection-start-line="24" selection-start-column="6" selection-end-line="24" selection-end-column="6" />
+        <state relative-caret-position="342">
+          <caret line="18" column="77" selection-start-line="18" selection-start-column="77" selection-end-line="18" selection-end-column="77" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/pvoutput_org/html_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3667">
+          <caret line="204" column="1" selection-start-line="204" selection-start-column="1" selection-end-line="204" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="30" column="27" selection-start-line="30" selection-start-column="27" selection-end-line="30" selection-end-column="27" />
         </state>
       </provider>
     </entry>
@@ -1231,108 +1287,48 @@
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/case4_vpp4.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="399">
-          <caret line="21" column="76" lean-forward="true" selection-start-line="21" selection-start-column="76" selection-end-line="21" selection-end-column="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/case5_vpp1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="456">
-          <caret line="30" column="27" selection-start-line="30" selection-start-column="27" selection-end-line="30" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/original_elia/in_use/min5/PV_Rew_7_25.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-35639" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/pvoutput_org/html_parser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="204" column="1" lean-forward="true" selection-start-line="204" selection-start-column="1" selection-end-line="204" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp4-case4.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="30" column="29" lean-forward="true" selection-start-line="30" selection-start-column="29" selection-end-line="30" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/util/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/util/modifyfromfile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38">
-          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="19" column="11" lean-forward="true" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp1-case5.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="13" column="31" lean-forward="true" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/results_preparation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="3" column="14" selection-start-line="3" selection-start-column="14" selection-end-line="3" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vpp_ems_4bus_ns.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="562">
-          <caret line="577" column="96" selection-start-line="577" selection-start-column="75" selection-end-line="577" selection-end-column="96" />
+          <caret line="21" column="76" selection-start-line="21" selection-start-column="76" selection-end-line="21" selection-end-column="76" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/utilities.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="439" column="72" lean-forward="true" selection-start-line="439" selection-start-column="72" selection-end-line="439" selection-end-column="72" />
+        <state relative-caret-position="649">
+          <caret line="168" column="53" selection-start-line="168" selection-start-column="34" selection-end-line="168" selection-end-column="53" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/other_agents.py">
+    <entry file="file://$PROJECT_DIR$/vpp_ems_4bus_ns.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="307">
-          <caret line="921" column="53" selection-start-line="921" selection-start-column="53" selection-end-line="921" selection-end-column="53" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
+          <caret line="79" selection-start-line="79" selection-end-line="79" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/vpp4bus/vpp2-case4.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="18" column="11" lean-forward="true" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
+        <state relative-caret-position="190">
+          <caret line="10" column="15" lean-forward="true" selection-start-line="10" selection-start-column="15" selection-end-line="10" selection-end-column="15" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/settings_4bus.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
-          <caret line="11" column="7" selection-start-line="11" selection-start-column="7" selection-end-line="11" selection-end-column="7" />
+        <state relative-caret-position="209">
+          <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/other_agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="394">
+          <caret line="1275" lean-forward="true" selection-start-line="1275" selection-end-line="1275" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -789,6 +789,7 @@ class VPP_ext_agent(Agent):
                                     'n_ref': "tbd",
                                     'price': gen_deals[:, 3],
                                     'quantity': np.round(np.abs(gen_deals[:, 2]), 3),
+                                    'deal': deal[1],
                                     'percent_req': np.round(np.sum(np.abs(gen_deals[:, 2])) / req_value, 4),
                                     'bids_saldo': bids_saldo,
                                     'pcf': self.get_attr('price_increase_factor'),
@@ -819,22 +820,6 @@ class VPP_ext_agent(Agent):
                     res_now_power = installed_power * res_inst * av_weather_onevpp
                     res_now_power_all += res_now_power
 
-                # for index, row in learn_memory_mod.iterrows():
-                #     if index != 0 and row['pcf'] != min_pcf:
-                #         # change of deal factor:
-                #         codf = abs(learn_memory_mod.iloc[index]['percent_req'] - learn_memory_mod.iloc[index - 1][
-                #             'percent_req'])
-                #         # environment similarity factor (discount):
-                #         esf = self.environment_similarity_factor(learn_memory_mod, index)
-                #         mp_factor = np.round(codf * esf, 4)
-                #     else:
-                #         mp_factor = -1
-                #         codf = -1
-                #         esf = -1
-                #     row['mp_factor'] = mp_factor
-                #     row['codf'] = codf
-                #     row['esf'] = esf
-
                 to_append.update({'mem_requests': req_value,
                                     'mem_requesters': int(data_names_dict[deal_with]),
                                     'mem_week_t': int(current_time.weekday()) + 1,
@@ -854,6 +839,7 @@ class VPP_ext_agent(Agent):
                                     'n_ref': "tbd",
                                     'price': np.array([price_minimum]),
                                     'quantity': np.array([self.get_attr('pc_memory_exc')[self.get_attr('n_iteration')]['all'][np.argmin(price_minimum), 1]]),
+                                    'deal': 0,
                                     'percent_req': 0,
                                     'bids_saldo': bids_saldo,
                                     'pcf': self.get_attr('price_increase_factor'),
@@ -900,6 +886,7 @@ class VPP_ext_agent(Agent):
                          'n_ref',  # number of refuses during the negotiation
                          'price',  # sell price(s) of particular generators
                          'quantity',  # amount(s) sold from particular generators
+                         'deal', # all generators deals with this particular vpp together, it says "who is selling" i.e. me
                          'percent_req',  # how much of the particular request was filled by my resources
                          'bids_saldo',  # positive if revenue negative if have to be bought
                          'pcf',  # price increase factor, that could be modified according to the vpp settings in json
@@ -1176,7 +1163,9 @@ class VPP_ext_agent(Agent):
         # Load history
         path_pickle = path_dir_history + "temp_ln_" + str(my_idx) + ".pkl"
         learn_memory = pd.read_pickle(path_pickle)
+
         # learn_memory = learn_memory.iloc[0:100, :]  # selection if necessary for example if only the first week as learning
+
         learn_memory_mod = copy.deepcopy(learn_memory)
 
         # new columns:
@@ -1187,35 +1176,111 @@ class VPP_ext_agent(Agent):
         # week and month are ready in original version
         learn_memory_mod['mem_av_weather'] = ""
 
-        learn_memory_mod['codf'] = ""
-        learn_memory_mod['esf'] = ""
-        learn_memory_mod['mp_factor'] = ""
-        # learn_memory_mod['mp_factor'] = learn_memory_mod['mp_factor'].astype(object)
-
+        learn_memory_mod['codf'] = ""   # !!! this should be per-my-generator! - it refers to my gens so should be divided
+        learn_memory_mod['esf'] = ""    # it is ok like that (?) - only one for the environment i.e. other opponents
+        learn_memory_mod['mp_factor'] = ""  # should be also divided into generators and thus into particular prices - refers to my own generators
 
         # additional factors:
         # 1) if percent_request increases
         # 2) if we sell anyway 100% of our excess, it is not MP
         learn_memory_mod['percent_of_excess_sold'] = ""
         # 3) if the decrease of request and decrease of deal are the same, ration ~1, it is not due to MP
-        learn_memory_mod['change_of_request_to_change_of_deal'] = ""
+        learn_memory_mod['cor2cod'] = ""  # change_of_request_to_change_of_deal
 
-        # factors per generator
+        min_pcf = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]
+        print("MIN_PCF=" + str(min_pcf) + ". If different then in the learning memory then should be adjusted !!!")
 
-        print(self.get_attr("opf1_ppct")["gen"])
-        print(self.get_attr("opf1_res")["gen"])
+        # ---- factors per generator: excess, deal, deal_price, change of excess / change of deal ----
 
-        for gen_idx in self.get_attr("opf1_ppct")["gen"][:, 0]:
+        # create empty colums for single generators
+        gens_from_ppct = self.get_attr("opf1_ppct")["gen"][:, 0]
+        for gen_idx in gens_from_ppct:
             if gen_idx == 0:
                 continue
-            col_name = "g"+str(int(gen_idx))+"_excess"
-            learn_memory_mod[col_name] = ""
 
-            #XXXXXXXXXXXXXXXXXXXXXXXXXXX
-            #XXXXXXXXXXXXXXXXXXXXXXXXXXX
-            #XXXXXXXXXXXXXXXXXXXXXXXXXXX
+            learn_memory_mod["g"+str(int(gen_idx))+"_excess"] = ""
+            learn_memory_mod["g"+str(int(gen_idx))+"_deal"] = ""
+            learn_memory_mod["g"+str(int(gen_idx))+"_deal_price"] = ""
+            learn_memory_mod["g"+str(int(gen_idx))+"_coe2cod"] = ""
+            learn_memory_mod["g"+str(int(gen_idx))+"_codrf"] = ""       # change of relative deal - like codf but per generator, percentage change
 
-        # calculating the potential renewable power of all opponents together in Watts
+            learn_memory_mod["g" + str(int(gen_idx)) + "_mpf"] = ""     # mp factor per generator
+
+        learn_memory_mod["mgen"] = ""
+        learn_memory_mod["mp"] = ""
+
+        # Extract values per my generators to columns:
+        for index, row in learn_memory_mod.iterrows():
+            for gen_idx in gens_from_ppct:
+
+                if gen_idx == 0:
+                    continue
+                col1_name = "g" + str(int(gen_idx)) + "_excess"
+                col2_name = "g" + str(int(gen_idx)) + "_deal"
+                col3_name = "g" + str(int(gen_idx)) + "_deal_price"
+
+                if index != 0 and row['pcf'] != min_pcf:
+                    my_excess_now = np.array(learn_memory_mod.iloc[index]['my_excess'])
+                    col1 = np.round(my_excess_now[my_excess_now[:, 0] == gen_idx, 1], 4)
+                    if col1.size == 0:
+                        col1 = 0
+                    my_deal_now = np.array(learn_memory_mod.iloc[index]['deal'])
+
+                    if my_deal_now.size == 1:  # if no deals at all
+                        col2 = 0
+                        col3 = 0
+                    else:  # if no deal of this generator in deals
+                        col2 = np.round(-1 * my_deal_now[my_deal_now[:, 1] == gen_idx, 2], 4)
+                        col3 = np.round(my_deal_now[my_deal_now[:, 1] == gen_idx, 3], 4)
+                        if col2.size == 0:
+                            col2 = 0
+                        if col3.size == 0:
+                            col3 = 0
+
+                    row[col1_name] = float(col1)
+                    row[col2_name] = float(col2)
+                    row[col3_name] = float(col3)
+
+                else:
+                    row[col1_name] = 0
+                    row[col2_name] = 0
+                    row[col3_name] = 0
+
+            learn_memory_mod.iloc[index] = row
+
+
+
+        # Change of deal factors etc per generator!
+        for index, row in learn_memory_mod.iterrows():
+            if index != 0 and row['pcf'] != min_pcf:
+                for gen_idx in gens_from_ppct:
+                    if gen_idx == 0:
+                        continue
+
+                    col1_name = "g" + str(int(gen_idx)) + "_codrf"
+                    col2_name = "g" + str(int(gen_idx)) + "_coe2cod"
+
+                    codaf = round(learn_memory_mod.iloc[index-1]["g" + str(int(gen_idx)) + "_deal"] -
+                              learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_deal"], 4)
+                    previous_deal = learn_memory_mod.iloc[index-1]["g" + str(int(gen_idx)) + "_deal"]
+                    if previous_deal == 0:
+                        codrf = 0
+                    else:
+                        codrf = round(codaf / learn_memory_mod.iloc[index-1]["g" + str(int(gen_idx)) + "_deal"], 4)
+
+                    if codaf == 0:
+                        coe2cod = -1
+                    else:
+                        coe2cod = (learn_memory_mod.iloc[index-1]["g" + str(int(gen_idx)) + "_excess"] -
+                                learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_excess"]) / codaf # change of excess to change of deal
+
+                    row[col1_name] = float(codrf)
+                    row[col2_name] = float(coe2cod)
+
+                learn_memory_mod.iloc[index] = row
+
+
+        # ---- Calculating the potential renewable power of all opponents together in Watts ----
         for index, row in learn_memory_mod.iterrows():
 
             res_now_power_all = 0
@@ -1233,21 +1298,21 @@ class VPP_ext_agent(Agent):
             row['mem_av_weather'] = res_now_power_all
             learn_memory_mod.iloc[index] = row
 
-        #### Calculate margina price factors (mp_factor) and estimate the marginal prices factors/probabilites
 
-        min_pcf = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]
-        # min_pcf = 1.1
-        print("MIN_PCF=" + str(min_pcf) + ". If different then in the learning memory then should be adjusted !!!")
+        ##########################33
+        #### Calculate margina price factors (mp_factor) and estimate the marginal prices factors/probabilites, and other stuff per generator
+        ############################
+
         for index, row in learn_memory_mod.iterrows():
             if index != 0 and row['pcf'] != min_pcf:
 
                 # change of (successful) deal factor:
                 codf = -1*(learn_memory_mod.iloc[index]['percent_req'] - learn_memory_mod.iloc[index-1]['percent_req'])
 
-                my_excess = np.sum(np.array(learn_memory_mod.iloc[index]['my_excess'])[:, 1])
-                percent_of_excess_sold = learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']/my_excess
+                my_excess_sum = np.sum(np.array(learn_memory_mod.iloc[index]['my_excess'])[:, 1])
+                percent_of_excess_sold = learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']/my_excess_sum
 
-                change_of_request_to_change_of_deal = (learn_memory_mod.iloc[index]['mem_requests']-learn_memory_mod.iloc[index-1]['mem_requests'])/\
+                cor2cod = (learn_memory_mod.iloc[index]['mem_requests']-learn_memory_mod.iloc[index-1]['mem_requests'])/\
                                          (learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']-
                                           learn_memory_mod.iloc[index-1]['percent_req']*learn_memory_mod.iloc[index-1]['mem_requests'])
 
@@ -1258,31 +1323,78 @@ class VPP_ext_agent(Agent):
 
                 if codf < 0:
                     mp_factor = -1
-
                 if percent_of_excess_sold > 0.99 and percent_of_excess_sold < 1.01:
                     mp_factor = -1
-
-                if change_of_request_to_change_of_deal > 0.99 and change_of_request_to_change_of_deal < 1.01:
+                if cor2cod > 0.99 and cor2cod < 1.01:
                     mp_factor = -1
+
+                row['codf'] = codf
+                row['esf'] = esf2
+                row['cor2cod'] = cor2cod
+                row['percent_of_excess_sold'] = percent_of_excess_sold
 
             else:
                 mp_factor = -1
-                codf = -1
-                esf2 = -1
-                change_of_request_to_change_of_deal = -1
-                percent_of_excess_sold = -1
+                # codf = -1
+                # esf2 = -1
+                # cor2cod = -1
+                # percent_of_excess_sold = -1
 
             row['mp_factor'] = mp_factor
-            row['codf'] = codf
-            row['esf'] = esf2
-            row['change_of_request_to_change_of_deal'] = change_of_request_to_change_of_deal
-            row['percent_of_excess_sold'] = percent_of_excess_sold
+            learn_memory_mod.iloc[index] = row
+
+
+        for index, row in learn_memory_mod.iterrows():
+            mpf_test = 0
+            for gen_idx in gens_from_ppct:
+
+                if gen_idx == 0:
+                    continue
+                col1_name = "g" + str(int(gen_idx)) + "_mpf"
+
+                g_excess = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_excess"]
+                g_deal = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_deal"]
+                g_deal_price = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_deal_price"]
+                g_coe2cod = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_coe2cod"]
+                if g_coe2cod == "":
+                    g_coe2cod = 0
+                g_codrf = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_codrf"]
+                if g_codrf == "":
+                    g_codrf = 0
+
+                if index != 0 and row['pcf'] != min_pcf:
+
+                    esf = self.environment_similarity_factor(learn_memory_mod, index)
+                    esf2 = esf * esf
+                    mpf0 = np.round(g_codrf * esf2, 4)
+
+                    if mpf0 < 0:
+                        mpf0 = -1
+                    if g_coe2cod > 0.99 and g_coe2cod < 1.01:
+                        mpf0 = -1
+                else:
+                    mpf0 = 0
+
+                row[col1_name] = 0
+
+                if mpf0 > mpf_test:  # in order to find the maximum generator g_codrf in this timestamp
+                    mpf_test = mpf0
+                    mgen = gen_idx
+                    mp = g_deal_price
+                else:
+                    mgen = ""
+                    mp = ""
+
+            if mpf_test > 0:
+                row["mgen"] = mgen
+                row["mp"] = mp
 
             learn_memory_mod.iloc[index] = row
 
-        # learn_memory_mod = learn_memory_mod.sort_values(by='mp_factor', ascending=False)
+        ###############################################
+        ### Make a belief table based on mp_factors ###
+        ###############################################
 
-        ### Make a belief table based on mp_factors
         mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
         pcfs_list = learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['pcf'].unique()  # only pcf where mp_factor is >0 in whole set
 
