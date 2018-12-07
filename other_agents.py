@@ -181,61 +181,92 @@ class VPP_ext_agent(Agent):
 
         n_iteration = self.get_attr("n_iteration")
 
-        ######## build price curve according to pc_matrix_price_increase_factor (gen prices * increase factor)
-        # price increase factor modification should be calculated according to request number not to the timestamp
-        # i.e. if the last request was at previous X timestamps then modify the factor
-        price_increase_factor = self.load_data(data_paths[data_names_dict[self.name]])[
-            'pc_matrix_price_increase_factor']
+        price_increase_factor = "not active"
+        price_absolute_increase = "not active"
 
-        if type(price_increase_factor) == list:
+        if self.name not in vpp_exploit or (self.name in vpp_exploit and price_increase_policy == 1):
+            ######## build price curve according to pc_matrix_price_increase_factor (gen prices * increase factor)
+            # price increase factor modification should be calculated according to request number not to the timestamp
+            # i.e. if the last request was at previous X timestamps then modify the factor
+            price_increase_factor = self.load_data(data_paths[data_names_dict[self.name]])[
+                'pc_matrix_price_increase_factor']
 
-            currmem = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
+            if type(price_increase_factor) == list:
+                currmem = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
+                rows_range = currmem.tail(max_ts_range_for_price_modification)
 
-            # t_range = np.arange(t - max_ts_range_for_price_modification, t)
-            rows_range = currmem.tail(max_ts_range_for_price_modification)
+                previous_fulfilled = 0  # check if the time exist and if some conditions are fulfilled: success
+                if not rows_range.empty:
+                    previous_fulfilled = np.sum(rows_range['success'].tolist())
 
-            previous_fulfilled = 0  # check if the time exist and if some conditions are fulfilled: success
-            if not rows_range.empty:
-                previous_fulfilled = np.sum(rows_range['success'].tolist())
+                if previous_fulfilled == max_ts_range_for_price_modification:
 
-            # for test_t in t_range:
-            #     if 't' in currmem.columns:
-            #         test_row = currmem.loc[currmem['t'] == test_t]
-            #         if not test_row.empty:
-            #             if (currmem['t'] == test_t).any() and test_row.iloc[0]['success'] == 1:
-            #                 previous_fulfilled += 1
+                    previous_row = rows_range.tail(1)
+                    previous_mod = previous_row.iloc[0]['pcf']
 
-            if previous_fulfilled == max_ts_range_for_price_modification:
+                    if previous_mod < price_increase_factor[1]:
+                        price_increase_factor = previous_mod + price_increase_factor[2]
+                    else:
+                        price_increase_factor = price_increase_factor[0]
 
-                # previous_row = currmem.loc[currmem['t'] == t-1]  # take previous row
-                previous_row = rows_range.tail(1)
-                previous_mod = previous_row.iloc[0]['pcf']
+                else:  # if conditions not fulilled come back to the first value
+                    if not constant_environment:
+                        price_increase_factor = price_increase_factor[0]
 
-                if previous_mod < price_increase_factor[1]:
-                    price_increase_factor = previous_mod + price_increase_factor[2]
-                else:
-                    price_increase_factor = price_increase_factor[0]
-
-            else:  # if conditions not fulilled come back to the first value
-                if not constant_environment:
-                    price_increase_factor = price_increase_factor[0]
-
-                else:  # if we assume exploration in a constant environment...
-                    test_row = currmem.tail(1)
-                    if not test_row.empty:
-                        previous_mod = test_row.iloc[0]['pcf']
-                        if test_row.iloc[0]['success'] == 1:
-                            if previous_mod < price_increase_factor[1]:
-                                price_increase_factor = previous_mod + price_increase_factor[2]
+                    else:  # if we assume exploration in a constant environment...
+                        test_row = currmem.tail(1)
+                        if not test_row.empty:
+                            previous_mod = test_row.iloc[0]['pcf']
+                            if test_row.iloc[0]['success'] == 1:
+                                if previous_mod < price_increase_factor[1]:
+                                    price_increase_factor = previous_mod + price_increase_factor[2]
+                                else:
+                                    price_increase_factor = price_increase_factor[0]
                             else:
                                 price_increase_factor = price_increase_factor[0]
                         else:
                             price_increase_factor = price_increase_factor[0]
+
+        if self.name in vpp_exploit and price_increase_policy == 2:
+            ######## build price curve according to pc_matrix_price_absolute_increase (from, to, step)
+            # it is not driven by the current price of excess generator (it does is by the excess amount though).
+            # also increases in case of X successes, it resets on failure
+
+            price_increase_vector = self.load_data(data_paths[data_names_dict[self.name]])[
+                'pc_matrix_price_absolute_increase']
+
+            currmem = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
+            rows_range = currmem.tail(max_ts_range_for_price_modification)
+            previous_fulfilled = 0  # check if the time exist and if some conditions are fulfilled: success
+            if not rows_range.empty:
+                previous_fulfilled = np.sum(rows_range['success'].tolist())
+
+            if previous_fulfilled == max_ts_range_for_price_modification:
+                previous_row = rows_range.tail(1)
+                previous_mod = previous_row.iloc[0]['pai']
+                if previous_mod < price_increase_vector[1]:
+                    price_absolute_increase = previous_mod + price_increase_vector[2]
+                else:
+                    price_absolute_increase = price_increase_vector[0]
+            else:  # if conditions not fulilled come back to the first value
+                if not constant_environment:
+                    price_absolute_increase = price_increase_vector[0]
+                else:  # if we assume exploration in a constant environment...
+                    test_row = currmem.tail(1)
+                    if not test_row.empty:
+                        previous_mod = test_row.iloc[0]['pai']
+                        if test_row.iloc[0]['success'] == 1:
+                            if previous_mod < price_increase_vector[1]:
+                                price_absolute_increase = previous_mod + price_increase_vector[2]
+                            else:
+                                price_absolute_increase = price_increase_vector[0]
+                        else:
+                            price_absolute_increase = price_increase_vector[0]
                     else:
-                        price_increase_factor = price_increase_factor[0]
+                        price_absolute_increase = price_increase_vector[0]
 
         a = 'OFF'
-        if exploit and self.name in vpp_exploit:
+        if exploit and self.name in vpp_exploit: # not prepared yet for price_absolute_increase
             self.log_info("I will apply memory through similarity.")
             if update_during_exploit:
                 self.log_info("Live update_during_exploit is on!")
@@ -243,7 +274,15 @@ class VPP_ext_agent(Agent):
             a = 'ON'
 
         self.log_info("My runopf_e2 (exploit " + a + ") price_increase_factor: " + str(price_increase_factor))
+        self.log_info("My runopf_e2 (exploit " + a + ") price_absolute_increase: " + str(price_absolute_increase))
         self.set_attr(price_increase_factor=price_increase_factor)
+        self.set_attr(price_absolute_increase=price_absolute_increase)
+
+        # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
         if n_iteration == 0:  # if its 0 iteration, make according to pr_matrix_price_increase_factor (each vpp has own)
             pc_matrix_incr = copy.deepcopy(exc_matrix.T)
@@ -789,6 +828,7 @@ class VPP_ext_agent(Agent):
                                     'n_ref': "tbd",
                                     'price': gen_deals[:, 3],
                                     'quantity': np.round(np.abs(gen_deals[:, 2]), 3),
+                                    'pc': self.get_attr('pc_memory_exc'),
                                     'deal': deal[1],
                                     'percent_req': np.round(np.sum(np.abs(gen_deals[:, 2])) / req_value, 4),
                                     'bids_saldo': bids_saldo,
@@ -839,6 +879,7 @@ class VPP_ext_agent(Agent):
                                     'n_ref': "tbd",
                                     'price': np.array([price_minimum]),
                                     'quantity': np.array([self.get_attr('pc_memory_exc')[self.get_attr('n_iteration')]['all'][np.argmin(price_minimum), 1]]),
+                                    'pc': self.get_attr('pc_memory_exc'),
                                     'deal': 0,
                                     'percent_req': 0,
                                     'bids_saldo': bids_saldo,
@@ -886,6 +927,7 @@ class VPP_ext_agent(Agent):
                          'n_ref',  # number of refuses during the negotiation
                          'price',  # sell price(s) of particular generators
                          'quantity',  # amount(s) sold from particular generators
+                         'pc',
                          'deal', # all generators deals with this particular vpp together, it says "who is selling" i.e. me
                          'percent_req',  # how much of the particular request was filled by my resources
                          'bids_saldo',  # positive if revenue negative if have to be bought
@@ -1124,13 +1166,13 @@ class VPP_ext_agent(Agent):
                 print("pcf_avg before considering MP limits: " + str(pcf_avg))
 
                 mp_factor_table = pd.read_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
-                mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg_column'] > mp_belief_treshold]
-                mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg_column'], ascending=False)
+                mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
+                mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
 
                 # print("mp_factor_table: ")
-                # print(mp_factor_table[['pcfs_column', 'mp_factor_avg_column']])
+                # print(mp_factor_table[['pcfs', 'mp_factor_avg']])
 
-                mp_limits = np.round(mp_factor_table['pcfs_column'].tolist(), 4)
+                mp_limits = np.round(mp_factor_table['pcfs'].tolist(), 4)
                 # print("mp_limits: " + str(mp_limits))
 
                 for mp_limit in mp_limits:
@@ -1193,14 +1235,15 @@ class VPP_ext_agent(Agent):
         # ---- factors per generator: excess, deal, deal_price, change of excess / change of deal ----
 
         # create empty colums for single generators
-        gens_from_ppct = self.get_attr("opf1_ppct")["gen"][:, 0]
+        gens_from_ppct = self.get_attr("opf1_ppct")["gen"][:, 0]  # idxes of gens from ppct
+        gens_max_from_ppct = self.get_attr("opf1_ppct")["gen"][:, 8]  # idxes of gens from ppct (intalled power)
         for gen_idx in gens_from_ppct:
             if gen_idx == 0:
                 continue
 
             learn_memory_mod["g"+str(int(gen_idx))+"_excess"] = ""
             learn_memory_mod["g"+str(int(gen_idx))+"_deal"] = ""
-            learn_memory_mod["g"+str(int(gen_idx))+"_deal_price"] = ""
+            learn_memory_mod["g"+str(int(gen_idx))+"_offer_price"] = ""
             learn_memory_mod["g"+str(int(gen_idx))+"_coe2cod"] = ""
             learn_memory_mod["g"+str(int(gen_idx))+"_codrf"] = ""       # change of relative deal - like codf but per generator, percentage change
 
@@ -1217,7 +1260,7 @@ class VPP_ext_agent(Agent):
                     continue
                 col1_name = "g" + str(int(gen_idx)) + "_excess"
                 col2_name = "g" + str(int(gen_idx)) + "_deal"
-                col3_name = "g" + str(int(gen_idx)) + "_deal_price"
+                col3_name = "g" + str(int(gen_idx)) + "_offer_price"
 
                 if index != 0 and row['pcf'] != min_pcf:
                     my_excess_now = np.array(learn_memory_mod.iloc[index]['my_excess'])
@@ -1228,7 +1271,14 @@ class VPP_ext_agent(Agent):
 
                     if my_deal_now.size == 1:  # if no deals at all
                         col2 = 0
+                        # pc = np.array(learn_memory_mod.iloc[index]['pc'])[0]['all']
+                        # find = pc[pc[:, 0] == gen_idx, 2]
+                        # if find.size == 0:
+                        #     col3 = 0
+                        # else:
                         col3 = 0
+                            # col3 = pc[pc[:, 0] == gen_idx, 2][0]
+
                     else:  # if no deal of this generator in deals
                         col2 = np.round(-1 * my_deal_now[my_deal_now[:, 1] == gen_idx, 2], 4)
                         col3 = np.round(my_deal_now[my_deal_now[:, 1] == gen_idx, 3], 4)
@@ -1248,15 +1298,12 @@ class VPP_ext_agent(Agent):
 
             learn_memory_mod.iloc[index] = row
 
-
-
         # Change of deal factors etc per generator!
         for index, row in learn_memory_mod.iterrows():
             if index != 0 and row['pcf'] != min_pcf:
                 for gen_idx in gens_from_ppct:
                     if gen_idx == 0:
                         continue
-
                     col1_name = "g" + str(int(gen_idx)) + "_codrf"
                     col2_name = "g" + str(int(gen_idx)) + "_coe2cod"
 
@@ -1266,8 +1313,8 @@ class VPP_ext_agent(Agent):
                     if previous_deal == 0:
                         codrf = 0
                     else:
-                        codrf = round(codaf / learn_memory_mod.iloc[index-1]["g" + str(int(gen_idx)) + "_deal"], 4)
-
+                        codrf = round(codaf / gens_max_from_ppct[int(gen_idx)], 4)  # relatively to installed power of this generator
+                        # codrf = round(codaf / learn_memory_mod.iloc[index-1]["g" + str(int(gen_idx)) + "_deal"], 4)  # relatively to the previous deal, depreciated
                     if codaf == 0:
                         coe2cod = -1
                     else:
@@ -1318,7 +1365,7 @@ class VPP_ext_agent(Agent):
 
                 # environment similarity factor (discount of codf due to the change of environment):
                 esf = self.environment_similarity_factor(learn_memory_mod, index)
-                esf2 = esf*esf
+                esf2 = esf*esf*esf
                 mp_factor = np.round(codf * esf2, 4)
 
                 if codf < 0:
@@ -1346,6 +1393,9 @@ class VPP_ext_agent(Agent):
 
         for index, row in learn_memory_mod.iterrows():
             mpf_test = 0
+            mgen = ""
+            mp = ""
+
             for gen_idx in gens_from_ppct:
 
                 if gen_idx == 0:
@@ -1354,8 +1404,9 @@ class VPP_ext_agent(Agent):
 
                 g_excess = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_excess"]
                 g_deal = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_deal"]
-                g_deal_price = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_deal_price"]
+                g_offer_price = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_offer_price"]
                 g_coe2cod = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_coe2cod"]
+
                 if g_coe2cod == "":
                     g_coe2cod = 0
                 g_codrf = learn_memory_mod.iloc[index]["g" + str(int(gen_idx)) + "_codrf"]
@@ -1375,15 +1426,12 @@ class VPP_ext_agent(Agent):
                 else:
                     mpf0 = 0
 
-                row[col1_name] = 0
+                row[col1_name] = mpf0
 
                 if mpf0 > mpf_test:  # in order to find the maximum generator g_codrf in this timestamp
                     mpf_test = mpf0
                     mgen = gen_idx
-                    mp = g_deal_price
-                else:
-                    mgen = ""
-                    mp = ""
+                    mp = g_offer_price
 
             if mpf_test > 0:
                 row["mgen"] = mgen
@@ -1391,53 +1439,91 @@ class VPP_ext_agent(Agent):
 
             learn_memory_mod.iloc[index] = row
 
-        ###############################################
-        ### Make a belief table based on mp_factors ###
-        ###############################################
-
-        mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
-        pcfs_list = learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['pcf'].unique()  # only pcf where mp_factor is >0 in whole set
-
-        pcfs_column = []
-        mp_factor_avg_column = []
-        for pcf in pcfs_list:
-            print(pcf)
-            mp_factor_forpcf = learn_memory_mod[learn_memory_mod['pcf'] == pcf]
-            mp_factor_forpcf_positive = mp_factor_forpcf[mp_factor_forpcf['mp_factor'] > 0]
-            print(mp_factor_forpcf_positive['mp_factor'])
-            mp_factor_forpcf_sum = np.sum(mp_factor_forpcf_positive['mp_factor'])
-            mp_factor_weight = np.round((mp_factor_forpcf_sum / mp_factors_allsum), 4)
-
-            pcfs_column.append(pcf)
-            mp_factor_avg_column.append(mp_factor_weight)
-
-        mpf_frame = pd.DataFrame(data={'pcfs_column': pcfs_column, 'mp_factor_avg_column': mp_factor_avg_column})
-        # mpf_frame = mpf_frame.sort_values(by=['mp_factor_avg_column'], ascending=False)
-        # print(mpf_frame)
-        mpf_frame.to_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
-        mpf_frame.to_csv(path_dir_history + "mp_belief_ln_" + str(my_idx) + "_view.csv")
-
-        ### Select only one for each timestep i.e. when more timesteps exist
-
         # save to pickle and csv - REDUCED memory
         learn_memory_mod.to_pickle(path_initial_memory)
         learn_memory_mod.to_csv(path_dir_history + "memory_ln_full_" + str(
             my_idx) + "_view.csv")
 
-        selection_idx = []
-        for tt in learn_memory_mod['t'].unique():
-            a = learn_memory_mod.loc[learn_memory_mod['t'] == tt]
-            max_bidsaldo_idx = a['bids_saldo'].idxmax()
-            if learn_memory_mod.iloc[max_bidsaldo_idx]['bids_saldo'] == 0:
-                max_bidsaldo_idx += 1
-            selection_idx.append(max_bidsaldo_idx)
-        print(selection_idx)
-        learn_memory_mod = learn_memory_mod.iloc[selection_idx]
-        learn_memory_mod = learn_memory_mod.reset_index()
+        ###############################################
+        ### Make a belief table based on mp_factors ###
+        ###############################################
 
-        # save to pickle and csv - REDUCED memory
-        learn_memory_mod.to_pickle(path_initial_memory)
-        learn_memory_mod.to_csv(path_dir_history + "memory_ln_reduced_" + str(my_idx) + "_view.csv") # change it as the path_initial_memory!!!!!!!!!!
+        mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
+        pcfs_list = learn_memory_mod['pcf'].unique()  # all pcfs
+        # pcfs_list = learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['pcf'].unique()  # only pcf where mp_factor is >0 in whole set
+
+        pcfs = []
+        mp_factor_avg = []
+        # print("pcf: " + str(pcfs_list))
+        # print("mp_factors_allsum: " + str(mp_factors_allsum))
+        for pcf in pcfs_list:
+            # print("pcf: " + str(pcf))
+            mp_factor_forpcf = learn_memory_mod[learn_memory_mod['pcf'] == pcf]
+            # print("mp_factor_forpcf: " + str(mp_factor_forpcf))
+            mp_factor_forpcf_positive = mp_factor_forpcf[mp_factor_forpcf['mp_factor'] > 0]
+            # print("mp_factor_forpcf_positive: " + str(mp_factor_forpcf_positive))
+            mp_factor_forpcf_sum = np.sum(mp_factor_forpcf_positive['mp_factor'])
+            # print("mp_factor_forpcf_sum: " + str(mp_factor_forpcf_sum))
+            mp_factor_weight = np.round((mp_factor_forpcf_sum / mp_factors_allsum), 4)
+            # print("mp_factor_weight: " + str(mp_factor_weight))
+            # print("---------------------------- ")
+
+            pcfs.append(pcf)
+            mp_factor_avg.append(mp_factor_weight)
+
+        data_dict = {'pcfs': pcfs, 'mp_factor_avg': mp_factor_avg}
+
+        # do the same per-generator:
+        for gen_idx in gens_from_ppct:
+            print("gen_idx: " + str(gen_idx))
+            if gen_idx == 0:
+                continue
+            else:
+                mp_factors_allsum_pergen = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
+                print("mp_factors_allsum_pergen: " + str(mp_factors_allsum_pergen))
+                pcfs_pergen = []
+                mp_factor_avg_pergen = []
+
+                g_mpf_col_name = "g" + str(int(gen_idx)) + "_mpf"
+
+                for pcf in pcfs_list:
+                    print("pcf: " + str(pcf))
+                    mp_factor_forpcf = learn_memory_mod[learn_memory_mod['pcf'] == pcf]
+                    print("mp_factor_forpcf: " + str(mp_factor_forpcf[g_mpf_col_name]))
+                    mp_factor_forpcf_positive = mp_factor_forpcf[mp_factor_forpcf[g_mpf_col_name] > 0]
+                    print("mp_factor_forpcf_positive: " + str(mp_factor_forpcf_positive))
+                    mp_factor_forpcf_sum = np.sum(mp_factor_forpcf_positive[g_mpf_col_name])
+                    print("mp_factor_forpcf_sum: " + str(mp_factor_forpcf_sum))
+                    mp_factor_weight = np.round((mp_factor_forpcf_sum / mp_factors_allsum_pergen), 4)
+
+                    pcfs_pergen.append(pcf)
+                    mp_factor_avg_pergen.append(mp_factor_weight)
+
+            data_dict[g_mpf_col_name + "_avg"] = mp_factor_avg_pergen
+
+        mpf_frame = pd.DataFrame(data=data_dict)
+        mpf_frame.to_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
+        mpf_frame.to_csv(path_dir_history + "mp_belief_ln_" + str(my_idx) + "_view.csv")
+
+        ### Select only one for each timestep i.e. when more timesteps exist
+
+        selection_idx = []
+        t_vector = learn_memory_mod['t'].unique()
+        if t_vector.size == learn_memory_mod['t'].size:
+            print("No reduction of the memory necessary, becase no repetitions for the same timestamp.")
+        else:
+            for tt in t_vector:
+                a = learn_memory_mod.loc[learn_memory_mod['t'] == tt]
+                max_bidsaldo_idx = a['bids_saldo'].idxmax()
+                if learn_memory_mod.iloc[max_bidsaldo_idx]['bids_saldo'] == 0:
+                    max_bidsaldo_idx += 1
+                selection_idx.append(max_bidsaldo_idx)
+            learn_memory_mod = learn_memory_mod.iloc[selection_idx]
+            learn_memory_mod = learn_memory_mod.reset_index()
+
+            # save to pickle and csv - REDUCED memory
+            learn_memory_mod.to_pickle(path_initial_memory)
+            learn_memory_mod.to_csv(path_dir_history + "memory_ln_reduced_" + str(my_idx) + "_view.csv") # change it as the path_initial_memory!!!!!!!!!!
         return
 
     def environment_similarity_factor(self, learn_memory_mod, index):
@@ -1448,11 +1534,11 @@ class VPP_ext_agent(Agent):
         :return:
         """
 
-        features_weights_esim = {"mem_requests": 0.3,
-                                 "minute_t": 0.0,
+        features_weights_esim = {"mem_requests": 0.0,
+                                 "minute_t": 0.05,
                                  "mem_week_t": 0.0,
                                  "month_t": 0.0,
-                                 "mem_av_weather": 0.7}
+                                 "mem_av_weather": 0.95}
 
         ##### this part redundant >>>
         my_idx = data_names_dict[self.name]

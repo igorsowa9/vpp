@@ -9,7 +9,7 @@ np.set_printoptions(suppress=True)
 
 ts_0 = 3861#7*int(60/5*24)#3861
 constant_environment = False
-ts_n = 1#7*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_n = 1#14*int(60/5*24)-1  # number of timestamps of whole simulation
 
 start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already introduces the offset!
 # if you want to determine the prices based on the memory
@@ -18,6 +18,10 @@ start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already 
 # and if you want to include the negotiation from already exploit (i.e. the most optimal) in the next negotiation already
 exploit = True
 update_during_exploit = False  # it is stored at current folder, not at original history floder path_dir_history
+
+# pc_matrix_price_increase_factor (1) vs. pc_matrix_price_absolute_increase (2)
+# dumb VPPs always have price increase factor policy, regardless of this choice
+price_increase_policy = 1
 
 # pcf_avg modification (similarity() ) based on the belief in the memory
 do_not_exceed_mp_belief = True  # during the derivation of deal pay attention to the mp_factors from the mp_belief in the history folder
@@ -32,6 +36,9 @@ update_mp_belief = False  # not yet there at all, update during negotiation
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1201_0721_week2_multi_oneshot_10/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0822_1555_week1-2/'
 path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1204_1723_week1_multi_oneshot_10_withdeal/'
+# path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1206_1323_week1_multi_oneshot_1/'
+# path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1206_1620_week1and2_explore_oneshot/'
+# path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1207_1458_test_history/'
 
 # if set to more then 1, during the exploration, the learning agent has more than one try to propose an offer with the
 # exactly same conditions of environment, i.e. explore the opponent / environemnt better
@@ -41,7 +48,7 @@ explore_multi_oneshot = 1
 tocsv = True
 pdf = True
 
-# directory_tail = "_week1_multi_oneshot_10_withdeal"
+# directory_tail = "_week1and2_explore_oneshot"
 directory_tail = "_test"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'

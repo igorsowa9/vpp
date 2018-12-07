@@ -233,6 +233,7 @@ def erase_iteration_memory(ns):
         a.set_attr(iteration_memory_bid_accept=[])
         a.set_attr(iteration_memory_bid_finalanswer=[])
         a.set_attr(price_increase_factor=[])
+        a.set_attr(price_absolute_increase=[])
         a.set_attr(n_bids=0)
         a.set_attr(opfe3=0)
         a.set_attr(opfd3=0)
