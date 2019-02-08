@@ -7,35 +7,36 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 3861#7*int(60/5*24)#3861
+ts_0 = 7*int(60/5*24)#3861
 constant_environment = False
-ts_n = 1#14*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
 
 start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already introduces the offset!
 # if you want to determine the prices based on the memory
 
 # explit means that you want to determine price increase factor by the similarity method,
 # and if you want to include the negotiation from already exploit (i.e. the most optimal) in the next negotiation already
-exploit = True
-update_during_exploit = False  # it is stored at current folder, not at original history floder path_dir_history
+exploit_mode = True
+update_during_exploit = True  # it is stored at current folder, not at original history floder path_dir_history
 
 # pc_matrix_price_increase_factor (1) vs. pc_matrix_price_absolute_increase (2)
 # dumb VPPs always have price increase factor policy, regardless of this choice
-price_increase_policy = 1
+price_increase_policy = 2
 
 # pcf_avg modification (similarity() ) based on the belief in the memory
 do_not_exceed_mp_belief = True  # during the derivation of deal pay attention to the mp_factors from the mp_belief in the history folder
 mp_belief_treshold = 0.04  # minimum treshold of marginal price belief in order to take that price under consideration in mp_belief
-mp_belief_range = 0.10  # range of vicinity of the mp prices to consider in bids derivation
-exceeding_or_vicinity = True  # modify in case of a pcf exceeding the probable MP or modify if the pcf is only in the vicinity of the pcf (i.e. also lower, within the range)
+mp_belief_range = 2.0  # absolute range of vicinity of the mp prices to consider in bids derivation
+exceeding_or_vicinity = False  # modify in case of a pcf exceeding the probable MP or modify if the pcf is only in the vicinity of the pcf (i.e. also lower, within the range)
+# rather vicinity!!!
 
-update_mp_belief = False  # not yet there at all, update during negotiation
+update_mp_belief = False  # not yet there at all, update during negotiation according to BL
 
 # the path to the folder where the exploration results are saved, ALSO: belief about the marginal price is saved in that folder:
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0830_1544_week1_multi_oneshot_10/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1201_0721_week2_multi_oneshot_10/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0822_1555_week1-2/'
-path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1204_1723_week1_multi_oneshot_10_withdeal/'
+path_dir_history = '/home/iso/Desktop/vpp_some_results/2019_0207_1401_history__week1_oneshot_pri4_2_38/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1206_1323_week1_multi_oneshot_1/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1206_1620_week1and2_explore_oneshot/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1207_1458_test_history/'
@@ -48,8 +49,8 @@ explore_multi_oneshot = 1
 tocsv = True
 pdf = True
 
-# directory_tail = "_week1and2_explore_oneshot"
-directory_tail = "_test"
+directory_tail = "_week2_exploit_with_update"
+# directory_tail = "_test"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
 
@@ -62,9 +63,10 @@ vpp_learn = [0, 1, 2, 3]
 
 # vpps that utilize the memory to exploit
 vpp_exploit = ['vpp3']
-similarity_treshold = 0.70
-top_selection_quantity = 10
+similarity_treshold = 0.60
+top_selection_quantity = 100
 order_by = 'sim'
+mp_factor_treshold_in_selection = 0.3  # treshold value that are selected based on mp_factor before the average is calculated
 
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}
