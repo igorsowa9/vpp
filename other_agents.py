@@ -767,7 +767,7 @@ class VPP_ext_agent(Agent):
         :return:
         """
         myself = self.name
-
+        my_idx = data_names_dict[self.name]
         # memory = self.get_attr("learning_memory") <------------ now from file
         memory = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
 
@@ -888,9 +888,9 @@ class VPP_ext_agent(Agent):
                                     'mem_requesters': int(data_names_dict[deal_with]),
                                     'mem_week_t': int(current_time.weekday()) + 1,
                                     'mem_av_weather': res_now_power_all,
-                                    'codf': 1,  # change of deal factor -> there is no deal now to compare with
-                                    'esf': 1,  # environment similarity factor (discount)
-                                    'mp_factor': 1
+                                    'codf': 'tbd',  # change of deal factor -> there is no deal now to compare with
+                                    'esf': 'tbd',  # environment similarity factor (discount)
+                                    'mp_factor': 'tbd'
                                   })
 
         else:  # there were no deal on that request:
@@ -939,9 +939,9 @@ class VPP_ext_agent(Agent):
                                     'mem_requesters': int(data_names_dict[req_alias]),
                                     'mem_week_t': int(current_time.weekday()) + 1,
                                     'mem_av_weather': res_now_power_all,
-                                    'codf': -1,
-                                    'esf': -1,
-                                    'mp_factor': -1
+                                    'codf': 'tbd',
+                                    'esf': 'tbd',
+                                    'mp_factor': 'tbd'
                                   })
 
         memory = memory.append(to_append, ignore_index=True)
@@ -974,17 +974,22 @@ class VPP_ext_agent(Agent):
 
         if memory_update and self.name in vpp_exploit:
             updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
-            if not os.path.isfile(updated_memory_path):
+            if not os.path.isfile(updated_memory_path):  # make empty file and append
                 initial_history = pd.read_pickle(path_dir_history + "memory_ln_" + str(data_names_dict[self.name]) + ".pkl")
                 updated_memory = initial_history.append(to_append, ignore_index=True)
                 updated_memory.to_pickle(updated_memory_path)
                 updated_memory.to_csv(path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + "_view.csv")
-            else:
+            else:  # read existing file and append
                 updated_memory = pd.read_pickle(updated_memory_path)
                 updated_memory = updated_memory.append(to_append, ignore_index=True)
                 updated_memory.to_pickle(updated_memory_path)
                 updated_memory.to_csv(path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + "_view.csv")
             self.log_info("My learning memory (updated_memory) updated with current (exploitation) negotiation.")
+
+            # memory should be updated with the esf mp_factors etc.
+            # offset should make processing only for the new records
+            self.prepare_memory(updated_memory_path, True)
+
         return
 
     def similarity(self, t, mode):
@@ -1006,7 +1011,7 @@ class VPP_ext_agent(Agent):
         updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
 
         if not os.path.isfile(path_initial_memory):  # if memory file has not been prepared so far
-            self.prepare_initial_memory(t, path_initial_memory)
+            self.prepare_memory(path_initial_memory)
             self.log_info("Initial memory prepared and saved. Marginal prices (their pcfs) estimated.")
             fmem = pd.read_pickle(path_initial_memory)
         else:
@@ -1173,13 +1178,13 @@ class VPP_ext_agent(Agent):
 
             # 3) select top X in in bids_saldo
             fmem_mod = fmem_mod.head(top_selection_quantity)
-            print("SIM HEAD: ")
-            print(fmem_mod[['t', 'sim', 'pcf']])
+            print("SIM HEAD (top " + str(top_selection_quantity) + "): ")
+            print(fmem_mod[['t', 'sim', 'pcf', 'mp_factor']])
 
             # 3.1) select only those where mp_factor >0
             fmem_mod = fmem_mod.loc[fmem_mod['mp_factor'] > mp_factor_treshold_in_selection]
-            print("SIM HEAD, mp_factor> X: ")
-            print(fmem_mod[['t', 'sim', 'pcf']])
+            print("SIM HEAD, mp_factor>"+str(mp_factor_treshold_in_selection)+": ")
+            print(fmem_mod[['t', 'sim', 'pcf', 'mp_factor']])
 
             # 4) calculate average of pcfs of all selected cases with that similarity
             if fmem_mod.empty:
@@ -1236,59 +1241,63 @@ class VPP_ext_agent(Agent):
 
         return pcf_avg
 
-    def prepare_initial_memory(self, t, path_initial_memory):
+    def prepare_memory(self, path_memory, update=False):  # offset used if not initial memory needs to be prepared
 
         my_idx = data_names_dict[self.name]
 
         # Load history
         path_pickle = path_dir_history + "temp_ln_" + str(my_idx) + ".pkl"
+        if update:
+            path_pickle = path_memory
         learn_memory = pd.read_pickle(path_pickle)
+        mem_len = learn_memory.shape[0]
 
         # learn_memory = learn_memory.iloc[0:100, :]  # selection if necessary for example if only the first week as learning
-
         learn_memory_mod = copy.deepcopy(learn_memory)
-
-        # new columns:
-        learn_memory_mod['mem_requests'] = np.array(learn_memory_mod.with_idx_req.tolist())[:, 1]
-        learn_memory_mod['mem_requesters'] = np.array(learn_memory_mod.with_idx_req.tolist())[:, 0]
-        learn_memory_mod['mem_week_t'] = [x + 1 for x in learn_memory_mod.week_t.tolist()]
-
-        # week and month are ready in original version
-        learn_memory_mod['mem_av_weather'] = ""
-
-        learn_memory_mod['codf'] = ""   # !!! this should be per-my-generator! - it refers to my gens so should be divided
-        learn_memory_mod['esf'] = ""    # it is ok like that (?) - only one for the environment i.e. other opponents
-        learn_memory_mod['mp_factor'] = ""  # should be also divided into generators and thus into particular prices - refers to my own generators
-
-        # additional factors:
-        # 1) if percent_request increases
-        # 2) if we sell anyway 100% of our excess, it is not MP
-        learn_memory_mod['percent_of_excess_sold'] = ""
-        # 3) if the decrease of request and decrease of deal are the same, ration ~1, it is not due to MP
-        learn_memory_mod['cor2cod'] = ""  # change_of_request_to_change_of_deal
 
         min_pcf = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]
         print("MIN_PCF=" + str(min_pcf) + ". If different then in the learning memory then should be adjusted !!!")
 
-        # ---- factors per generator: excess, deal, deal_price, change of excess / change of deal ----
-
-        # create empty colums for single generators
         gens_from_ppct = self.get_attr("opf1_ppct")["gen"][:, 0]  # idxes of gens from ppct
         gens_max_from_ppct = self.get_attr("opf1_ppct")["gen"][:, 8]  # idxes of gens from ppct (intalled power)
-        for gen_idx in gens_from_ppct:
-            if gen_idx == 0:
-                continue
 
-            learn_memory_mod["g"+str(int(gen_idx))+"_excess"] = ""
-            learn_memory_mod["g"+str(int(gen_idx))+"_deal"] = ""
-            learn_memory_mod["g"+str(int(gen_idx))+"_offer_price"] = ""
-            learn_memory_mod["g"+str(int(gen_idx))+"_coe2cod"] = ""
-            learn_memory_mod["g"+str(int(gen_idx))+"_codrf"] = ""       # change of relative deal - like codf but per generator, percentage change
+        if not update:
+            # new columns:
+            learn_memory_mod['mem_requests'] = np.array(learn_memory_mod.with_idx_req.tolist())[:, 1]
+            learn_memory_mod['mem_requesters'] = np.array(learn_memory_mod.with_idx_req.tolist())[:, 0]
+            learn_memory_mod['mem_week_t'] = [x + 1 for x in learn_memory_mod.week_t.tolist()]
 
-            learn_memory_mod["g" + str(int(gen_idx)) + "_mpf"] = ""     # mp factor per generator
+            # week and month are ready in original version
+            learn_memory_mod['mem_av_weather'] = ""
 
-        learn_memory_mod["mgen"] = ""
-        learn_memory_mod["mp"] = ""
+            learn_memory_mod['codf'] = ""   # !!! this should be per-my-generator! - it refers to my gens so should be divided
+            learn_memory_mod['esf'] = ""    # it is ok like that (?) - only one for the environment i.e. other opponents
+            learn_memory_mod['mp_factor'] = ""  # should be also divided into generators and thus into particular prices - refers to my own generators
+
+            # additional factors:
+            # 1) if percent_request increases
+            # 2) if we sell anyway 100% of our excess, it is not MP
+            learn_memory_mod['percent_of_excess_sold'] = ""
+            # 3) if the decrease of request and decrease of deal are the same, ration ~1, it is not due to MP
+            learn_memory_mod['cor2cod'] = ""  # change_of_request_to_change_of_deal
+
+            # ---- factors per generator: excess, deal, deal_price, change of excess / change of deal ----
+
+            # create empty colums for single generators
+            for gen_idx in gens_from_ppct:
+                if gen_idx == 0:
+                    continue
+
+                learn_memory_mod["g"+str(int(gen_idx))+"_excess"] = ""
+                learn_memory_mod["g"+str(int(gen_idx))+"_deal"] = ""
+                learn_memory_mod["g"+str(int(gen_idx))+"_offer_price"] = ""
+                learn_memory_mod["g"+str(int(gen_idx))+"_coe2cod"] = ""
+                learn_memory_mod["g"+str(int(gen_idx))+"_codrf"] = ""       # change of relative deal - like codf but per generator, percentage change
+
+                learn_memory_mod["g" + str(int(gen_idx)) + "_mpf"] = ""     # mp factor per generator
+
+            learn_memory_mod["mgen"] = ""
+            learn_memory_mod["mp"] = ""
 
         # DEACTIVATED create empty columns for all prospective opponents i.e. all vpps but myself:
         # for po_idx in data_names:
@@ -1296,8 +1305,15 @@ class VPP_ext_agent(Agent):
         #         continue
         #     learn_memory_mod["mem_av_weather_"+str(po_idx)] = ""
 
+        #####################################
+        ### Calculations #################### if update, calculations should be done only for updated values (last row)
+        #####################################
+
         # Extract values per my generators to columns:
         for index, row in learn_memory_mod.iterrows():
+            if update:
+                if not index == mem_len-1:
+                    continue
             for gen_idx in gens_from_ppct:
 
                 if gen_idx == 0:
@@ -1344,6 +1360,9 @@ class VPP_ext_agent(Agent):
 
         # Change of deal factors etc per generator!
         for index, row in learn_memory_mod.iterrows():
+            if update:
+                if not index == mem_len-1:
+                    continue
             if index != 0 and row['pcf'] != min_pcf:
                 for gen_idx in gens_from_ppct:
                     if gen_idx == 0:
@@ -1373,6 +1392,9 @@ class VPP_ext_agent(Agent):
 
         # ---- Calculating the potential renewable power of all opponents together in Watts ----
         for index, row in learn_memory_mod.iterrows():
+            if update:
+                if not index == mem_len-1:
+                    continue
 
             res_now_power_all = 0
             av_weather = row.loc['av_weather']
@@ -1399,6 +1421,9 @@ class VPP_ext_agent(Agent):
         ############################
 
         for index, row in learn_memory_mod.iterrows():
+            if update:
+                if not index == mem_len-1:
+                    continue
             if index != 0 and row['pcf'] != min_pcf:
 
                 # change of (successful) deal factor:
@@ -1440,6 +1465,9 @@ class VPP_ext_agent(Agent):
 
 
         for index, row in learn_memory_mod.iterrows():
+            if update:
+                if not index == mem_len-1:
+                    continue
             mpf_test = 0
             mgen = ""
             mp = ""
@@ -1488,12 +1516,18 @@ class VPP_ext_agent(Agent):
             learn_memory_mod.iloc[index] = row
 
         # save to pickle and csv - REDUCED memory
-        learn_memory_mod.to_pickle(path_initial_memory)
-        learn_memory_mod.to_csv(path_dir_history + "memory_ln_full_" + str(
-            my_idx) + "_view.csv")
+        if update:
+            updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
+            learn_memory_mod.to_pickle(updated_memory_path)
+            learn_memory_mod.to_csv(path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + "_view.csv")
+            return
+        else:
+            learn_memory_mod.to_pickle(path_memory)
+            learn_memory_mod.to_csv(path_dir_history + "memory_ln_full_" + str(
+                my_idx) + "_view.csv")
 
         ###############################################
-        ### Make a belief table based on mp_factors ###
+        ### Make a belief table based on mp_factors ### # also needs to be updated !!
         ###############################################
 
         mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
@@ -1570,7 +1604,7 @@ class VPP_ext_agent(Agent):
             learn_memory_mod = learn_memory_mod.reset_index()
 
             # save to pickle and csv - REDUCED memory
-            learn_memory_mod.to_pickle(path_initial_memory)
+            learn_memory_mod.to_pickle(path_memory)
             learn_memory_mod.to_csv(path_dir_history + "memory_ln_reduced_" + str(my_idx) + "_view.csv") # change it as the path_initial_memory!!!!!!!!!!
         return
 
