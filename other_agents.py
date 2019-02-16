@@ -280,6 +280,9 @@ class VPP_ext_agent(Agent):
                 price_increase_factor = self.similarity(t, 1)
             if price_increase_policy == 2:
                 price_absolute_increase = self.similarity(t, 2) # this needs to be done! otherwise the part below will work only for the exploration
+                if price_absolute_increase == 0:
+                    price_increase_factor = self.load_data(data_paths[data_names_dict[self.name]])[
+                'pc_matrix_price_increase_factor'][0] # as emergency if no absolute increase
             a = 'ON'
 
         self.log_info("My runopf_e2 (I exploit: " + a + ") price_increase_factor: " + str(price_increase_factor))
@@ -295,7 +298,7 @@ class VPP_ext_agent(Agent):
         if n_iteration == 0:  # if its 0 iteration, make according to pr_matrix_price_increase_factor (each vpp has own)
             pc_matrix_incr = copy.deepcopy(exc_matrix.T)
 
-            if self.name in vpp_exploit and price_increase_policy == 2:
+            if self.name in vpp_exploit and price_increase_policy == 2 and price_absolute_increase != 0:
                 # substitute only prices of the generators that have cheaper production costs then the derived price
 
                 if exploit_mode == False:
@@ -731,17 +734,72 @@ class VPP_ext_agent(Agent):
             if np.max(deal[1][:, 3]) > marginal_price:
                 marginal_price = np.max(deal[1][:, 3])
 
+        #### VERY NON-UNIVERSAL
+        # calculate the maximum possible revenue (after excluding one vpp):
+        vppidx_to_delete = 2
+        received_pc = np.array(received_pc)
+
+        # delete vpp3 bids
+        received_pc_novpp3 = np.delete(received_pc, (np.where(received_pc[:, 0] == vppidx_to_delete)), axis=0)
+        # delete bids cheaper than vpp3's generation cost
+        vpp3_mingencost = 9
+        received_pc_novpp3 = np.delete(received_pc_novpp3, (np.where(received_pc[:, 3] < vpp3_mingencost)), axis=0)
+        # subtract the cheaper deals... self.get_attr('timestep_memory_mydeals')
+        final_deals = self.get_attr('timestep_memory_mydeals')
+        sum = 0
+        for fd in final_deals:
+            v = fd[0]
+            if v == "vpp3":
+                continue
+            d = fd[1]
+            for dg in d:
+                if dg[3] < vpp3_mingencost:
+                    sum = sum + dg[2]
+        #########################################
+
+        need = abs(self.get_attr('opf1')['power_balance']) - sum
+        bids = []
+        for pc in received_pc_novpp3:
+            pc_vpp_idx = pc[0]
+            pc_gen_idx = pc[1]
+            pc_maxval = float(pc[2])
+            pc_price = float(pc[3])
+            if need != 0 and need >= pc_maxval:
+                bids.append([pc_vpp_idx, pc_gen_idx, pc_maxval, pc_price])
+                need = need - pc_maxval
+            elif need != 0 and need < pc_maxval:
+                bids.append([pc_vpp_idx, pc_gen_idx, need, pc_price])
+                need = 0
+            elif need == 0:
+                break
+        # fill the bids with the unbidded vpps for refuse messages
+        bids = np.array(bids)
+        if bids.size == 0:
+            th_max_rev_forvpp3 = 0
+            th_max_rev_forvpp3_res1 = 0
+        else:
+            th_max_rev_forvpp3 = np.round(np.sum(bids[:, 2]*bids[:, 3]), 4)
+            th_max_rev_forvpp3_res1 = np.round(np.sum(bids[:, 2]*np.floor(bids[:, 3])), 4)
+
         memory = memory.append({'t': global_time,
                                 'my_deficit': my_deficit,
                                 'received_pc': np.array(received_pc),
-                                'final_deals': self.get_attr('timestep_memory_mydeals'),
-                                'marginal_price': marginal_price
+                                'final_deals': final_deals,
+                                'marginal_price': marginal_price,
+                                'received_pc_novpp3': np.array(received_pc_novpp3),
+                                'bids_novpp3': bids,
+                                'th_max_rev_forvpp3': th_max_rev_forvpp3,
+                                'th_max_rev_forvpp3_res1': th_max_rev_forvpp3_res1
                                 }, ignore_index=True)
         memory = memory[['t',
                          'my_deficit',
                          'received_pc',  # all received original price curves by the excess agents as response to request
                          'final_deals',
-                         'marginal_price']]
+                         'marginal_price',
+                         'received_pc_novpp3',
+                         'bids_novpp3',
+                         'th_max_rev_forvpp3',
+                         'th_max_rev_forvpp3_res1']]
 
         memory.to_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
         self.log_info("My learning memory updated (saved to file)")
@@ -845,6 +903,10 @@ class VPP_ext_agent(Agent):
             if req_value == np.round(np.sum(np.abs(gen_deals[:, 2])), 4):
                 ton = []
 
+            # total bids generation costs (if successful), i.e. only to produce the amount dealt
+            bids_gen_cost = np.round(np.sum(-1*deal[1][:, 2] *
+                                            self.get_attr('opf1')['exc_matrix'].T[:, 2]), 4)
+
             # create the record
             to_append = {'with_idx_req': np.array([int(data_names_dict[deal_with]), req_value]),
                                     'success': True,   # its based on successful deals so far only
@@ -856,8 +918,9 @@ class VPP_ext_agent(Agent):
                                     'deal': deal[1],
                                     'percent_req': np.round(np.sum(np.abs(gen_deals[:, 2])) / req_value, 4),
                                     'bids_saldo': bids_saldo,
+                                    'bids_gen_cost': bids_gen_cost,
                                     'pcf': self.get_attr('price_increased'),
-                                    'sim_cases': self.get_attr('similar_cases_chosen'),
+                                    'sim_cases': self.get_attr('selection'),
                                     'my_excess': self.get_attr('opf1')['exc_matrix'].T,
                                     'exc_cost_range': [np.min(self.get_attr('opf1')['exc_matrix'][2, :]),
                                                        np.max(self.get_attr('opf1')['exc_matrix'][2, :])],
@@ -907,8 +970,9 @@ class VPP_ext_agent(Agent):
                                     'deal': 0,
                                     'percent_req': 0,
                                     'bids_saldo': bids_saldo,
+                                    'bids_gen_cost': 0,
                                     'pcf': self.get_attr('price_increased'),
-                                    'sim_cases': self.get_attr('similar_cases_chosen'),
+                                    'sim_cases': self.get_attr('selection'),
                                     'my_excess': self.get_attr('opf1')['exc_matrix'].T,
                                     'exc_cost_range': [np.min(self.get_attr('opf1')['exc_matrix'][2, :]),
                                                        np.max(self.get_attr('opf1')['exc_matrix'][2, :])],
@@ -955,6 +1019,7 @@ class VPP_ext_agent(Agent):
                          'deal', # all generators deals with this particular vpp together, it says "who is selling" i.e. me
                          'percent_req',  # how much of the particular request was filled by my resources
                          'bids_saldo',  # positive if revenue negative if have to be bought
+                         'bids_gen_cost',
                          'pcf',  # price increase factor, that could be modified according to the vpp settings in json
                          'sim_cases',  # quantity of the similar cases chosen from the memory before benchmark
                          'my_excess',  # matrix of excess generators from opf1
@@ -1174,7 +1239,7 @@ class VPP_ext_agent(Agent):
             # 2) select the ones with similarity more than treshold
             fmem_mod = fmem_mod.loc[fmem_mod['sim'] > similarity_treshold]
             fmem_mod = fmem_mod.sort_values(by=[order_by], ascending=False)
-            self.get_attr("similar_cases_chosen").update({deficit_agent: fmem_mod.shape[0]})
+            self.get_attr("selection").update({deficit_agent: fmem_mod.shape[0]})
 
             # 3) select top X in in bids_saldo
             fmem_mod = fmem_mod.head(top_selection_quantity)
@@ -1185,16 +1250,20 @@ class VPP_ext_agent(Agent):
             fmem_mod = fmem_mod.loc[fmem_mod['mp_factor'] > mp_factor_treshold_in_selection]
             print("SIM HEAD, mp_factor>"+str(mp_factor_treshold_in_selection)+": ")
             print(fmem_mod[['t', 'sim', 'pcf', 'mp_factor']])
+            self.get_attr("selection").update({"over_mpfactor": fmem_mod.shape[0]})
 
             # 4) calculate average of pcfs of all selected cases with that similarity
             if fmem_mod.empty:
-                pcf_avg = self.load_data(data_paths[data_names_dict[self.name]])[
-            'pc_matrix_price_increase_factor'][0]
+                pcf_avg=0
+                # pcf_avg = self.load_data(data_paths[data_names_dict[self.name]])[
+            # 'pc_matrix_price_increase_factor'][0]
             else:
                 pcfs = fmem_mod['pcf'].tolist()
                 pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
 
             print("Average from chosen list: " + str(pcf_avg))
+            self.get_attr("selection").update({"raw_pcf_avg": pcf_avg})
+
             # 5) check the belief about the marginal prices
             if not do_not_exceed_mp_belief:
                 print("mp_factor_table limits DO NOT matter! ")
@@ -1239,6 +1308,7 @@ class VPP_ext_agent(Agent):
                 self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
                 print("pcf_avg: " + str(pcf_avg) + "\n\n")
 
+        self.get_attr("selection").update({"final_pcf_avg": pcf_avg})
         return pcf_avg
 
     def prepare_memory(self, path_memory, update=False):  # offset used if not initial memory needs to be prepared

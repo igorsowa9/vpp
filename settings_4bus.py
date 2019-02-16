@@ -25,10 +25,17 @@ price_increase_policy = 2
 
 # pcf_avg modification (similarity() ) based on the belief in the memory
 do_not_exceed_mp_belief = True  # during the derivation of deal pay attention to the mp_factors from the mp_belief in the history folder
-mp_belief_treshold = 0.04  # minimum treshold of marginal price belief in order to take that price under consideration in mp_belief
-mp_belief_range = 2.0  # absolute range of vicinity of the mp prices to consider in bids derivation
+mp_belief_treshold = 0.1  # minimum treshold of marginal price belief in order to take that price under consideration in mp_belief # can depend on amount of hipothesis
+mp_belief_range = 1.0  # absolute range of vicinity of the mp prices to consider in bids derivation
 exceeding_or_vicinity = False  # modify in case of a pcf exceeding the probable MP or modify if the pcf is only in the vicinity of the pcf (i.e. also lower, within the range)
 # rather vicinity!!!
+
+# vpps that utilize the memory to exploit
+vpp_exploit = ['vpp3']
+similarity_treshold = 0.70  # 0.70
+top_selection_quantity = 100  # 100
+order_by = 'sim'
+mp_factor_treshold_in_selection = 0.2  # treshold value that are selected based on mp_factor before the average is calculated
 
 update_mp_belief = False  # not yet there at all, update during negotiation according to BL
 
@@ -36,7 +43,8 @@ update_mp_belief = False  # not yet there at all, update during negotiation acco
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0830_1544_week1_multi_oneshot_10/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1201_0721_week2_multi_oneshot_10/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0822_1555_week1-2/'
-path_dir_history = '/home/iso/Desktop/vpp_some_results/2019_0207_1401_history__week1_oneshot_pri4_2_38/'
+path_dir_history = '/home/iso/Desktop/vpp_some_results/2019_0216_0957_history_week1_oneshot_pri3_1_20/'
+# path_dir_history = '/home/iso/Desktop/vpp_some_results/2019_0215_1519_history_week1_oneshot_pri3_1_20/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1206_1323_week1_multi_oneshot_1/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1206_1620_week1and2_explore_oneshot/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1207_1458_test_history/'
@@ -49,8 +57,8 @@ explore_multi_oneshot = 1
 tocsv = True
 pdf = True
 
-directory_tail = "_week2_exploit_with_update(improved)_reduced_gen2cost_inMLagent"
-# directory_tail = "_test"
+# directory_tail = "_week2_exploit_with_update(improved)_reduced_gen2cost_inMLagent"
+directory_tail = "_week2_for_plots_with_exploit"
 # directory_tail = "_history_week1_oneshot_pri3_1_20"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
@@ -61,13 +69,6 @@ negotiation = True  # if False, then only opf1 and requests
 
 # vpps that lear/memorize the history of negotiation
 vpp_learn = [0, 1, 2, 3]
-
-# vpps that utilize the memory to exploit
-vpp_exploit = ['vpp3']
-similarity_treshold = 0.60
-top_selection_quantity = 100
-order_by = 'sim'
-mp_factor_treshold_in_selection = 0.3  # treshold value that are selected based on mp_factor before the average is calculated
 
 data_names = ["vpp1", "vpp2", "vpp3", "vpp4"]
 data_names_dict = {"vpp1": 0, "vpp2": 1, "vpp3": 2, "vpp4": 3}

@@ -570,6 +570,11 @@ if __name__ == '__main__':
     # osbrain.config['TRANSPORT'] = 'tcp'
     # ##### RUN the simulation
 
+    with open('settings_4bus.py', 'r') as myfile:
+        data = myfile.read()
+        with open(path_save + "settings_text.txt", 'w') as output:
+            output.write(data)
+
     erase_learning_memory(vpp_learn)
 
     if not constant_environment:
