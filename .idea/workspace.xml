@@ -2,22 +2,57 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f433fee2-31f8-47db-bcdd-003fbacebfe5" name="Default" comment="next steps:&#10;&#10;-&gt; finish with absolute increase and thus single price in PC curve&#10;-&gt; test with more data, longer -&gt; data structure for more time, more exploration and explotation&#10;&#10;live update causes decrease of price because of the last, 10th similarity row, that is excluded after update.&#10;integarte marginal price belief:&#10;- change the mp_factor calculation from full table, not from the boiled down one. I think. - DONE&#10;How to better detect marginal prices e.g. 1,85?&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??) - found!&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Freakycat_20.100kW/Freakycat_20.100kW_20180618_20180701.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180618_20180701.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180702_20180708.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180709_20180715.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180716_20180722.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180723_20180729.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180730_20180805.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180806_20180812.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180813_20180819.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180820_20180826.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180827_20180902.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180903_20180909.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180910_20180916.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180917_20180923.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/GfB_mbH_-_Westnetz_GmbH_29.610kW/GfB_mbH_-_Westnetz_GmbH_29.610kW_20180924_20180930.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/HLB_Sunnyfarm_19.500kW/HLB_Sunnyfarm_19.500kW_20180618_20180701.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180618_20180701.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180702_20180708.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180709_20180715.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180716_20180722.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180723_20180729.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180730_20180805.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180806_20180812.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180813_20180819.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180820_20180826.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180827_20180902.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180903_20180909.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180910_20180916.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180917_20180923.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/Michiels_Wegberg_27.900kW/Michiels_Wegberg_27.900kW_20180924_20180930.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/PV-Anlage_dahoam_23.000kW/PV-Anlage_dahoam_23.000kW_20180618_20180701.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180618_20180701.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180702_20180708.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180709_20180715.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180716_20180722.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180723_20180729.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180730_20180805.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180806_20180812.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180813_20180819.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180820_20180826.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180827_20180902.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180903_20180909.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180910_20180916.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/SGjuk_12KW_29.000kW/SGjuk_12KW_29.000kW_20180917_20180923.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/WohnhausA1_20.240kW/WohnhausA1_20.240kW_20180618_20180701.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/pvoutput_org/min5/race|result_92.750kW/race|result_92.750kW_20180618_20180701.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/vpp4bus/vpp3-case4.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/other_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/other_agents.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_all.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_green.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp1_fromOPF_e2_green.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pcc_check/vpp2_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp2_fromOPF1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e2_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e2_all.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e2_green.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e2_green.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e3.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp3_fromOPF_e3.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF1.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e2_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e2_all.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e2_green.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e2_green.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e3.py" beforeDir="false" afterPath="$PROJECT_DIR$/pcc_check/vpp4_fromOPF_e3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings_4bus.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_4bus.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -63,7 +98,7 @@
             <file pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/other_agents.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="298">
+                  <state relative-caret-position="328">
                     <caret line="1735" column="20" selection-start-line="1735" selection-start-column="14" selection-end-line="1735" selection-end-column="20" />
                     <folding>
                       <element signature="e#0#25#0" expanded="true" />
@@ -352,21 +387,13 @@
               <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
               <item name="vpp" type="462c0819:PsiDirectoryNode" />
               <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="original_elia" type="462c0819:PsiDirectoryNode" />
+              <item name="pvoutput_org" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
               <item name="vpp" type="462c0819:PsiDirectoryNode" />
               <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="original_elia" type="462c0819:PsiDirectoryNode" />
-              <item name="in_use" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vpp" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vpp" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="original_elia" type="462c0819:PsiDirectoryNode" />
-              <item name="in_use" type="462c0819:PsiDirectoryNode" />
+              <item name="pvoutput_org" type="462c0819:PsiDirectoryNode" />
               <item name="min5" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -572,13 +599,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1498654725175</updated>
-    </task>
-    <task id="LOCAL-00041" summary="next steps:&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;!!! thermal limits were removed!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
-      <created>1528812368995</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1528812368998</updated>
     </task>
     <task id="LOCAL-00042" summary="next steps:&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;!!! thermal limits were removed!&#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
       <created>1529677066573</created>
@@ -916,7 +936,14 @@
       <option name="project" value="LOCAL" />
       <updated>1550341482194</updated>
     </task>
-    <option name="localTasksCounter" value="90" />
+    <task id="LOCAL-00090" summary="next steps:&#10;&#10;-&gt; finish with absolute increase and thus single price in PC curve&#10;-&gt; test with more data, longer -&gt; data structure for more time, more exploration and explotation&#10;&#10;live update causes decrease of price because of the last, 10th similarity row, that is excluded after update.&#10;integarte marginal price belief:&#10;- change the mp_factor calculation from full table, not from the boiled down one. I think. - DONE&#10;How to better detect marginal prices e.g. 1,85?&#10;&#10;try to rebuild very close prices case... (ranges of weather-power factors??) - found!&#10;&#10;live update !!!&#10;&#10;integrate detected marginal prices into boundries of proposals&#10;finish the margina price occurance factor and reduction of timesteps memory with respect to that.&#10;&#10;integration of last negotiation results into current ones&#10;&#10;finish to visualize the &quot;live&quot; reservation value for deficit agents (i.e. from chosen price curves: bids) together with the offered bids by learning agent vpp and by others' prices (unknown for learning agent) - for now in excel!&#10;what other domain specific knowledge than the &quot;17% lower reservation price of the other agent&quot; like in the paper? something related to opponents since their prices determine the RP of the deficit agent&#10;integrate more data for testing (whole year?)&#10;develop live update of the history (already current negotiation is considered in the next timestamp)&#10;&#10;check counting of iteration... it does not work&#10;&#10;make the ppc gen so that the constraints are not fixed but they regulate on their own... through OPF&#10;socket/files problem -&gt; translation into working NS in the loop...&#10;translate to pypsa?&#10;&#10;make a mmemory database and export to matlab to test some learning!&#10;&#10;situation when deficit agent receives PC with too little resources -&gt; it should break the simulation and propose better price (up to dso intervention price)&#10;&#10;situation when deficit agent refuses already accepted bid offer (because it got a new price curve from another excess agent (e.g. modified one))&#10;&#10;update 15minutes files to 5minutes ones. Put more data into code, import using the new script&#10;&#10;visualisation, more testing of different cases, more files implementation - see below&#10;&#10;Implement modifying the resources from files.&#10;Check files from Gianlu, David, Jannik, Andrea&#10;&#10;~~~ extract the feasible excess as the price curve for further evaluation !!!!!! important to develop such scenario!!&#10;&#10;finish prepare_initial_memory() for making the mp detection reducing timestamps &#10;&#10;normal negotiation:&#10;- build other blocks from the chart&#10;- develop the iterations &gt; 1, in different moments,&#10;- integrate batteries&#10;- where in the details of the negotiation (opfs/decisions/evaluation/alignments), some ML might me used:&#10;   + initial requests by Defs&#10;   + initial price curves by Exc&#10;   + alignment of the accept-mod (need behaviour of Def as answer)&#10;&#10;Pursue towards the pure ML derivation i.e. prediction of adjacent power balances to propose better negotiations? - with no agents, only pure ML on an isolated system case and opfs...&#10; &#10;ML data and implementation, where, what:&#10;1) basic table with simple time data and PC and bids, and ML estimation of success&#10;2) estimation generator by generator, resource by resource in order to make a real opf output estimation.">
+      <created>1550389954223</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1550389954223</updated>
+    </task>
+    <option name="localTasksCounter" value="91" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -964,12 +991,12 @@
     <frame x="69" y="-4" width="1851" height="1084" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20295405" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20295405" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32845187" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49781182" visible="true" weight="0.33646813" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49781182" visible="true" weight="0.33646813" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39853558" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -1334,7 +1361,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/other_agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
+        <state relative-caret-position="328">
           <caret line="1735" column="20" selection-start-line="1735" selection-start-column="14" selection-end-line="1735" selection-end-column="20" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
