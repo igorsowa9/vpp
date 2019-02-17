@@ -909,8 +909,18 @@ class VPP_ext_agent(Agent):
                 ton = []
 
             # total bids generation costs (if successful), i.e. only to produce the amount dealt
-            bids_gen_cost = np.round(np.sum(-1*deal[1][:, 2] *
-                                            self.get_attr('opf1')['exc_matrix'].T[:, 2]), 4)
+            print(deal)
+            print(self.get_attr('opf1')['exc_matrix'].T)
+
+            print(np.sum(-1*deal[1][:, 2]))
+            print(np.array(self.get_attr('opf1')['exc_matrix'].T[:, 2]))
+
+            excm = self.get_attr('opf1')['exc_matrix'].T
+            a1 = deal[1][:, 1]
+            b1 = np.array(self.get_attr('opf1')['exc_matrix'].T[:, 0])
+            todel = np.setdiff1d(b1, a1)
+            excm = np.delete(excm, (np.where(excm[:, 0] == todel)), axis=0)
+            bids_gen_cost = np.round(np.sum(-1*deal[1][:, 2] * excm[:, 2]), 4)
 
             # create the record
             to_append = {'with_idx_req': np.array([int(data_names_dict[deal_with]), req_value]),

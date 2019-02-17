@@ -16,15 +16,15 @@ start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already 
 
 # explit means that you want to determine price increase factor by the similarity method,
 # and if you want to include the negotiation from already exploit (i.e. the most optimal) in the next negotiation already
-exploit_mode = True
+exploit_mode = False
 update_during_exploit = True  # it is stored at current folder, not at original history floder path_dir_history
 
 # pc_matrix_price_increase_factor (1) vs. pc_matrix_price_absolute_increase (2)
 # dumb VPPs always have price increase factor policy, regardless of this choice
-price_increase_policy = 2
+price_increase_policy = 1
 
 # pcf_avg modification (similarity() ) based on the belief in the memory
-do_not_exceed_mp_belief = True  # during the derivation of deal pay attention to the mp_factors from the mp_belief in the history folder
+do_not_exceed_mp_belief = False  # during the derivation of deal pay attention to the mp_factors from the mp_belief in the history folder
 mp_belief_treshold = 0.1  # minimum treshold of marginal price belief in order to take that price under consideration in mp_belief # can depend on amount of hipothesis
 mp_belief_range = 1.0  # absolute range of vicinity of the mp prices to consider in bids derivation
 exceeding_or_vicinity = False  # modify in case of a pcf exceeding the probable MP or modify if the pcf is only in the vicinity of the pcf (i.e. also lower, within the range)
@@ -58,7 +58,7 @@ tocsv = True
 pdf = True
 
 directory_tail = "_test"
-# directory_tail = "_week2_for_plots_fixed_at1.1"
+# directory_tail = "_week2_for_plots_fixed13"
 # directory_tail = "_history_week1_oneshot_pri3_1_20"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
