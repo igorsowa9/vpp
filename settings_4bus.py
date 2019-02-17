@@ -57,8 +57,8 @@ explore_multi_oneshot = 1
 tocsv = True
 pdf = True
 
-# directory_tail = "_week2_exploit_with_update(improved)_reduced_gen2cost_inMLagent"
-directory_tail = "_week2_for_plots_with_exploit"
+directory_tail = "_test"
+# directory_tail = "_week2_for_plots_fixed_at1.1"
 # directory_tail = "_history_week1_oneshot_pri3_1_20"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'

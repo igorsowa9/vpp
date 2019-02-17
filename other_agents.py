@@ -757,7 +757,12 @@ class VPP_ext_agent(Agent):
                     sum = sum + dg[2]
         #########################################
 
-        need = abs(self.get_attr('opf1')['power_balance']) - sum
+        need0 = abs(self.get_attr('opf1')['power_balance'])  # need should be the max(value of vpp3 excess!, need) - sum of cheaper
+        excess = np.sum(received_pc[received_pc[:, 0] == vppidx_to_delete, 2])
+        need = min(need0, excess) - sum
+
+        ##########################################
+
         bids = []
         for pc in received_pc_novpp3:
             pc_vpp_idx = pc[0]
