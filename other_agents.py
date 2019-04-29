@@ -1257,14 +1257,25 @@ class VPP_ext_agent(Agent):
             self.get_attr("selection").update({deficit_agent: fmem_mod.shape[0]})
 
             # 3) select top X in in bids_saldo
-            fmem_mod = fmem_mod.head(top_selection_quantity)
-            print("SIM HEAD (top " + str(top_selection_quantity) + "): ")
-            print(fmem_mod[['t', 'sim', 'pcf', 'mp_factor']])
+            if not top_selection_quantity == 0:
+                fmem_mod = fmem_mod.head(top_selection_quantity)
+                print("SIM HEAD (top " + str(top_selection_quantity) + "): ")
+                print(fmem_mod[['t', 'sim', 'pcf', 'mp_factor']])
 
             # 3.1) select only those where mp_factor >0
+            print("3.1 condition:")
+            # print(fmem_mod['mp_factor'] > mp_factor_treshold_in_selection)
+            # print(fmem_mod['mp_factor'])
+            # print(fmem_mod.loc[:, [fmem_mod['mp_factor']]])
+            #
+            # print(mp_factor_treshold_in_selection)
             fmem_mod = fmem_mod.loc[fmem_mod['mp_factor'] > mp_factor_treshold_in_selection]
+            print(fmem_mod)
+
             print("SIM HEAD, mp_factor>"+str(mp_factor_treshold_in_selection)+": ")
             print(fmem_mod[['t', 'sim', 'pcf', 'mp_factor']])
+            print(fmem_mod.shape[0])
+
             self.get_attr("selection").update({"over_mpfactor": fmem_mod.shape[0]})
 
             # 4) calculate average of pcfs of all selected cases with that similarity
@@ -1286,9 +1297,14 @@ class VPP_ext_agent(Agent):
                 print("mp_factor_table limits matter! ")
                 print("pcf_avg before considering MP limits: " + str(pcf_avg))
 
-                mp_factor_table = pd.read_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
-                mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
-                mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
+                if update_mp_belief:
+                    updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
+                    updated_memory = pd.read_pickle(updated_memory_path)
+
+                else:
+                    mp_factor_table = pd.read_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
+                    mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
+                    mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
 
                 # print("mp_factor_table: ")
                 # print(mp_factor_table[['pcfs', 'mp_factor_avg']])
@@ -1383,6 +1399,7 @@ class VPP_ext_agent(Agent):
 
             learn_memory_mod["mgen"] = ""
             learn_memory_mod["mp"] = ""
+            learn_memory_mod["mp_belief"] = ""
 
         # DEACTIVATED create empty columns for all prospective opponents i.e. all vpps but myself:
         # for po_idx in data_names:
@@ -1474,7 +1491,6 @@ class VPP_ext_agent(Agent):
 
                 learn_memory_mod.iloc[index] = row
 
-
         # ---- Calculating the potential renewable power of all opponents together in Watts ----
         for index, row in learn_memory_mod.iterrows():
             if update:
@@ -1548,7 +1564,6 @@ class VPP_ext_agent(Agent):
             row['mp_factor'] = mp_factor
             learn_memory_mod.iloc[index] = row
 
-
         for index, row in learn_memory_mod.iterrows():
             if update:
                 if not index == mem_len-1:
@@ -1600,7 +1615,78 @@ class VPP_ext_agent(Agent):
 
             learn_memory_mod.iloc[index] = row
 
-        # save to pickle and csv - REDUCED memory
+        ###############################################
+        ### Make a belief table based on mp_factors ### # also needs to be updated !!
+        ###############################################
+
+        if not update:
+            mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
+            pcfs_list = learn_memory_mod['pcf'].unique()  # all pcfs
+            # pcfs_list = learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['pcf'].unique()  # only pcf where mp_factor is >0 in whole set
+
+            pcfs = []
+            mp_factor_avg = []
+            # print("pcf: " + str(pcfs_list))
+            # print("mp_factors_allsum: " + str(mp_factors_allsum))
+            for pcf in pcfs_list:
+                # print("pcf: " + str(pcf))
+                mp_factor_forpcf = learn_memory_mod[learn_memory_mod['pcf'] == pcf]
+                # print("mp_factor_forpcf: " + str(mp_factor_forpcf))
+                mp_factor_forpcf_positive = mp_factor_forpcf[mp_factor_forpcf['mp_factor'] > 0]
+                # print("mp_factor_forpcf_positive: " + str(mp_factor_forpcf_positive))
+                mp_factor_forpcf_sum = np.sum(mp_factor_forpcf_positive['mp_factor'])
+                # print("mp_factor_forpcf_sum: " + str(mp_factor_forpcf_sum))
+                mp_factor_weight = np.round((mp_factor_forpcf_sum / mp_factors_allsum), 4)
+                # print("mp_factor_weight: " + str(mp_factor_weight))
+                # print("---------------------------- ")
+
+                pcfs.append(pcf)
+                mp_factor_avg.append(mp_factor_weight)
+
+            data_dict = {'pcfs': pcfs, 'mp_factor_avg': mp_factor_avg}
+            # update the mp_beliefs to the last row of the prepared memory (from exploration)
+            learn_memory_mod['mp_belief'].iloc[[-1]] = [data_dict]
+
+        else:
+            # print("ASDASD2: " + str(learn_memory_mod.iloc[-2][['t', 'mp_belief', 'mp_belief']]))
+            last_mp_belief = learn_memory_mod.iloc[-2]['mp_belief']
+            print("last_mp_belief: " + str(last_mp_belief))
+            if update_mp_belief:
+                # print("last rows: " + str(learn_memory_mod.iloc[-5:-1]))
+                print("last mp_factor: " + str(learn_memory_mod.iloc[-1]['mp_factor']))
+                # print("-5:-1 belief: " + str(learn_memory_mod.iloc[-5:-1][['t', 'mp_belief']]))
+                if learn_memory_mod.iloc[-1]['mp_factor'] <= 0:
+                    # learn_memory_mod['mp_belief'].iloc[[-1]] = "no update necessary mp_factor<0"
+                    # print("rewriting -2: " + str(learn_memory_mod.iloc[-2][['t', 'mp_belief']]))
+                    # print("rewriting -3: " + str(learn_memory_mod.iloc[-3][['t', 'mp_belief']]))
+                    # print("to -1: " + str(learn_memory_mod.iloc[-1][['t','mp_belief']]))
+                    learn_memory_mod['mp_belief'].iloc[[-1]] = [last_mp_belief]
+                    # print("after update mp_belief: " + str(learn_memory_mod.iloc[-1]['mp_belief']))
+                    # print("ASDASD 2: " + str(learn_memory_mod.iloc[[-3, -2, -1]][['t', 'mp_belief']]))
+                    # learn_memory_mod.iloc[-1, learn_memory_mod.columns.get_loc('mp_belief')] = 1
+                else:
+                    mpf = learn_memory_mod.iloc[-1]['mp_factor']  # my row
+                    pri = learn_memory_mod.iloc[-1]['pcf']  # my row
+                    P_H_dict = learn_memory_mod.iloc[-2]['mp_belief']  # previous row
+
+                    a = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][0]
+                    b = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][1]
+                    c = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][2]
+                    thetaH = np.arange(a, b+c, c)
+                    # print(thetaH)
+
+                    P_He = self.P_He_constrained(P_H_dict, pri, mpf, thetaH, pow, multi, theta_constraints, c)
+                    print("== back to main ===")
+                    P_He_dict = copy.deepcopy(P_H_dict)
+                    P_He_dict['mp_factor_avg'] = P_He.tolist()
+                    # print(P_H_dict)
+                    # print(P_He_dict)
+
+                    learn_memory_mod['mp_belief'].iloc[[-1]] = [P_He_dict]
+
+                # print("after ASDASD: " + str(learn_memory_mod.iloc[[-3,-2,-1]][['t', 'mp_belief']]))
+
+        # save to pickle and csv - both original and updated memory
         if update:
             updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
             learn_memory_mod.to_pickle(updated_memory_path)
@@ -1611,69 +1697,14 @@ class VPP_ext_agent(Agent):
             learn_memory_mod.to_csv(path_dir_history + "memory_ln_full_" + str(
                 my_idx) + "_view.csv")
 
-        ###############################################
-        ### Make a belief table based on mp_factors ### # also needs to be updated !!
-        ###############################################
 
-        mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
-        pcfs_list = learn_memory_mod['pcf'].unique()  # all pcfs
-        # pcfs_list = learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['pcf'].unique()  # only pcf where mp_factor is >0 in whole set
-
-        pcfs = []
-        mp_factor_avg = []
-        # print("pcf: " + str(pcfs_list))
-        # print("mp_factors_allsum: " + str(mp_factors_allsum))
-        for pcf in pcfs_list:
-            # print("pcf: " + str(pcf))
-            mp_factor_forpcf = learn_memory_mod[learn_memory_mod['pcf'] == pcf]
-            # print("mp_factor_forpcf: " + str(mp_factor_forpcf))
-            mp_factor_forpcf_positive = mp_factor_forpcf[mp_factor_forpcf['mp_factor'] > 0]
-            # print("mp_factor_forpcf_positive: " + str(mp_factor_forpcf_positive))
-            mp_factor_forpcf_sum = np.sum(mp_factor_forpcf_positive['mp_factor'])
-            # print("mp_factor_forpcf_sum: " + str(mp_factor_forpcf_sum))
-            mp_factor_weight = np.round((mp_factor_forpcf_sum / mp_factors_allsum), 4)
-            # print("mp_factor_weight: " + str(mp_factor_weight))
-            # print("---------------------------- ")
-
-            pcfs.append(pcf)
-            mp_factor_avg.append(mp_factor_weight)
-
-        data_dict = {'pcfs': pcfs, 'mp_factor_avg': mp_factor_avg}
-
-        # deactivated - do the same per-generator:
-        # for gen_idx in gens_from_ppct:
-        #     print("gen_idx: " + str(gen_idx))
-        #     if gen_idx == 0:
-        #         continue
-        #     else:
-        #         mp_factors_allsum_pergen = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
-        #         print("mp_factors_allsum_pergen: " + str(mp_factors_allsum_pergen))
-        #         pcfs_pergen = []
-        #         mp_factor_avg_pergen = []
-        #
-        #         g_mpf_col_name = "g" + str(int(gen_idx)) + "_mpf"
-        #
-        #         for pcf in pcfs_list:
-        #             print("pcf: " + str(pcf))
-        #             mp_factor_forpcf = learn_memory_mod[learn_memory_mod['pcf'] == pcf]
-        #             print("mp_factor_forpcf: " + str(mp_factor_forpcf[g_mpf_col_name]))
-        #             mp_factor_forpcf_positive = mp_factor_forpcf[mp_factor_forpcf[g_mpf_col_name] > 0]
-        #             print("mp_factor_forpcf_positive: " + str(mp_factor_forpcf_positive))
-        #             mp_factor_forpcf_sum = np.sum(mp_factor_forpcf_positive[g_mpf_col_name])
-        #             print("mp_factor_forpcf_sum: " + str(mp_factor_forpcf_sum))
-        #             mp_factor_weight = np.round((mp_factor_forpcf_sum / mp_factors_allsum_pergen), 4)
-        #
-        #             pcfs_pergen.append(pcf)
-        #             mp_factor_avg_pergen.append(mp_factor_weight)
-        #
-        #     data_dict[g_mpf_col_name + "_avg"] = mp_factor_avg_pergen
-
+        # Save mp_belief to the separate file in the originial history folder - old. Now I save to prepared memory
         mpf_frame = pd.DataFrame(data=data_dict)
         mpf_frame.to_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
         mpf_frame.to_csv(path_dir_history + "mp_belief_ln_" + str(my_idx) + "_view.csv")
 
-        ### Select only one for each timestep i.e. when more timesteps exist
 
+        ### Select only one for each timestep i.e. when more timesteps exist
         selection_idx = []
         t_vector = learn_memory_mod['t'].unique()
         if t_vector.size == learn_memory_mod['t'].size:
@@ -1692,6 +1723,176 @@ class VPP_ext_agent(Agent):
             learn_memory_mod.to_pickle(path_memory)
             learn_memory_mod.to_csv(path_dir_history + "memory_ln_reduced_" + str(my_idx) + "_view.csv") # change it as the path_initial_memory!!!!!!!!!!
         return
+
+
+    def P_He_constrained(self, P_Hd, pri, mp_factor, thetaH, pow, multi, theta_constraints, prices_step):
+        """
+
+        :param pri: price relative increase, event
+        :param mpf: mp_factor, event
+        :param thetaH: range of hypothesis in absolute price values
+        :param pow: variable for the function translating mp_factor to parameters for beta-distribution
+        :param multi: variable for the function translating mp_factor to parameters for beta-distribution
+        :param theta_constraints_idx: constraints for the range around the event price, to limit the influence of on event on other marginal prices
+        :return:
+        """
+        # print("ASDASD")
+        # print(mpf)
+        # print(pri)
+        # print(P_H)
+        # print(thetaH)
+
+        # fake values
+        # pri = 16.11
+        # mp_factor = 0.9238
+
+        n_hypoth = len(thetaH)
+        thetaH_idx = np.arange(0, n_hypoth)
+        thetaH_idx_ranges = np.transpose(np.concatenate((np.array([thetaH_idx]), np.array([thetaH-prices_step]), np.array([thetaH])), axis=0))
+        print(thetaH_idx_ranges)
+        print(thetaH_idx_ranges.shape)
+        resolution_normalized = 1/n_hypoth
+        theta = np.divide(thetaH_idx, n_hypoth)
+
+        min_probability = resolution_normalized/10
+
+        print("--- in function ---")
+        print(n_hypoth)
+        print(thetaH_idx)
+        print(resolution_normalized)
+        print(theta)
+
+        cont_res = 0.001
+        # B norm definition
+
+        n_hypoth_constr = 2*theta_constraints/prices_step+1
+
+        print("\n")
+        print(thetaH)
+        print(pri)
+        print(P_Hd)
+        P_H = np.array(P_Hd['mp_factor_avg'])
+        print("P_H: " + str(P_H))
+        print("pri: " + str(pri))
+        print(thetaH == pri)
+        print("mpf: " + str(mp_factor))
+
+        # row beta-distribution part
+        theta01 = np.arange(0, 1+cont_res, cont_res)
+        alpha = multi * (mp_factor ** pow)
+        print("alpha01: " + str(alpha))
+        if alpha < 1:
+            P_He = P_H
+            P_He[P_He < min_probability] = min_probability
+            P_He = np.round(P_He / np.sum(P_He), 4)
+            return P_He
+        beta = (alpha - 1 + 2*0.5 - 0.5*alpha)/0.5
+        print("beta01: " + str(beta))
+        B01 = self.B_norm(alpha, beta, theta01, cont_res)
+        print(B01)
+        cont_probability = (theta01**(alpha-1) * (1-theta01)**(beta-1)) / B01
+        print("should be 1:" + str(np.sum(cont_probability*cont_res)))
+
+        pri_ranges = np.empty([int(n_hypoth_constr), 2])
+        pri_start = pri-theta_constraints
+        pri_ranges[0, 0] = pri_start
+        pri_max = pri + theta_constraints
+        pri_ranges[-1, -1] = pri_max
+        print(pri_ranges)
+        thetaHext = np.sort(np.concatenate([thetaH, np.array([pri_start])]))
+
+        print(thetaHext)
+        thetaHext_greater = thetaHext[thetaHext > pri_start]
+        print(thetaHext_greater)
+
+        print("\n")
+        for nh in range(0, int(n_hypoth_constr)):
+            if thetaHext_greater[nh] <= pri_max:
+                pri_ranges[nh, 1] = thetaHext_greater[nh]
+                pri_ranges[nh+1, 0] = thetaHext_greater[nh]
+            else:
+                break
+
+        print(pri_ranges)
+        ranges = pri_ranges - pri_start
+        ranges_norm = ranges / ranges[-1, -1]
+
+        P_eH_constr = np.empty(int(n_hypoth_constr))
+        print(P_eH_constr)
+        for nh in range(0, int(n_hypoth_constr)):
+            print(nh)
+            start = np.round(ranges_norm[nh, 0] + cont_res, 4)
+            stop = np.round(ranges_norm[nh, 1], 4)
+            print(start)
+            print(stop)
+
+            theta_prob = np.arange(start, stop+10e-6, cont_res)
+            print(theta_prob)
+            prob = (theta_prob**(alpha-1) * (1-theta_prob)**(beta-1)) / B01
+            print("prob1: " + str(prob))
+            print("prob2: " + str(prob*cont_res))
+            print("prob3: " + str(np.sum(prob*cont_res)))
+            P_eH_constr[nh] = np.sum(prob*cont_res)
+
+        print("P_eH_constr: " + str(P_eH_constr))
+        print("Should be one: " + str(np.sum(P_eH_constr)))
+
+
+        a = pri > thetaH_idx_ranges[:, 1]
+        b = pri <= thetaH_idx_ranges[:, 2]
+        middle_idx = thetaH_idx_ranges[a*b, 0]
+
+        a = pri_start > thetaH_idx_ranges[:, 1]
+        b = pri_start <= thetaH_idx_ranges[:, 2]
+        down_idx = thetaH_idx_ranges[a * b, 0]
+
+        a = pri_max > thetaH_idx_ranges[:, 1]
+        b = pri_max <= thetaH_idx_ranges[:, 2]
+        up_idx = thetaH_idx_ranges[a * b, 0]
+
+        thetaH_idx_constr = np.arange(down_idx, up_idx+1)
+        print(P_H)
+        print(thetaH_idx_constr)
+
+        P_H_constr = P_H[thetaH_idx_constr.astype(int)]
+        eps_sum = 0
+
+        print(P_eH_constr)
+        print(P_H_constr)
+
+        for i in range(0, int(n_hypoth_constr)):
+            a = P_eH_constr[i] * P_H_constr[i]
+            eps_sum = eps_sum + a
+        print("eps_sum: " + str(eps_sum))
+
+        P_He_constr = copy.deepcopy(P_H_constr)
+        for i in range(0, int(n_hypoth_constr)):
+            print(i)
+            print(P_H_constr[i] * P_eH_constr[i] / eps_sum)
+            P_He_constr[i] = P_H_constr[i] * P_eH_constr[i] / eps_sum
+
+        P_He_constr = P_He_constr/np.sum(P_He_constr)
+
+        print("P_He_constr: " + str(P_He_constr))
+
+        P_He_constr_put = copy.deepcopy(P_H)
+        P_He_constr_put[thetaH_idx_constr.astype(int)] = P_He_constr
+        print("first P_He_constr_put: " + str(P_He_constr_put))
+        print("min_probability: " + str(min_probability))
+
+        P_He_constr_put[P_He_constr_put < min_probability] = min_probability
+        print("second P_He_constr_put: " + str(P_He_constr_put))
+        print("sum: " + str(np.sum(P_He_constr_put)))
+        P_He_constr_put = np.round(P_He_constr_put / np.sum(P_He_constr_put), 4)
+
+        print("final P_He_constr_put: " + str(P_He_constr_put))
+
+        return P_He_constr_put
+
+
+    def B_norm(self, alpha, beta, theta, const_res):
+        return np.sum(theta ** (alpha-1) * (1-theta) ** (beta-1))*const_res
+
 
     def environment_similarity_factor(self, learn_memory_mod, index):
         """
