@@ -7,9 +7,9 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 3003#7*int(60/5*24)#3861
+ts_0 = 7*int(60/5*24)  # 3861
 constant_environment = False
-ts_n = 5#7*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
 
 start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already introduces the offset!
 # if you want to determine the prices based on the memory
@@ -30,15 +30,17 @@ mp_belief_range = 1.0  # absolute range of vicinity of the mp prices to consider
 exceeding_or_vicinity = False  # modify in case of a pcf exceeding the probable MP or modify if the pcf is only in the vicinity of the pcf (i.e. also lower, within the range)
 # rather vicinity!!!
 
-# vpps that utilize the memory to exploit
+# VPPs that are able to utilize the strategy
 vpp_exploit = ['vpp3']
+
+# SIMILARITY parameters:
 similarity_treshold = 0.70  # 0.70
-top_selection_quantity = 0  # 100 or 0 if no top selection
-order_by = 'sim'
+top_selection_quantity = 0  # 100 or 0 to disable top selection
+order_by = 'sim'  # order column in sorting
 mp_factor_treshold_in_selection = 0.2  # treshold value that are selected based on mp_factor before the average is calculated
 
+# BAYESIAN LEARNING marginal prices belief update parameters: (some in the function)
 update_mp_belief = True  # update during negotiation according to BL, either from the file in the history folder, or from the negotiation history file, if True
-#settings for the BL mp_belief update:
 pow = 20
 multi = 50
 theta_constraints = 2  # number of neighbouring hypotheses to be omitted during the BL update (around the event price)

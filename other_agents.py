@@ -1300,17 +1300,27 @@ class VPP_ext_agent(Agent):
                 if update_mp_belief:
                     updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
                     updated_memory = pd.read_pickle(updated_memory_path)
+                    mp_factor_dict = updated_memory.iloc[-1]['mp_belief']
+                    # print(mp_factor_dict)
+                    mp_factor_table = pd.DataFrame.from_dict(mp_factor_dict)
+                    # print(mp_factor_table)
+                    mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
+                    mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
+                    mp_limits = np.round(mp_factor_table['pcfs'].tolist(), 4)
+                    print("mp_factor_table: ")
+                    print(mp_factor_table)
+                    print("mp_limits (updated memory): " + str(mp_limits))
 
                 else:
                     mp_factor_table = pd.read_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
                     mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
                     mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
+                    mp_limits = np.round(mp_factor_table['pcfs'].tolist(), 4)
+                    print("mp_factor_table: ")
+                    print(mp_factor_table)
+                    print("mp_limits (original memory): " + str(mp_limits))
 
-                # print("mp_factor_table: ")
-                # print(mp_factor_table[['pcfs', 'mp_factor_avg']])
-
-                mp_limits = np.round(mp_factor_table['pcfs'].tolist(), 4)
-                print("mp_limits: " + str(mp_limits))
+                self.get_attr("selection").update({"mp_limits": mp_limits})
 
                 for mp_limit in mp_limits:
                     if exceeding_or_vicinity == True: # see the settings description
