@@ -11,6 +11,10 @@ ts_0 = 7*int(60/5*24)  # 3861
 constant_environment = False
 ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
 
+# directory_tail = "_test"
+directory_tail = "_week2_BLupdate_with_exclude_avg"
+# directory_tail = "_history_week1_oneshot_pri3_1_20"
+
 start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already introduces the offset!
 # if you want to determine the prices based on the memory
 
@@ -25,7 +29,7 @@ price_increase_policy = 2
 
 # pcf_avg modification (similarity() ) based on the belief in the memory
 do_not_exceed_mp_belief = True  # during the derivation of deal pay attention to the mp_factors from the mp_belief in the history folder
-mp_belief_treshold = 0.05  # minimum treshold of marginal price belief in order to take that price under consideration in mp_belief # can depend on amount of hipothesis
+mp_belief_treshold = 0.07  # minimum treshold of marginal price belief in order to take that price under consideration in mp_belief # can depend on amount of hipothesis
 mp_belief_range = 1.0  # absolute range of vicinity of the mp prices to consider in bids derivation
 exceeding_or_vicinity = False  # modify in case of a pcf exceeding the probable MP or modify if the pcf is only in the vicinity of the pcf (i.e. also lower, within the range)
 # rather vicinity!!!
@@ -34,10 +38,18 @@ exceeding_or_vicinity = False  # modify in case of a pcf exceeding the probable 
 vpp_exploit = ['vpp3']
 
 # SIMILARITY parameters:
-similarity_treshold = 0.70  # 0.70
+# (1) select those with bids_saldo > 0 i.e. successful ones
+# (2) select similar ones
+similarity_treshold = 0.70  # 0.70 in (2)
+# (2.1) order the similar ones by
+order_by = 'bids_saldo'  # order column in sorting (2.1) - 'sim' originially bids_saldo
+# (3) select top X quantity
 top_selection_quantity = 0  # 100 or 0 to disable top selection
-order_by = 'sim'  # order column in sorting
+# (3.1) or as 2.1.1, check!! select those with mp_factor more than:
 mp_factor_treshold_in_selection = 0.2  # treshold value that are selected based on mp_factor before the average is calculated
+# (4) calculate average from the rest and
+# (5) check with the BL based beliefs about MPs
+use_pcf_exclude = True
 
 # BAYESIAN LEARNING marginal prices belief update parameters: (some in the function)
 update_mp_belief = True  # update during negotiation according to BL, either from the file in the history folder, or from the negotiation history file, if True
@@ -62,10 +74,6 @@ explore_multi_oneshot = 1
 # if you want to save the files to the .CSV and the plots to PDF instead of showing them
 tocsv = True
 pdf = True
-
-directory_tail = "_test"
-# directory_tail = "_week2_for_plots_fixed13"
-# directory_tail = "_history_week1_oneshot_pri3_1_20"
 
 path_save = '/home/iso/Desktop/vpp_some_results/' + strftime("%Y_%m%d_%H%M", gmtime()) + directory_tail + '/'
 

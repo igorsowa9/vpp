@@ -1253,6 +1253,13 @@ class VPP_ext_agent(Agent):
 
             # 2) select the ones with similarity more than treshold
             fmem_mod = fmem_mod.loc[fmem_mod['sim'] > similarity_treshold]
+            print(fmem_mod[['t', 'sim', 'pcf', 'bids_saldo', 'mp_factor']])
+
+            print("2.1.1 condition:")
+            fmem_mod = fmem_mod.loc[fmem_mod['mp_factor'] >= mp_factor_treshold_in_selection]
+            print(fmem_mod[['t', 'sim', 'pcf',  'bids_saldo', 'mp_factor']])
+
+            # 2.1) order the chosen ones by
             fmem_mod = fmem_mod.sort_values(by=[order_by], ascending=False)
             self.get_attr("selection").update({deficit_agent: fmem_mod.shape[0]})
 
@@ -1263,17 +1270,12 @@ class VPP_ext_agent(Agent):
                 print(fmem_mod[['t', 'sim', 'pcf', 'mp_factor']])
 
             # 3.1) select only those where mp_factor >0
-            print("3.1 condition:")
-            # print(fmem_mod['mp_factor'] > mp_factor_treshold_in_selection)
-            # print(fmem_mod['mp_factor'])
-            # print(fmem_mod.loc[:, [fmem_mod['mp_factor']]])
-            #
-            # print(mp_factor_treshold_in_selection)
-            fmem_mod = fmem_mod.loc[fmem_mod['mp_factor'] > mp_factor_treshold_in_selection]
-            print(fmem_mod)
+            # print("3.1 condition:")
+            # fmem_mod = fmem_mod.loc[fmem_mod['mp_factor'] >= mp_factor_treshold_in_selection]
+            # print(fmem_mod)
 
             print("SIM HEAD, mp_factor>"+str(mp_factor_treshold_in_selection)+": ")
-            print(fmem_mod[['t', 'sim', 'pcf', 'mp_factor']])
+            print(fmem_mod[['t', 'sim', 'pcf', 'bids_saldo', 'mp_factor']])
             print(fmem_mod.shape[0])
 
             self.get_attr("selection").update({"over_mpfactor": fmem_mod.shape[0]})
@@ -1322,12 +1324,35 @@ class VPP_ext_agent(Agent):
 
                 self.get_attr("selection").update({"mp_limits": mp_limits})
 
+                # 5.1) exclude the chosen ones (before averaging) that refer directly to other MPs (with high probability, high mp_factor)
+                if use_pcf_exclude:
+                    print("\npcf_avg is modified to exclude rows refering to other MPs beliefs (before averaging): " + str(pcf_avg))
+                    pcfs_exclude = fmem_mod['pcf'].tolist()
+                    print(pcfs_exclude)
+
+                    # min distance to beliefs
+                    dist = 99999
+                    for b in mp_limits:
+                        d = np.abs(b - pcf_avg)
+                        if d < dist:
+                            dist = d
+                            min_dist_b = b
+                    print("MP (belief) closes to initial average (" + str(pcf_avg) + "): " + str(min_dist_b))
+                    print("othe MP beliefs ("+str(np.setdiff1d(mp_limits, min_dist_b))+") excluded in calculation of the new average.")
+
+                    for p in np.setdiff1d(mp_limits, min_dist_b):
+                        pcfs_exclude = np.delete(pcfs_exclude, np.where(pcfs_exclude == p))
+                    pcf_avg_exclude = np.round(np.sum(pcfs_exclude)/len(pcfs_exclude), 4)
+                    print("New average (excluded): " + str(pcf_avg_exclude))
+                    pcf_avg = pcf_avg_exclude
+                    self.get_attr("selection").update({"pcf_avg_exclude": pcf_avg_exclude})
+
                 for mp_limit in mp_limits:
-                    if exceeding_or_vicinity == True: # see the settings description
+                    if exceeding_or_vicinity: # see the settings description
                         mpl_down = mp_limit  # THE price is the limit
                     else:
                         # mpl_down = np.round(mp_limit*(1-mp_belief_range), 4)  # see the settings description
-                        mpl_down = np.round(mp_limit-mp_belief_range, 4)  # see the settings description
+                        mpl_down = np.round(mp_limit-self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][2]-mp_belief_range, 4)  # see the settings description
 
                     # mpl_up = np.round(mp_limit*(1+mp_belief_range), 4)
                     mpl_up = np.round(mp_limit+mp_belief_range, 4)
