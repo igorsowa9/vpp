@@ -251,7 +251,7 @@ class VPP_ext_agent(Agent):
                 self.log_warning("previous_row: " + str(previous_row))
                 previous_mod = previous_row.iloc[0]['pcf']
                 print("previous_mod: " + str(previous_mod))
-                if previous_mod < price_increase_vector[1]:
+                if previous_mod < price_increase_vector[1]-price_increase_vector[2]:
                     price_absolute_increase = previous_mod + price_increase_vector[2]
                 else:
                     price_absolute_increase = price_increase_vector[0]
@@ -303,7 +303,7 @@ class VPP_ext_agent(Agent):
                 # substitute only prices of the generators that have cheaper production costs then the derived price
 
                 if exploit_mode == False:
-                    pc_matrix_incr[:, 2] = price_absolute_increase
+                    pc_matrix_incr[:, 2] = price_absolute_increase # + self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][2] / 2
                 else:  # exploit_mode == True
                     for g in range(len(pc_matrix_incr[:, 1])):
                         gen_row = pc_matrix_incr[g, :]

@@ -7,9 +7,9 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 3861#0*int(60/5*24)  # 3861
+ts_0 = 93#0*int(60/5*24)  # 3861
 constant_environment = False
-ts_n = 8#7*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_n = 22#7*int(60/5*24)-1  # number of timestamps of whole simulation
 
 directory_tail = "_test"
 # directory_tail = "_week2_decreased_vpp4price"
@@ -20,7 +20,7 @@ start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already 
 
 # explit means that you want to determine price increase factor by the similarity method,
 # and if you want to include the negotiation from already exploit (i.e. the most optimal) in the next negotiation already
-exploit_mode = True
+exploit_mode = False
 update_during_exploit = True  # it is stored at current folder, not at original history folder path_dir_history
 
 # pc_matrix_price_increase_factor (1) vs. pc_matrix_price_absolute_increase (2)
