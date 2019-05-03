@@ -7,13 +7,13 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 7*int(60/5*24)  # 3861
+ts_0 = 3861#0*int(60/5*24)  # 3861
 constant_environment = False
-ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_n = 8#7*int(60/5*24)-1  # number of timestamps of whole simulation
 
-# directory_tail = "_test"
-directory_tail = "_week2_BLupdate_with_exclude_avg"
-# directory_tail = "_history_week1_oneshot_pri3_1_20"
+directory_tail = "_test"
+# directory_tail = "_week2_decreased_vpp4price"
+# directory_tail = "_history_week1_oneshot_pri3_1_20_loadoffset1"
 
 start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already introduces the offset!
 # if you want to determine the prices based on the memory
@@ -42,7 +42,7 @@ vpp_exploit = ['vpp3']
 # (2) select similar ones
 similarity_treshold = 0.70  # 0.70 in (2)
 # (2.1) order the similar ones by
-order_by = 'bids_saldo'  # order column in sorting (2.1) - 'sim' originially bids_saldo
+order_by = 'sim'  # order column in sorting (2.1) - 'sim' originially bids_saldo
 # (3) select top X quantity
 top_selection_quantity = 0  # 100 or 0 to disable top selection
 # (3.1) or as 2.1.1, check!! select those with mp_factor more than:
@@ -55,7 +55,10 @@ use_pcf_exclude = True
 update_mp_belief = True  # update during negotiation according to BL, either from the file in the history folder, or from the negotiation history file, if True
 pow = 20
 multi = 50
-theta_constraints = 2  # number of neighbouring hypotheses to be omitted during the BL update (around the event price)
+theta_constraints = 1.5  # number of neighbouring hypotheses to be omitted during the BL update (around the event price)
+
+# exploitation policies:
+multiple_failure = 3  # after this amount of failures during explitation
 
 # the path to the folder where the exploration results are saved, ALSO: belief about the marginal price is saved in that folder:
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0830_1544_week1_multi_oneshot_10/'
@@ -129,8 +132,8 @@ opfe3_prinpf = False
 max_ts_range_for_price_modification = 2
 
 
-relax_e2 = 0.01  # relaxation of constraints in opf_e2
-relax_e3 = 0.01  # relaxation of constraints in opf_e3
+relax_e2 = 0.1  # relaxation of constraints in opf_e2, 0.01
+relax_e3 = 0.1  # relaxation of constraints in opf_e3
 # modification of convergence condition, check:
 # http://rwl.github.io/PYPOWER/api/pypower.dcopf_solver-pysrc.html
 #         feastol = ppopt['PDIPM_FEASTOL']
@@ -196,4 +199,4 @@ MEASURED = 2
 
 # offset for all loads and max generations from json files
 gen_mod_offset = 0
-load_mod_offset = 0
+load_mod_offset = 0.0

@@ -47,6 +47,7 @@ class VPP_ext_agent(Agent):
 
         fixed_load0 = copy.deepcopy(ppc0['bus'][:, 2])
         max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])
+        max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])
         price0 = copy.deepcopy(ppc0['gencost'][:, 4])
 
         slack_idx = vpp_file['slack_idx']
@@ -601,6 +602,7 @@ class VPP_ext_agent(Agent):
         # fill the bids with the unbidded vpps for refuse messages
         bids = np.array(bids)
         b = np.matrix(all_pc)
+        print(b)
         allb = np.unique(np.array(b[:, 0]))
         are = np.array(np.matrix(bids)[:, 0])
         missing = np.setdiff1d(allb, are)
@@ -1247,6 +1249,81 @@ class VPP_ext_agent(Agent):
             # 0) save original memory to file
             fmem.to_csv(path_save + "_temp_pre-sorting_memory.csv")
 
+            # 0.1) load mp beliefs:
+
+            if update_mp_belief:
+                updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
+                updated_memory = pd.read_pickle(updated_memory_path)
+                mp_factor_dict = updated_memory.iloc[-1]['mp_belief']
+                # print(mp_factor_dict)
+                mp_factor_table = pd.DataFrame.from_dict(mp_factor_dict)
+                # print(mp_factor_table)
+                mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
+                mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
+                mp_limits = np.round(mp_factor_table['pcfs'].tolist(), 4)
+                print("mp_factor_table: ")
+                print(mp_factor_table)
+                print("mp_limits (updated memory): " + str(mp_limits))
+
+            else:
+                mp_factor_table = pd.read_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
+                mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
+                mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
+                mp_limits = np.round(mp_factor_table['pcfs'].tolist(), 4)
+                print("mp_factor_table: ")
+                print(mp_factor_table)
+                print("mp_limits (original memory): " + str(mp_limits))
+
+            self.get_attr("selection").update({"mp_limits": mp_limits})
+
+            ### Before calculating price, failures should be checked.
+            # if X in a row for the hypothesis with high belief, we should start to decrease
+            fmem_fail = fmem.tail(multiple_failure)
+            print(fmem_fail[['t', 'sim', 'pcf', 'bids_saldo', 'mp_factor']])
+            fmem_fail = fmem_fail.loc[fmem_fail['bids_saldo'] == 0]
+            cond1 = False
+            cond2 = False
+            cond3 = False
+            cond4 = False
+            p = 0
+            forced_price_decrease = 0
+
+
+
+            print("fmem_fail: ")
+            print(fmem_fail[['t', 'sim', 'pcf', 'bids_saldo', 'mp_factor']])
+
+            if len(fmem_fail) == multiple_failure:
+                cond1 = True
+
+                f_dec = fmem.iloc[-1]['sim_cases']["forced_decrease"]
+                print("f_dec: " + str(f_dec))
+                if f_dec >= 1 and f_dec < multiple_failure:
+                    self.get_attr("selection").update({"forced_decrease": f_dec + 1})
+                    pcf_avg = fmem_fail.iloc[-1]['pcf'] - 1
+                    return pcf_avg
+
+                if fmem_fail.iloc[-1]['pcf'] == fmem_fail.iloc[-2]['pcf'] and fmem_fail.iloc[-2]['pcf'] == fmem_fail.iloc[-3]['pcf']:
+                    p = fmem_fail.iloc[-1]['pcf']
+                    cond2 = True
+                    print("p: " + str(p))
+                    print(mp_limits)
+                if fmem_fail.iloc[-1]['bids_saldo'] == 0 and fmem_fail.iloc[-2]['bids_saldo'] == 0 and fmem_fail.iloc[-3]['bids_saldo'] == 0:
+                    cond3 = True
+                if np.any(np.isin(np.array(mp_limits), p+1.0)): # p + 1 to convert price to hypothesis
+                    cond4 = True
+            print(cond1)
+            print(cond2)
+            print(cond3)
+            print(cond4)
+            if cond1 and cond2 and cond3 and cond4:
+                self.log_info("Multi-failure nagotiation failure (with high believed prices): "+str(multiple_failure)+"x!. Need to decrease the offers regardless of estimations.")
+                self.get_attr("selection").update({"forced_decrease": 1})  # save decrease to memory for the next period
+                pcf_avg = fmem_fail.iloc[-1]['pcf'] - 1
+
+                return pcf_avg
+
+
             # 1) exclude unsuccessful ones
             select = fmem.index[fmem['bids_saldo'] == 0].tolist()
             fmem_mod = fmem.drop(fmem.index[select])
@@ -1299,32 +1376,7 @@ class VPP_ext_agent(Agent):
                 print("mp_factor_table limits matter! ")
                 print("pcf_avg before considering MP limits: " + str(pcf_avg))
 
-                if update_mp_belief:
-                    updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
-                    updated_memory = pd.read_pickle(updated_memory_path)
-                    mp_factor_dict = updated_memory.iloc[-1]['mp_belief']
-                    # print(mp_factor_dict)
-                    mp_factor_table = pd.DataFrame.from_dict(mp_factor_dict)
-                    # print(mp_factor_table)
-                    mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
-                    mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
-                    mp_limits = np.round(mp_factor_table['pcfs'].tolist(), 4)
-                    print("mp_factor_table: ")
-                    print(mp_factor_table)
-                    print("mp_limits (updated memory): " + str(mp_limits))
-
-                else:
-                    mp_factor_table = pd.read_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
-                    mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
-                    mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
-                    mp_limits = np.round(mp_factor_table['pcfs'].tolist(), 4)
-                    print("mp_factor_table: ")
-                    print(mp_factor_table)
-                    print("mp_limits (original memory): " + str(mp_limits))
-
-                self.get_attr("selection").update({"mp_limits": mp_limits})
-
-                # 5.1) exclude the chosen ones (before averaging) that refer directly to other MPs (with high probability, high mp_factor)
+            # 5.1) exclude the chosen ones (before averaging) that refer directly to other MPs (with high probability, high mp_factor)
                 if use_pcf_exclude:
                     print("\npcf_avg is modified to exclude rows refering to other MPs beliefs (before averaging): " + str(pcf_avg))
                     pcfs_exclude = fmem_mod['pcf'].tolist()
@@ -1332,21 +1384,28 @@ class VPP_ext_agent(Agent):
 
                     # min distance to beliefs
                     dist = 99999
-                    for b in mp_limits:
-                        d = np.abs(b - pcf_avg)
+                    min_dist_pcf = False
+                    for mp_pcf in mp_limits:
+                        d = np.abs(mp_pcf - pcf_avg)
                         if d < dist:
                             dist = d
-                            min_dist_b = b
-                    print("MP (belief) closes to initial average (" + str(pcf_avg) + "): " + str(min_dist_b))
-                    print("othe MP beliefs ("+str(np.setdiff1d(mp_limits, min_dist_b))+") excluded in calculation of the new average.")
+                            min_dist_pcf = mp_pcf
+                    print("MP pcf closes to initial pcf average (" + str(pcf_avg) + "): " + str(min_dist_pcf))
 
-                    for p in np.setdiff1d(mp_limits, min_dist_b):
+                    self.log_info("MP belief closes to initial average (" + str(pcf_avg) + "): " + str(min_dist_pcf))
+                    print("other MP beliefs ("+str(np.setdiff1d(mp_limits, min_dist_pcf))+") excluded in calculation of the new average.")
+
+                    for p in np.setdiff1d(mp_limits, min_dist_pcf):
                         pcfs_exclude = np.delete(pcfs_exclude, np.where(pcfs_exclude == p))
+
                     pcf_avg_exclude = np.round(np.sum(pcfs_exclude)/len(pcfs_exclude), 4)
-                    print("New average (excluded): " + str(pcf_avg_exclude))
+                    print("New average (after excluded): " + str(pcf_avg_exclude))
+                    print("New pcf (after excluded): " + str(self.which_pcf_hypothesis(pcf_avg_exclude)))
                     pcf_avg = pcf_avg_exclude
                     self.get_attr("selection").update({"pcf_avg_exclude": pcf_avg_exclude})
+                    self.get_attr("selection").update({"pcf_exclude": self.which_pcf_hypothesis(pcf_avg_exclude)})
 
+                    print("mp_limits: " + str(mp_limits))
                 for mp_limit in mp_limits:
                     if exceeding_or_vicinity: # see the settings description
                         mpl_down = mp_limit  # THE price is the limit
@@ -1364,7 +1423,7 @@ class VPP_ext_agent(Agent):
                         if price_increase_policy == 2:
                             pcf_resolution = np.round(self.load_data(data_paths[data_names_dict[self.name]])[
                                                           'pc_matrix_price_absolute_increase'][2], 4)
-                        print("pcf_avg in the range of considered MP limits!")
+                        print("pcf_avg ("+str(pcf_avg)+") in the range of considered MP limits!")
                         print("pcf_resolution: " + str(pcf_resolution))
                         new_pcf = mp_limit - pcf_resolution
                         print("pcf_avg after considering MP limits: " + str(new_pcf))
@@ -1374,8 +1433,27 @@ class VPP_ext_agent(Agent):
                 self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
                 print("pcf_avg: " + str(pcf_avg) + "\n\n")
 
+        self.get_attr("selection").update({"forced_decrease": 0})
         self.get_attr("selection").update({"final_pcf_avg": pcf_avg})
         return pcf_avg
+
+    def which_pcf_hypothesis(self, price):
+        data = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase']
+        vector = np.arange(data[0], data[1]+data[2], data[2])
+
+        pcf_ranges = np.zeros((int(len(vector)), 3))
+        pcf_ranges[0, 1] = data[0] - 1.0
+        pcf_ranges[-1, 2] = data[1]
+
+        pcf_ranges[:, 0] = vector
+        pcf_ranges[:, 1] = vector - data[2]
+        pcf_ranges[:, 2] = vector
+
+        a = price > pcf_ranges[:, 1]
+        b = price <= pcf_ranges[:, 2]
+        idx = int(pcf_ranges[a * b, 0])
+
+        return idx
 
     def prepare_memory(self, path_memory, update=False):  # offset used if not initial memory needs to be prepared
 
@@ -1566,19 +1644,24 @@ class VPP_ext_agent(Agent):
                 codf = -1*(learn_memory_mod.iloc[index]['percent_req'] - learn_memory_mod.iloc[index-1]['percent_req'])
 
                 my_excess_sum = np.sum(np.array(learn_memory_mod.iloc[index]['my_excess'])[:, 1])
-                percent_of_excess_sold = learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']/my_excess_sum
+                percent_of_excess_sold = np.abs(learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']/my_excess_sum)
 
-                cor2cod = (learn_memory_mod.iloc[index]['mem_requests']-learn_memory_mod.iloc[index-1]['mem_requests'])/\
+                cor2cod = np.abs((learn_memory_mod.iloc[index]['mem_requests']-learn_memory_mod.iloc[index-1]['mem_requests'])/\
                                          (learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']-
-                                          learn_memory_mod.iloc[index-1]['percent_req']*learn_memory_mod.iloc[index-1]['mem_requests'])
+                                          learn_memory_mod.iloc[index-1]['percent_req']*learn_memory_mod.iloc[index-1]['mem_requests']))
 
                 # environment similarity factor (discount of codf due to the change of environment):
                 esf = self.environment_similarity_factor(learn_memory_mod, index)
                 esf2 = esf*esf*esf
                 mp_factor = np.round(codf * esf2, 4)
+                mp_factor = np.abs(mp_factor)
 
                 if codf < 0:
-                    mp_factor = -1
+                    if ("forced_decrease" in row['sim_cases']):
+                        if row['sim_cases']["forced_decrease"] == 0:
+                            mp_factor = -1
+                    else:
+                        mp_factor = -1
                 if percent_of_excess_sold > 0.99 and percent_of_excess_sold < 1.01:
                     mp_factor = -1
                 if cor2cod > 0.99 and cor2cod < 1.01:
@@ -1800,7 +1883,13 @@ class VPP_ext_agent(Agent):
         cont_res = 0.001
         # B norm definition
 
-        n_hypoth_constr = 2*theta_constraints/prices_step+1
+        if np.isin((pri - theta_constraints), thetaH) and np.isin((pri + theta_constraints), thetaH):
+            decim = 0
+        else:
+            decim = 1
+        n_hypoth_constr = 2*theta_constraints/prices_step + decim
+
+        print("n_hypoth_constr: " + str(n_hypoth_constr))
 
         print("\n")
         print(thetaH)
@@ -1828,45 +1917,53 @@ class VPP_ext_agent(Agent):
         cont_probability = (theta01**(alpha-1) * (1-theta01)**(beta-1)) / B01
         print("should be 1:" + str(np.sum(cont_probability*cont_res)))
 
-        pri_ranges = np.empty([int(n_hypoth_constr), 2])
+        pri_ranges = np.zeros((int(n_hypoth_constr), 2))
+        print("pri_ranges0: " + str(pri_ranges))
         pri_start = pri-theta_constraints
         pri_ranges[0, 0] = pri_start
         pri_max = pri + theta_constraints
         pri_ranges[-1, -1] = pri_max
-        print(pri_ranges)
         thetaHext = np.sort(np.concatenate([thetaH, np.array([pri_start])]))
 
         print(thetaHext)
         thetaHext_greater = thetaHext[thetaHext > pri_start]
         print(thetaHext_greater)
-
+        print("pri_ranges: " + str(pri_ranges))
+        print("pri_max: " + str(pri_max))
         print("\n")
         for nh in range(0, int(n_hypoth_constr)):
-            if thetaHext_greater[nh] <= pri_max:
+            print(nh)
+            if thetaHext_greater[nh] < pri_max:
                 pri_ranges[nh, 1] = thetaHext_greater[nh]
                 pri_ranges[nh+1, 0] = thetaHext_greater[nh]
+                print("pri_ranges loop: " + str(pri_ranges))
             else:
                 break
 
-        print(pri_ranges)
+        print("pri_ranges: " + str(pri_ranges))
         ranges = pri_ranges - pri_start
         ranges_norm = ranges / ranges[-1, -1]
+
+        print("ranges_norm: " + str(ranges_norm))
 
         P_eH_constr = np.empty(int(n_hypoth_constr))
         print(P_eH_constr)
         for nh in range(0, int(n_hypoth_constr)):
-            print(nh)
+            # print(nh)
             start = np.round(ranges_norm[nh, 0] + cont_res, 4)
             stop = np.round(ranges_norm[nh, 1], 4)
-            print(start)
-            print(stop)
+            # print(start)
+            # print(stop)
 
             theta_prob = np.arange(start, stop+10e-6, cont_res)
-            print(theta_prob)
-            prob = (theta_prob**(alpha-1) * (1-theta_prob)**(beta-1)) / B01
-            print("prob1: " + str(prob))
-            print("prob2: " + str(prob*cont_res))
-            print("prob3: " + str(np.sum(prob*cont_res)))
+            # print("prob-1: " + str(((1.0**(alpha-1)) * ((1-1.0)**(beta-1))) / B01))
+            prob = ((theta_prob**(alpha-1.0)) * ((1.0-theta_prob)**(beta-1.0))) / B01
+            prob = np.nan_to_num(prob)
+            # print("B01: " + str(B01))
+            # print("prob1: " + str(prob))
+
+            # print("prob2: " + str(prob*cont_res))
+            # print("prob3: " + str(np.sum(prob*cont_res)))
             P_eH_constr[nh] = np.sum(prob*cont_res)
 
         print("P_eH_constr: " + str(P_eH_constr))
