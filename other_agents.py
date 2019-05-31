@@ -233,8 +233,14 @@ class VPP_ext_agent(Agent):
             # it is not driven by the current price of excess generator (it does is by the excess amount though i.e. occurs only when excess exists).
             # also increases in case of X successes, it resets on failure
 
-            price_increase_vector = self.load_data(data_paths[data_names_dict[self.name]])[
+            price_increase_settings = self.load_data(data_paths[data_names_dict[self.name]])[
                 'pc_matrix_price_absolute_increase']
+            middle_offset = self.load_data(data_paths[data_names_dict[self.name]])[
+                'pc_matrix_price_absolute_increase'][2] / 2.0
+            # price increase vector need to be the lower boundries of the hypotheses not middle!
+            price_increase_vector = np.arange(price_increase_settings[0],
+                                              price_increase_settings[1],
+                                              price_increase_settings[2])
 
             currmem = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
 
@@ -249,28 +255,31 @@ class VPP_ext_agent(Agent):
             if previous_fulfilled == max_ts_range_for_price_modification:
                 previous_row = rows_range.tail(1)
                 self.log_warning("previous_row: " + str(previous_row))
+
                 previous_mod = previous_row.iloc[0]['pcf']
                 print("previous_mod: " + str(previous_mod))
-                if previous_mod < price_increase_vector[1]-price_increase_vector[2]:
-                    price_absolute_increase = previous_mod + price_increase_vector[2]
+
+                if previous_mod < price_increase_vector[-1]:  # price_increase_settings[1]-price_increase_settings[2]:
+                    price_absolute_increase = previous_mod + price_increase_settings[2]
                 else:
                     price_absolute_increase = price_increase_vector[0]
+
             else:  # if conditions not fulilled come back to the first value
                 if not constant_environment:
                     price_absolute_increase = price_increase_vector[0]
-                else:  # if we assume exploration in a constant environment...
+                else:  # if we assume exploration in a constant environment... CONSTANT ENVIRONMENT DEPRECIATED - NOT UPDATED TO PRICE INCREASE VECTOR !!!!!
                     test_row = currmem.tail(1)
                     if not test_row.empty:
                         previous_mod = test_row.iloc[0]['pcf']
                         if test_row.iloc[0]['success'] == 1:
-                            if previous_mod < price_increase_vector[1]:
-                                price_absolute_increase = previous_mod + price_increase_vector[2]
+                            if previous_mod < price_increase_settings[1]:
+                                price_absolute_increase = previous_mod + price_increase_settings[2]
                             else:
-                                price_absolute_increase = price_increase_vector[0]
+                                price_absolute_increase = price_increase_settings[0]
                         else:
-                            price_absolute_increase = price_increase_vector[0]
+                            price_absolute_increase = price_increase_settings[0]
                     else:
-                        price_absolute_increase = price_increase_vector[0]
+                        price_absolute_increase = price_increase_settings[0]
 
         a = 'OFF'
         if exploit_mode and self.name in vpp_exploit:  # not prepared yet for price_absolute_increase
@@ -283,7 +292,7 @@ class VPP_ext_agent(Agent):
                 price_absolute_increase = self.similarity(t, 2) # this needs to be done! otherwise the part below will work only for the exploration
                 if price_absolute_increase == 0:
                     price_increase_factor = self.load_data(data_paths[data_names_dict[self.name]])[
-                'pc_matrix_price_increase_factor'][0] # as emergency if no absolute increase
+                'pc_matrix_price_increase_factor'][0]  # as emergency if no absolute increase
             a = 'ON'
 
         self.log_info("My runopf_e2 (I exploit: " + a + ") price_increase_factor: " + str(price_increase_factor))
@@ -937,6 +946,7 @@ class VPP_ext_agent(Agent):
                                     'bids_saldo': bids_saldo,
                                     'bids_gen_cost': bids_gen_cost,
                                     'pcf': self.get_attr('price_increased'),
+                                    'h_mid': "",
                                     'sim_cases': self.get_attr('selection'),
                                     'my_excess': self.get_attr('opf1')['exc_matrix'].T,
                                     'exc_cost_range': [np.min(self.get_attr('opf1')['exc_matrix'][2, :]),
@@ -989,6 +999,7 @@ class VPP_ext_agent(Agent):
                                     'bids_saldo': bids_saldo,
                                     'bids_gen_cost': 0,
                                     'pcf': self.get_attr('price_increased'),
+                                    'h_mid': "",
                                     'sim_cases': self.get_attr('selection'),
                                     'my_excess': self.get_attr('opf1')['exc_matrix'].T,
                                     'exc_cost_range': [np.min(self.get_attr('opf1')['exc_matrix'][2, :]),
@@ -1038,6 +1049,7 @@ class VPP_ext_agent(Agent):
                          'bids_saldo',  # positive if revenue negative if have to be bought
                          'bids_gen_cost',
                          'pcf',  # price increase factor, that could be modified according to the vpp settings in json
+                         'h_mid',
                          'sim_cases',  # quantity of the similar cases chosen from the memory before benchmark
                          'my_excess',  # matrix of excess generators from opf1
                          'exc_cost_range',  # the cheapest generation cost of excess generators
@@ -1192,6 +1204,7 @@ class VPP_ext_agent(Agent):
             ### calculate similarity for each tuple in the memory:
             # make new column for similarity with zeros:
             fmem['sim'] = 0.0
+            fmem['h_mid'] = 0.0
 
             # loop for each tuple in memory
             # fmem = fmem.drop(fmem.index[[range(2, 333)]])
@@ -1244,15 +1257,16 @@ class VPP_ext_agent(Agent):
 
             # print("all sim assigned to tuples for r=" + str(r))
 
-            ### Choosing the best option and price for the proposal
+            #################################################################
+            ### Choosing the best option and price for the proposal #########
+            #################################################################
 
             # 0) save original memory to file
             fmem.to_csv(path_save + "_temp_pre-sorting_memory.csv")
 
             # 0.1) load mp beliefs:
-
-            if update_mp_belief:
-                updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
+            updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
+            if update_mp_belief and os.path.isfile(updated_memory_path):
                 updated_memory = pd.read_pickle(updated_memory_path)
                 mp_factor_dict = updated_memory.iloc[-1]['mp_belief']
                 # print(mp_factor_dict)
@@ -1260,7 +1274,7 @@ class VPP_ext_agent(Agent):
                 # print(mp_factor_table)
                 mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
                 mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
-                mp_limits = np.round(mp_factor_table['pcfs'].tolist(), 4)
+                mp_limits = np.round(mp_factor_table['pcfs_upper_h'].tolist(), 4)
                 print("mp_factor_table: ")
                 print(mp_factor_table)
                 print("mp_limits (updated memory): " + str(mp_limits))
@@ -1269,7 +1283,7 @@ class VPP_ext_agent(Agent):
                 mp_factor_table = pd.read_pickle(path_dir_history + "mp_belief_ln_" + str(my_idx) + ".pkl")
                 mp_factor_table = mp_factor_table.loc[mp_factor_table['mp_factor_avg'] > mp_belief_treshold]
                 mp_factor_table = mp_factor_table.sort_values(by=['mp_factor_avg'], ascending=False)
-                mp_limits = np.round(mp_factor_table['pcfs'].tolist(), 4)
+                mp_limits = np.round(mp_factor_table['pcfs_upper_h'].tolist(), 4)
                 print("mp_factor_table: ")
                 print(mp_factor_table)
                 print("mp_limits (original memory): " + str(mp_limits))
@@ -1278,6 +1292,7 @@ class VPP_ext_agent(Agent):
 
             ### Before calculating price, failures should be checked.
             # if X in a row for the hypothesis with high belief, we should start to decrease
+
             fmem_fail = fmem.tail(multiple_failure)
             print(fmem_fail[['t', 'sim', 'pcf', 'bids_saldo', 'mp_factor']])
             fmem_fail = fmem_fail.loc[fmem_fail['bids_saldo'] == 0]
@@ -1287,8 +1302,6 @@ class VPP_ext_agent(Agent):
             cond4 = False
             p = 0
             forced_price_decrease = 0
-
-
 
             print("fmem_fail: ")
             print(fmem_fail[['t', 'sim', 'pcf', 'bids_saldo', 'mp_factor']])
@@ -1310,13 +1323,13 @@ class VPP_ext_agent(Agent):
                     print(mp_limits)
                 if fmem_fail.iloc[-1]['bids_saldo'] == 0 and fmem_fail.iloc[-2]['bids_saldo'] == 0 and fmem_fail.iloc[-3]['bids_saldo'] == 0:
                     cond3 = True
-                if np.any(np.isin(np.array(mp_limits), p+1.0)): # p + 1 to convert price to hypothesis
+                if np.any(np.isin(np.array(mp_limits), p)): # p + 1 to convert price to hypothesis
                     cond4 = True
             print(cond1)
             print(cond2)
             print(cond3)
-            print(cond4)
-            if cond1 and cond2 and cond3 and cond4:
+            # print(cond4)
+            if cond1 and cond2 and cond3:# and cond4:
                 self.log_info("Multi-failure nagotiation failure (with high believed prices): "+str(multiple_failure)+"x!. Need to decrease the offers regardless of estimations.")
                 self.get_attr("selection").update({"forced_decrease": 1})  # save decrease to memory for the next period
                 pcf_avg = fmem_fail.iloc[-1]['pcf'] - 1
@@ -1328,13 +1341,13 @@ class VPP_ext_agent(Agent):
             select = fmem.index[fmem['bids_saldo'] == 0].tolist()
             fmem_mod = fmem.drop(fmem.index[select])
 
+            print("2.1.1 condition:")
+            fmem_mod = fmem_mod.loc[fmem_mod['mp_factor'] >= mp_factor_treshold_in_selection]
+            print(fmem_mod[['t', 'sim', 'pcf', 'bids_saldo', 'mp_factor']])
+
             # 2) select the ones with similarity more than treshold
             fmem_mod = fmem_mod.loc[fmem_mod['sim'] > similarity_treshold]
             print(fmem_mod[['t', 'sim', 'pcf', 'bids_saldo', 'mp_factor']])
-
-            print("2.1.1 condition:")
-            fmem_mod = fmem_mod.loc[fmem_mod['mp_factor'] >= mp_factor_treshold_in_selection]
-            print(fmem_mod[['t', 'sim', 'pcf',  'bids_saldo', 'mp_factor']])
 
             # 2.1) order the chosen ones by
             fmem_mod = fmem_mod.sort_values(by=[order_by], ascending=False)
@@ -1359,101 +1372,154 @@ class VPP_ext_agent(Agent):
 
             # 4) calculate average of pcfs of all selected cases with that similarity
             if fmem_mod.empty:
-                pcf_avg=0
-                # pcf_avg = self.load_data(data_paths[data_names_dict[self.name]])[
-            # 'pc_matrix_price_increase_factor'][0]
+                hmid_avg = 0
             else:
+                ## needs to be checked which of the selected ones are normal, which forced_decrease (then pcf+1 if forced)
+                fmem_mod = fmem_mod.reset_index()
+                for index, row in fmem_mod.iterrows():
+                    if 'forced_decrease' in row['sim_cases']:  # original history has those cells empty
+                        if row['sim_cases']['forced_decrease'] > 0:
+                            row['h_mid'] = np.round(row['pcf'] + self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][2] /2, 4)
+                        else:
+                            row['h_mid'] = np.round(row['pcf'] - self.load_data(data_paths[data_names_dict[self.name]])[
+                                'pc_matrix_price_absolute_increase'][2] / 2, 4)
+                    else:
+                        row['h_mid'] = np.round(row['pcf'] - self.load_data(data_paths[data_names_dict[self.name]])[
+                            'pc_matrix_price_absolute_increase'][2] / 2, 4)
+                    fmem_mod.iloc[index] = row
+
+                print("the table updated in case of chose forced_decrease rows (pcf+1):")
+                print(fmem_mod[['t', 'sim', 'pcf', 'h_mid', 'bids_saldo', 'mp_factor']])
+
                 pcfs = fmem_mod['pcf'].tolist()
                 pcf_avg = np.round(np.sum(pcfs)/len(pcfs), 4)
 
-            print("Average from chosen list: " + str(pcf_avg))
-            self.get_attr("selection").update({"raw_pcf_avg": pcf_avg})
+                hmids = fmem_mod['h_mid'].tolist()
+                hmid_avg = np.round(np.sum(hmids)/len(hmids), 4)
+
+            # print("Average pcf from chosen list: " + str(pcf_avg))
+            print("Average hmid from chosen list: " + str(hmid_avg))
+            self.get_attr("selection").update({"raw_hmid_avg": hmid_avg})
+
+            # 5.1) exclude the chosen ones (before averaging) that refer directly to other MPs (with high probability, high mp_factor)
+            if use_pcf_hmid_exclude:
+                print("\nhmid_avg is going to be modified in order to exclude rows refering to other MPs beliefs (origina hmid_avg): " + str(hmid_avg))
+                print(fmem_mod[['t', 'sim', 'pcf', 'h_mid', 'bids_saldo', 'mp_factor']])
+
+                hmid_exclude = fmem_mod['h_mid'].tolist()
+                # print(hmid_exclude)  # before exclude
+                # pcfs_exclude = fmem_mod['pcf'].tolist()
+
+                # min distance to beliefs
+                dist = 99999
+                hypos_mid = np.round(mp_limits - self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][2]/2, 4)
+                print("hypos_mid i.e. the mid values of hypothesis mp_limits: " + str(hypos_mid))
+                for h_mid in hypos_mid:
+                    d = np.abs(h_mid - hmid_avg)
+                    if d < dist:
+                        dist = d
+                        min_dist_h_mid = h_mid
+
+                self.log_info("MP belief (its middle value) closest to the initial h_mid average (" + str(hmid_avg) + "): " + str(min_dist_h_mid) + ". \nOther MP beliefs (mid) ("+str(np.setdiff1d(hypos_mid, min_dist_h_mid))+") excluded in calculation of the new average.")
+                self.get_attr("selection").update({"closest_mid": min_dist_h_mid})
+
+                for p in np.setdiff1d(hypos_mid, min_dist_h_mid):  # delete all the others, beside the minimum distance one
+                    hmid_exclude = np.delete(hmid_exclude, np.where(hmid_exclude == p))
+                self.log_info("The mid values left: " + str(hmid_exclude))
+
+                if not len(hmid_exclude) == 0:  # if there are some left numbers afer excluding
+                    hmid_avg_exclude = np.round(np.sum(hmid_exclude)/len(hmid_exclude), 4)
+                else:
+                    hmid_avg_exclude = hmid_avg
+                    print("No left values! The original hmid_avg stays!")
+
+                hmid_lower_boundry = self.value_in_hypothesis(hmid_avg_exclude, "lower")
+                print("New average of middle values (after excluded): " + str(hmid_avg_exclude) + ". Lower boundry of hypothesis including that price: " + str(hmid_lower_boundry))
+                print("Thus, this price (the lower boundry of hypothesis) is taken as the price to offer: " + str(hmid_lower_boundry))
+                hmid_avg = hmid_avg_exclude
+                self.get_attr("selection").update({"hmid_avg_exclude": hmid_avg_exclude})
+                # self.get_attr("selection").update({"pcf_exclude": self.which_pcf_hypothesis(pcf_avg_exclude)})
 
             # 5) check the belief about the marginal prices
             if not do_not_exceed_mp_belief:
-                print("mp_factor_table limits DO NOT matter! ")
+                print("Rages around the belief hypothesis limits DO NOT matter! ")
             if do_not_exceed_mp_belief:
-                print("mp_factor_table limits matter! ")
-                print("pcf_avg before considering MP limits: " + str(pcf_avg))
+                print("Rages around the belief hypothesis limits DO matter! ")
+                print("hmid_avg before considering MP limits: " + str(hmid_avg))
 
-            # 5.1) exclude the chosen ones (before averaging) that refer directly to other MPs (with high probability, high mp_factor)
-                if use_pcf_exclude:
-                    print("\npcf_avg is modified to exclude rows refering to other MPs beliefs (before averaging): " + str(pcf_avg))
-                    pcfs_exclude = fmem_mod['pcf'].tolist()
-                    print(pcfs_exclude)
-
-                    # min distance to beliefs
-                    dist = 99999
-                    min_dist_pcf = False
-                    for mp_pcf in mp_limits:
-                        d = np.abs(mp_pcf - pcf_avg)
-                        if d < dist:
-                            dist = d
-                            min_dist_pcf = mp_pcf
-                    print("MP pcf closes to initial pcf average (" + str(pcf_avg) + "): " + str(min_dist_pcf))
-
-                    self.log_info("MP belief closes to initial average (" + str(pcf_avg) + "): " + str(min_dist_pcf))
-                    print("other MP beliefs ("+str(np.setdiff1d(mp_limits, min_dist_pcf))+") excluded in calculation of the new average.")
-
-                    for p in np.setdiff1d(mp_limits, min_dist_pcf):
-                        pcfs_exclude = np.delete(pcfs_exclude, np.where(pcfs_exclude == p))
-
-                    pcf_avg_exclude = np.round(np.sum(pcfs_exclude)/len(pcfs_exclude), 4)
-                    print("New average (after excluded): " + str(pcf_avg_exclude))
-                    print("New pcf (after excluded): " + str(self.which_pcf_hypothesis(pcf_avg_exclude)))
-                    pcf_avg = pcf_avg_exclude
-                    self.get_attr("selection").update({"pcf_avg_exclude": pcf_avg_exclude})
-                    self.get_attr("selection").update({"pcf_exclude": self.which_pcf_hypothesis(pcf_avg_exclude)})
-
-                    print("mp_limits: " + str(mp_limits))
-                for mp_limit in mp_limits:
+                ranges = False
+                hmin_of_ranges = 99999
+                for h_mid in np.sort(hypos_mid):
                     if exceeding_or_vicinity: # see the settings description
-                        mpl_down = mp_limit  # THE price is the limit
+                        mpl_down = np.round(h_mid - self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][2] / 2)  # gives the lower boundry of the hypothesis - it is the limit
                     else:
-                        # mpl_down = np.round(mp_limit*(1-mp_belief_range), 4)  # see the settings description
-                        mpl_down = np.round(mp_limit-self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][2]-mp_belief_range, 4)  # see the settings description
+                        mpl_down = np.round(h_mid - self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][2] / 2 - mp_belief_range, 4)  # lower boundry like above minus the range
 
-                    # mpl_up = np.round(mp_limit*(1+mp_belief_range), 4)
-                    mpl_up = np.round(mp_limit+mp_belief_range, 4)
-                    print("Consideration limits: " + str(mpl_down) + "; " + str(mpl_up))
+                    mpl_up = np.round(h_mid + self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][2] / 2 + mp_belief_range, 4)  # upper limit of the hypothesis (already the mp_limit) plus the range
+                    print("Consideration limits (settings range is "+str(mp_belief_range)+"): " + str(mpl_down) + "; " + str(mpl_up))
 
-                    if pcf_avg>=mpl_down and pcf_avg<=mpl_up:
+                    if hmid_avg >= mpl_down and hmid_avg <= mpl_up:
+                        ranges = True
                         if price_increase_policy == 1:
-                            pcf_resolution = np.round(self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]-1,4)
+                            pcf_resolution = np.round(self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_increase_factor'][0]-1, 4)
                         if price_increase_policy == 2:
-                            pcf_resolution = np.round(self.load_data(data_paths[data_names_dict[self.name]])[
-                                                          'pc_matrix_price_absolute_increase'][2], 4)
-                        print("pcf_avg ("+str(pcf_avg)+") in the range of considered MP limits!")
-                        print("pcf_resolution: " + str(pcf_resolution))
-                        new_pcf = mp_limit - pcf_resolution
-                        print("pcf_avg after considering MP limits: " + str(new_pcf))
-                        pcf_avg = np.round(new_pcf, 4)
-                        break
+                            pcf_resolution = np.round(self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase'][2], 4)
+                        print("hmid_avg ("+str(hmid_avg)+") in the range of considered MP limits!")
+                        hmin_of_ranges = mpl_down
 
-                self.get_attr('requests')[r].update({'pcf_learning': pcf_avg})
-                print("pcf_avg: " + str(pcf_avg) + "\n\n")
+                if ranges:
+                    final_price = np.round(hmin_of_ranges + mp_belief_range, 4)
+                    print("hmid_avg after considering MP limits: " + str(hmin_of_ranges) + "\n\n")
+                else:
+                    print("hmid_avg not within the reanges\n\n")
+                    final_price = hmid_avg
+
+                self.get_attr('requests')[r].update({'final_price_hlow': final_price})
 
         self.get_attr("selection").update({"forced_decrease": 0})
-        self.get_attr("selection").update({"final_pcf_avg": pcf_avg})
-        return pcf_avg
+        self.get_attr("selection").update({"final_price_hlow": final_price})
+        return final_price
 
-    def which_pcf_hypothesis(self, price):
+    def value_in_hypothesis(self, price, mode):
+        """
+        :return: returns either lower boundry or middle value or upper boundry of the hypothesis according to a price
+        """
         data = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase']
         vector = np.arange(data[0], data[1]+data[2], data[2])
+        # print(vector)
 
-        pcf_ranges = np.zeros((int(len(vector)), 3))
+        pcf_ranges = np.zeros((int(len(vector)-1), 4))
         pcf_ranges[0, 1] = data[0] - 1.0
         pcf_ranges[-1, 2] = data[1]
+        # print(pcf_ranges)
 
-        pcf_ranges[:, 0] = vector
-        pcf_ranges[:, 1] = vector - data[2]
-        pcf_ranges[:, 2] = vector
+        idxs = np.arange(0, len(vector)-1)
+        # print(idxs)
+        pcf_ranges[:, 0] = idxs
+        pcf_ranges[:, 1] = np.arange(data[0], data[1], data[2])
+        pcf_ranges[:, 2] = np.arange(data[0], data[1], data[2]) + data[2]
+        pcf_ranges[:, 3] = np.arange(data[0], data[1], data[2]) + data[2]/2.0
+
+        if mode == "idx":
+            col = 0
+        if mode == "lower":
+            col = 1
+        if mode == "upper":
+            col = 2
+        if mode == "middle":
+            col = 3
 
         a = price > pcf_ranges[:, 1]
         b = price <= pcf_ranges[:, 2]
-        idx = int(pcf_ranges[a * b, 0])
+        # print(a)
+        # print(b)
+        # print(col)
+        # print(pcf_ranges)
+        chosen_value = int(pcf_ranges[a * b, col])
 
-        return idx
+        # print("value_in_hypothesis: " + str(pcf_ranges))
+
+        return chosen_value
 
     def prepare_memory(self, path_memory, update=False):  # offset used if not initial memory needs to be prepared
 
@@ -1629,7 +1695,6 @@ class VPP_ext_agent(Agent):
             row['mem_av_weather'] = res_now_power_all
             learn_memory_mod.iloc[index] = row
 
-
         ##########################33
         #### Calculate marginal price factors (mp_factor) and estimate the marginal prices factors/probabilites, and other stuff per generator
         ############################
@@ -1646,9 +1711,9 @@ class VPP_ext_agent(Agent):
                 my_excess_sum = np.sum(np.array(learn_memory_mod.iloc[index]['my_excess'])[:, 1])
                 percent_of_excess_sold = np.abs(learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']/my_excess_sum)
 
-                cor2cod = np.abs((learn_memory_mod.iloc[index]['mem_requests']-learn_memory_mod.iloc[index-1]['mem_requests'])/\
-                                         (learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']-
-                                          learn_memory_mod.iloc[index-1]['percent_req']*learn_memory_mod.iloc[index-1]['mem_requests']))
+                cor2cod = np.abs((learn_memory_mod.iloc[index]['mem_requests']-learn_memory_mod.iloc[index-1]['mem_requests'])/  # change of request to change of deal
+                                 (learn_memory_mod.iloc[index]['percent_req']*learn_memory_mod.iloc[index]['mem_requests']-
+                                  learn_memory_mod.iloc[index-1]['percent_req']*learn_memory_mod.iloc[index-1]['mem_requests']))
 
                 # environment similarity factor (discount of codf due to the change of environment):
                 esf = self.environment_similarity_factor(learn_memory_mod, index)
@@ -1656,16 +1721,14 @@ class VPP_ext_agent(Agent):
                 mp_factor = np.round(codf * esf2, 4)
                 mp_factor = np.abs(mp_factor)
 
-                if codf < 0:
-                    if ("forced_decrease" in row['sim_cases']):
-                        if row['sim_cases']["forced_decrease"] == 0:
-                            mp_factor = -1
-                    else:
+                if ("forced_decrease" not in row['sim_cases']) or (row['sim_cases']["forced_decrease"] == 0):  # conditions designed earlier for mp_factor estimations in normal, increasing conditions
+                    if codf < 0:
                         mp_factor = -1
-                if percent_of_excess_sold > 0.99 and percent_of_excess_sold < 1.01:
-                    mp_factor = -1
-                if cor2cod > 0.99 and cor2cod < 1.01:
-                    mp_factor = -1
+                    if percent_of_excess_sold > 0.99 and percent_of_excess_sold < 1.01:
+                        mp_factor = -1
+                    if cor2cod > 0.99 and cor2cod < 1.01:
+                        mp_factor = -1
+                # else:  # in case we are under forced increase of the price, do not modify the mp_factor
 
                 row['codf'] = codf
                 row['esf'] = esf2
@@ -1739,17 +1802,18 @@ class VPP_ext_agent(Agent):
 
         if not update:
             mp_factors_allsum = np.sum(learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['mp_factor'].tolist())
-            pcfs_list = learn_memory_mod['pcf'].unique()  # all pcfs
+            pcfs_list_memory = learn_memory_mod['pcf'].unique()  # all pcfs 3:20
+            self.log_info("PCFs from memory: " + str(pcfs_list_memory))
+            sett = self.load_data(data_paths[data_names_dict[self.name]])['pc_matrix_price_absolute_increase']
+            pcfs_settings = np.arange(sett[0]+sett[2], sett[1]+sett[2], sett[2])  # should be 4:20 - upper boundries
+            self.log_info("PCFs from settings (hypoth's lower boundries): " + str(pcfs_settings))
             # pcfs_list = learn_memory_mod[learn_memory_mod['mp_factor'] > 0]['pcf'].unique()  # only pcf where mp_factor is >0 in whole set
-
+            pcfs_list = np.intersect1d(np.array(pcfs_list_memory), pcfs_settings)
+            self.log_info("I am taking the intersection: " + str(pcfs_list))
             pcfs = []
             mp_factor_avg = []
-            # print("pcf: " + str(pcfs_list))
-            # print("mp_factors_allsum: " + str(mp_factors_allsum))
             for pcf in pcfs_list:
-                # print("pcf: " + str(pcf))
                 mp_factor_forpcf = learn_memory_mod[learn_memory_mod['pcf'] == pcf]
-                # print("mp_factor_forpcf: " + str(mp_factor_forpcf))
                 mp_factor_forpcf_positive = mp_factor_forpcf[mp_factor_forpcf['mp_factor'] > 0]
                 # print("mp_factor_forpcf_positive: " + str(mp_factor_forpcf_positive))
                 mp_factor_forpcf_sum = np.sum(mp_factor_forpcf_positive['mp_factor'])
@@ -1761,28 +1825,18 @@ class VPP_ext_agent(Agent):
                 pcfs.append(pcf)
                 mp_factor_avg.append(mp_factor_weight)
 
-            data_dict = {'pcfs': pcfs, 'mp_factor_avg': mp_factor_avg}
+            data_dict = {'pcfs_upper_h': pcfs, 'mp_factor_avg': mp_factor_avg}
             # update the mp_beliefs to the last row of the prepared memory (from exploration)
             learn_memory_mod['mp_belief'].iloc[[-1]] = [data_dict]
 
-        else:
-            # print("ASDASD2: " + str(learn_memory_mod.iloc[-2][['t', 'mp_belief', 'mp_belief']]))
-            last_mp_belief = learn_memory_mod.iloc[-2]['mp_belief']
-            print("last_mp_belief: " + str(last_mp_belief))
+        else:  # if update
+            last_mp_belief = learn_memory_mod.iloc[-2]['mp_belief']  # -1 is current row
+            # print("last_mp_belief: " + str(last_mp_belief))
             if update_mp_belief:
-                # print("last rows: " + str(learn_memory_mod.iloc[-5:-1]))
-                print("last mp_factor: " + str(learn_memory_mod.iloc[-1]['mp_factor']))
-                # print("-5:-1 belief: " + str(learn_memory_mod.iloc[-5:-1][['t', 'mp_belief']]))
-                if learn_memory_mod.iloc[-1]['mp_factor'] <= 0:
-                    # learn_memory_mod['mp_belief'].iloc[[-1]] = "no update necessary mp_factor<0"
-                    # print("rewriting -2: " + str(learn_memory_mod.iloc[-2][['t', 'mp_belief']]))
-                    # print("rewriting -3: " + str(learn_memory_mod.iloc[-3][['t', 'mp_belief']]))
-                    # print("to -1: " + str(learn_memory_mod.iloc[-1][['t','mp_belief']]))
+                # print("last mp_factor: " + str(learn_memory_mod.iloc[-1]['mp_factor']))
+                if learn_memory_mod.iloc[-1]['mp_factor'] <= 0:  # if so, then no change - rewrite the previous one
                     learn_memory_mod['mp_belief'].iloc[[-1]] = [last_mp_belief]
-                    # print("after update mp_belief: " + str(learn_memory_mod.iloc[-1]['mp_belief']))
-                    # print("ASDASD 2: " + str(learn_memory_mod.iloc[[-3, -2, -1]][['t', 'mp_belief']]))
-                    # learn_memory_mod.iloc[-1, learn_memory_mod.columns.get_loc('mp_belief')] = 1
-                else:
+                else:  # otherwise make whole BL based update
                     mpf = learn_memory_mod.iloc[-1]['mp_factor']  # my row
                     pri = learn_memory_mod.iloc[-1]['pcf']  # my row
                     P_H_dict = learn_memory_mod.iloc[-2]['mp_belief']  # previous row
@@ -1793,8 +1847,20 @@ class VPP_ext_agent(Agent):
                     thetaH = np.arange(a, b+c, c)
                     # print(thetaH)
 
-                    P_He = self.P_He_constrained(P_H_dict, pri, mpf, thetaH, pow, multi, theta_constraints, c)
-                    print("== back to main ===")
+                    bias = -0.5
+                    if learn_memory_mod.iloc[-1]['sim_cases']['forced_decrease'] > 0:
+                        bias = 0.5
+                        print("BL update with forced decrease. This implies pcf being the lower boundry of a hypothesis, therefore pri value in the function increased to the upper boundry.")
+
+                    # pri_mod is just to convert lower boundry to middle value. To focus belief on the hypothesis instead of on two hyp. if pri is on the boundry
+                    # pri_mod = c/2.0
+
+                    print("Triggering P_He_constrained for pri: " + str(pri) + " with bias: " + str(bias) + ". mp_factor=" + str(mpf))
+                    print(P_H_dict)
+                    P_He = self.P_He_constrained(P_H_dict, pri + bias, mpf, thetaH, pow, multi, theta_constraints, c)
+                    print("== back to main ===> new P_He: ")
+                    print(P_He)
+
                     P_He_dict = copy.deepcopy(P_H_dict)
                     P_He_dict['mp_factor_avg'] = P_He.tolist()
                     # print(P_H_dict)
@@ -1854,31 +1920,37 @@ class VPP_ext_agent(Agent):
         :param theta_constraints_idx: constraints for the range around the event price, to limit the influence of on event on other marginal prices
         :return:
         """
-        # print("ASDASD")
-        # print(mpf)
-        # print(pri)
-        # print(P_H)
-        # print(thetaH)
+        # print("Triggering P_He_constrained")
+        # print(mp_factor)
+        print("\n\n")
+        print(pri)
+        # print(thetaH)  # 3:1:20
+
+        P_H = np.array(P_Hd['mp_factor_avg'])
 
         # fake values
-        # pri = 16.11
-        # mp_factor = 0.9238
+        # pri = 17.20
+        # mp_factor = 0.8999
 
-        n_hypoth = len(thetaH)
-        thetaH_idx = np.arange(0, n_hypoth)
-        thetaH_idx_ranges = np.transpose(np.concatenate((np.array([thetaH_idx]), np.array([thetaH-prices_step]), np.array([thetaH])), axis=0))
+        n_hypoth = len(thetaH) - 1  # 17
+        thetaH_idx = np.arange(0, n_hypoth)  # 0...16
+        thetaH_idx_ranges = np.transpose(np.concatenate((np.array([thetaH_idx]), np.array([thetaH[0:-1]]), np.array([thetaH[0:-1]+prices_step])), axis=0))
+        print("thetaH_idx_ranges")
         print(thetaH_idx_ranges)
-        print(thetaH_idx_ranges.shape)
+        # print(thetaH_idx_ranges.shape)
         resolution_normalized = 1/n_hypoth
         theta = np.divide(thetaH_idx, n_hypoth)
 
         min_probability = resolution_normalized/10
+        P_H[P_H < min_probability] = min_probability
+        P_H = np.round(P_H / np.sum(P_H), 4)
 
-        print("--- in function ---")
-        print(n_hypoth)
-        print(thetaH_idx)
-        print(resolution_normalized)
-        print(theta)
+        # print(P_H)
+        # print("--- in function ---")
+        # print(n_hypoth)
+        # print(thetaH_idx)
+        # print(resolution_normalized)
+        # print(theta)
 
         cont_res = 0.001
         # B norm definition
@@ -1889,54 +1961,54 @@ class VPP_ext_agent(Agent):
             decim = 1
         n_hypoth_constr = 2*theta_constraints/prices_step + decim
 
-        print("n_hypoth_constr: " + str(n_hypoth_constr))
-
-        print("\n")
-        print(thetaH)
-        print(pri)
-        print(P_Hd)
-        P_H = np.array(P_Hd['mp_factor_avg'])
-        print("P_H: " + str(P_H))
-        print("pri: " + str(pri))
-        print(thetaH == pri)
-        print("mpf: " + str(mp_factor))
+        # print("n_hypoth_constr: " + str(n_hypoth_constr))
+        #
+        # print("\n")
+        # print(thetaH)
+        # print(pri)
+        # print(P_Hd)
+        #
+        # print("P_H: " + str(P_H))
+        # print("pri: " + str(pri))
+        # print(thetaH == pri)
+        # print("mpf: " + str(mp_factor))
 
         # row beta-distribution part
         theta01 = np.arange(0, 1+cont_res, cont_res)
         alpha = multi * (mp_factor ** pow)
-        print("alpha01: " + str(alpha))
+        # print("alpha01: " + str(alpha))
         if alpha < 1:
             P_He = P_H
             P_He[P_He < min_probability] = min_probability
             P_He = np.round(P_He / np.sum(P_He), 4)
             return P_He
         beta = (alpha - 1 + 2*0.5 - 0.5*alpha)/0.5
-        print("beta01: " + str(beta))
+        # print("beta01: " + str(beta))
         B01 = self.B_norm(alpha, beta, theta01, cont_res)
-        print(B01)
+        # print(B01)
         cont_probability = (theta01**(alpha-1) * (1-theta01)**(beta-1)) / B01
-        print("should be 1:" + str(np.sum(cont_probability*cont_res)))
+        # print("should be 1:" + str(np.sum(cont_probability*cont_res)))
 
         pri_ranges = np.zeros((int(n_hypoth_constr), 2))
-        print("pri_ranges0: " + str(pri_ranges))
+        # print("pri_ranges0: " + str(pri_ranges))
         pri_start = pri-theta_constraints
         pri_ranges[0, 0] = pri_start
         pri_max = pri + theta_constraints
         pri_ranges[-1, -1] = pri_max
         thetaHext = np.sort(np.concatenate([thetaH, np.array([pri_start])]))
 
-        print(thetaHext)
+        # print(thetaHext)
         thetaHext_greater = thetaHext[thetaHext > pri_start]
-        print(thetaHext_greater)
-        print("pri_ranges: " + str(pri_ranges))
-        print("pri_max: " + str(pri_max))
-        print("\n")
+        # print(thetaHext_greater)
+        # print("pri_ranges: " + str(pri_ranges))
+        # print("pri_max: " + str(pri_max))
+        # print("\n")
         for nh in range(0, int(n_hypoth_constr)):
-            print(nh)
+            # print(nh)
             if thetaHext_greater[nh] < pri_max:
                 pri_ranges[nh, 1] = thetaHext_greater[nh]
                 pri_ranges[nh+1, 0] = thetaHext_greater[nh]
-                print("pri_ranges loop: " + str(pri_ranges))
+                # print("pri_ranges loop: " + str(pri_ranges))
             else:
                 break
 
@@ -1944,10 +2016,10 @@ class VPP_ext_agent(Agent):
         ranges = pri_ranges - pri_start
         ranges_norm = ranges / ranges[-1, -1]
 
-        print("ranges_norm: " + str(ranges_norm))
+        # print("ranges_norm: " + str(ranges_norm))
 
         P_eH_constr = np.empty(int(n_hypoth_constr))
-        print(P_eH_constr)
+        # print(P_eH_constr)
         for nh in range(0, int(n_hypoth_constr)):
             # print(nh)
             start = np.round(ranges_norm[nh, 0] + cont_res, 4)
@@ -1967,8 +2039,7 @@ class VPP_ext_agent(Agent):
             P_eH_constr[nh] = np.sum(prob*cont_res)
 
         print("P_eH_constr: " + str(P_eH_constr))
-        print("Should be one: " + str(np.sum(P_eH_constr)))
-
+        # print("Should be one: " + str(np.sum(P_eH_constr)))
 
         a = pri > thetaH_idx_ranges[:, 1]
         b = pri <= thetaH_idx_ranges[:, 2]
@@ -1983,41 +2054,47 @@ class VPP_ext_agent(Agent):
         up_idx = thetaH_idx_ranges[a * b, 0]
 
         thetaH_idx_constr = np.arange(down_idx, up_idx+1)
-        print(P_H)
+        # print(P_H)
+        print("Indexes of the hypoths, thetaH_idx_constr: ")
         print(thetaH_idx_constr)
+
+        other_ones_idx = np.setdiff1d(thetaH_idx, thetaH_idx_constr)
+        sum_other_ones = np.sum(P_H[other_ones_idx.astype(int)])
 
         P_H_constr = P_H[thetaH_idx_constr.astype(int)]
         eps_sum = 0
 
-        print(P_eH_constr)
-        print(P_H_constr)
+        # print(P_eH_constr)
+        # print(P_H_constr)
 
         for i in range(0, int(n_hypoth_constr)):
             a = P_eH_constr[i] * P_H_constr[i]
             eps_sum = eps_sum + a
-        print("eps_sum: " + str(eps_sum))
+        # print("eps_sum: " + str(eps_sum))
 
         P_He_constr = copy.deepcopy(P_H_constr)
         for i in range(0, int(n_hypoth_constr)):
-            print(i)
-            print(P_H_constr[i] * P_eH_constr[i] / eps_sum)
+            # print(i)
+            # print(P_H_constr[i] * P_eH_constr[i] / eps_sum)
             P_He_constr[i] = P_H_constr[i] * P_eH_constr[i] / eps_sum
 
         P_He_constr = P_He_constr/np.sum(P_He_constr)
 
         print("P_He_constr: " + str(P_He_constr))
+        P_He_constr = P_He_constr * (1-sum_other_ones)
+        print("P_He_constr rescaled according to (1-sum of other ones): " + str(P_He_constr))
 
         P_He_constr_put = copy.deepcopy(P_H)
         P_He_constr_put[thetaH_idx_constr.astype(int)] = P_He_constr
-        print("first P_He_constr_put: " + str(P_He_constr_put))
-        print("min_probability: " + str(min_probability))
+        # print("first P_He_constr_put: " + str(P_He_constr_put))
+        # print("min_probability: " + str(min_probability))
 
         P_He_constr_put[P_He_constr_put < min_probability] = min_probability
-        print("second P_He_constr_put: " + str(P_He_constr_put))
-        print("sum: " + str(np.sum(P_He_constr_put)))
+        # print("second P_He_constr_put: " + str(P_He_constr_put))
+        # print("sum: " + str(np.sum(P_He_constr_put)))
         P_He_constr_put = np.round(P_He_constr_put / np.sum(P_He_constr_put), 4)
 
-        print("final P_He_constr_put: " + str(P_He_constr_put))
+        # print("final P_He_constr_put: " + str(P_He_constr_put))
 
         return P_He_constr_put
 

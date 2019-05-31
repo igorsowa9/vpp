@@ -7,11 +7,11 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 93#0*int(60/5*24)  # 3861
+ts_0 = 7*int(60/5*24)  # 3861
 constant_environment = False
-ts_n = 22#7*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
 
-directory_tail = "_test"
+directory_tail = "_test_price_decr_week2"
 # directory_tail = "_week2_decreased_vpp4price"
 # directory_tail = "_history_week1_oneshot_pri3_1_20_loadoffset1"
 
@@ -20,7 +20,7 @@ start_datetime = "01/09/2017 00:00"  # start of the __file!__ then ts_0 already 
 
 # explit means that you want to determine price increase factor by the similarity method,
 # and if you want to include the negotiation from already exploit (i.e. the most optimal) in the next negotiation already
-exploit_mode = False
+exploit_mode = True
 update_during_exploit = True  # it is stored at current folder, not at original history folder path_dir_history
 
 # pc_matrix_price_increase_factor (1) vs. pc_matrix_price_absolute_increase (2)
@@ -31,7 +31,7 @@ price_increase_policy = 2
 do_not_exceed_mp_belief = True  # during the derivation of deal pay attention to the mp_factors from the mp_belief in the history folder
 mp_belief_treshold = 0.07  # minimum treshold of marginal price belief in order to take that price under consideration in mp_belief # can depend on amount of hipothesis
 mp_belief_range = 1.0  # absolute range of vicinity of the mp prices to consider in bids derivation
-exceeding_or_vicinity = False  # modify in case of a pcf exceeding the probable MP or modify if the pcf is only in the vicinity of the pcf (i.e. also lower, within the range)
+exceeding_or_vicinity = False  # modify in case of a pcf exceeding the probable MP (the lower boundry of the hypothesis) or modify if the pcf is only in the vicinity of the pcf hypothesis (i.e. also lower, within a range)
 # rather vicinity!!!
 
 # VPPs that are able to utilize the strategy
@@ -49,13 +49,13 @@ top_selection_quantity = 0  # 100 or 0 to disable top selection
 mp_factor_treshold_in_selection = 0.2  # treshold value that are selected based on mp_factor before the average is calculated
 # (4) calculate average from the rest and
 # (5) check with the BL based beliefs about MPs
-use_pcf_exclude = True
+use_pcf_hmid_exclude = True
 
 # BAYESIAN LEARNING marginal prices belief update parameters: (some in the function)
 update_mp_belief = True  # update during negotiation according to BL, either from the file in the history folder, or from the negotiation history file, if True
-pow = 20
+pow = 11
 multi = 50
-theta_constraints = 1.5  # number of neighbouring hypotheses to be omitted during the BL update (around the event price)
+theta_constraints = 2.0  # number of neighbouring only range to be included during the BL update (around the event price)
 
 # exploitation policies:
 multiple_failure = 3  # after this amount of failures during explitation
@@ -65,7 +65,7 @@ multiple_failure = 3  # after this amount of failures during explitation
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1201_0721_week2_multi_oneshot_10/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_0822_1555_week1-2/'
 path_dir_history = '/home/iso/Desktop/vpp_some_results/2019_0216_0957_history_week1_oneshot_pri3_1_20/'
-# path_dir_history = '/home/iso/Desktop/vpp_some_results/2019_0215_1519_history_week1_oneshot_pri3_1_20/'
+# path_dir_history = '/home/iso/Desktop/vpp_some_results/2019_0506_1044_test_1week_3_1_20_hypotheses_org_prices/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1206_1323_week1_multi_oneshot_1/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1206_1620_week1and2_explore_oneshot/'
 # path_dir_history = '/home/iso/Desktop/vpp_some_results/2018_1207_1458_test_history/'
