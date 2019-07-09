@@ -43,7 +43,10 @@ class VPP_ext_agent(Agent):
 
         vpp_file = self.load_data(data_paths[data_names_dict[self.name]])
         ppc0 = cases[vpp_file['case']]()
+        ppc0 = self.time_modifications(ppc0, data_names_dict[self.name], t)
         ppc_t = copy.deepcopy(ppc0)
+        print("ppc_t")
+        print(ppc_t)
 
         fixed_load0 = copy.deepcopy(ppc0['bus'][:, 2])
         max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])
@@ -740,6 +743,7 @@ class VPP_ext_agent(Agent):
         memory = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict[self.name]) + ".pkl")
         my_deficit = self.get_attr('opf1')['power_balance']
         received_pc = self.get_attr('opfd2')['received_pc']
+
         marginal_price = 0
         for deal in self.get_attr('timestep_memory_mydeals'):
             if np.max(deal[1][:, 3]) > marginal_price:
@@ -797,6 +801,9 @@ class VPP_ext_agent(Agent):
             th_max_rev_forvpp3 = np.round(np.sum(bids[:, 2]*bids[:, 3]), 4)
             th_max_rev_forvpp3_res1 = np.round(np.sum(bids[:, 2]*np.floor(bids[:, 3])), 4)
 
+        ### marginal_price_novpp3
+        marginal_price_novpp3 = np.max(bids[:, 3])
+
         memory = memory.append({'t': global_time,
                                 'my_deficit': my_deficit,
                                 'received_pc': np.array(received_pc),
@@ -804,6 +811,7 @@ class VPP_ext_agent(Agent):
                                 'marginal_price': marginal_price,
                                 'received_pc_novpp3': np.array(received_pc_novpp3),
                                 'bids_novpp3': bids,
+                                'marginal_price_novpp3': marginal_price_novpp3,
                                 'th_max_rev_forvpp3': th_max_rev_forvpp3,
                                 'th_max_rev_forvpp3_res1': th_max_rev_forvpp3_res1
                                 }, ignore_index=True)
@@ -814,6 +822,7 @@ class VPP_ext_agent(Agent):
                          'marginal_price',
                          'received_pc_novpp3',
                          'bids_novpp3',
+                         'marginal_price_novpp3',
                          'th_max_rev_forvpp3',
                          'th_max_rev_forvpp3_res1']]
 
@@ -872,6 +881,7 @@ class VPP_ext_agent(Agent):
             vpp_file = self.load_data(data_paths[vpp_idx])
 
             ppc0 = cases[vpp_file['case']]()
+            ppc0 = self.time_modifications(ppc0, vpp_idx, global_time)
             max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])
 
             forecast_max_generation_factor = np.zeros(vpp_file['bus_n'])
@@ -967,6 +977,7 @@ class VPP_ext_agent(Agent):
                 for vpp_idx in av_weather_factor.keys():
                     vpp_file = self.load_data(data_paths[vpp_idx])
                     ppc0 = cases[vpp_file['case']]()
+                    ppc0 = self.time_modifications(ppc0, vpp_idx, global_time)
                     installed_power = np.round(np.sum(ppc0['gen'][1:, 8]), 4)
 
                     res_inst = res_installed_power_factor[vpp_idx]
@@ -1020,6 +1031,7 @@ class VPP_ext_agent(Agent):
                 for vpp_idx in av_weather_factor.keys():
                     vpp_file = self.load_data(data_paths[vpp_idx])
                     ppc0 = cases[vpp_file['case']]()
+                    ppc0 = self.time_modifications(ppc0, vpp_idx, global_time)
                     installed_power = np.round(np.sum(ppc0['gen'][1:, 8]), 4)
 
                     res_inst = res_installed_power_factor[vpp_idx]
@@ -1082,7 +1094,7 @@ class VPP_ext_agent(Agent):
 
             # memory should be updated with the esf mp_factors etc.
             # offset should make processing only for the new records
-            self.prepare_memory(updated_memory_path, True)
+            self.prepare_memory(global_time, updated_memory_path, True)
 
         return
 
@@ -1105,7 +1117,7 @@ class VPP_ext_agent(Agent):
         updated_memory_path = path_save + "updated_memory_ln_" + str(data_names_dict[self.name]) + ".pkl"
 
         if not os.path.isfile(path_initial_memory):  # if memory file has not been prepared so far
-            self.prepare_memory(path_initial_memory)
+            self.prepare_memory(t, path_initial_memory)
             self.log_info("Initial memory prepared and saved. Marginal prices (their pcfs) estimated.")
             fmem = pd.read_pickle(path_initial_memory)
         else:
@@ -1151,6 +1163,7 @@ class VPP_ext_agent(Agent):
                 vpp_file = self.load_data(data_paths[vpp_idx])
 
                 ppc0 = cases[vpp_file['case']]()
+                ppc0 = self.time_modifications(ppc0, vpp_idx, t)
                 max_generation0 = copy.deepcopy(ppc0['gen'][:, 8])  # this one is as a vector including slack bus
 
                 forecast_max_generation_factor = np.zeros(vpp_file['bus_n'])
@@ -1521,7 +1534,7 @@ class VPP_ext_agent(Agent):
 
         return chosen_value
 
-    def prepare_memory(self, path_memory, update=False):  # offset used if not initial memory needs to be prepared
+    def prepare_memory(self, t, path_memory, update=False):  # offset used if not initial memory needs to be prepared
 
         my_idx = data_names_dict[self.name]
 
@@ -1681,6 +1694,7 @@ class VPP_ext_agent(Agent):
             for vpp_idx in av_weather.keys():
                 vpp_file = self.load_data(data_paths[vpp_idx])
                 ppc0 = cases[vpp_file['case']]()
+                ppc0 = self.time_modifications(ppc0, vpp_idx, t)
                 installed_power = np.round(np.sum(ppc0['gen'][1:, 8]), 4)
 
                 res_inst = row['res_inst'][vpp_idx]
@@ -2201,3 +2215,9 @@ class VPP_ext_agent(Agent):
 
             return sim_sum
 
+
+    def time_modifications(self, ppc0, vpp_idx, t):
+        if vpp_idx == 3 and t >= 2114:
+            ppc0['gencost'][3, 4] = 13
+
+        return ppc0
