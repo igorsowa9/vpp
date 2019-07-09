@@ -7,11 +7,12 @@ from data.vpp4bus.case4_vpp4 import case4_vpp4
 
 np.set_printoptions(suppress=True)
 
-ts_0 = 7*int(60/5*24)  # 3861
+ts_0 = 3861#7*int(60/5*24)  # 3861
 constant_environment = False
-ts_n = 7*int(60/5*24)-1  # number of timestamps of whole simulation
+ts_n = 10#7*int(60/5*24)-1  # number of timestamps of whole simulation
 
-directory_tail = "_test_price_decr_week2"
+directory_tail = "_test"
+# directory_tail = "_test_price_decr_week2"
 # directory_tail = "_week2_decreased_vpp4price"
 # directory_tail = "_history_week1_oneshot_pri3_1_20_loadoffset1"
 

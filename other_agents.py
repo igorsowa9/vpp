@@ -1745,6 +1745,7 @@ class VPP_ext_agent(Agent):
             row['mp_factor'] = mp_factor
             learn_memory_mod.iloc[index] = row
 
+        # per-generator part
         for index, row in learn_memory_mod.iterrows():
             if update:
                 if not index == mem_len-1:
