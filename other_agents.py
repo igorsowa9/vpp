@@ -802,7 +802,12 @@ class VPP_ext_agent(Agent):
             th_max_rev_forvpp3_res1 = np.round(np.sum(bids[:, 2]*np.floor(bids[:, 3])), 4)
 
         ### marginal_price_novpp3
-        marginal_price_novpp3 = np.max(bids[:, 3])
+        print("debuggg:")
+        print(bids)
+        if not bids.size ==0:
+            marginal_price_novpp3 = np.max(bids[:, 3])
+        else:
+            marginal_price_novpp3 = 0
 
         memory = memory.append({'t': global_time,
                                 'my_deficit': my_deficit,
@@ -2217,7 +2222,7 @@ class VPP_ext_agent(Agent):
 
 
     def time_modifications(self, ppc0, vpp_idx, t):
-        if vpp_idx == 3 and t >= 2114:
-            ppc0['gencost'][3, 4] = 13
+        # if vpp_idx == 3 and t >= 2114:
+        #     ppc0['gencost'][3, 4] = 13
 
         return ppc0

@@ -429,9 +429,6 @@ def show_results_history(pdf):
     m_vpp3 = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict['vpp3']) + ".pkl")
     m_vpp2 = pd.read_pickle(path_save + "temp_ln_" + str(data_names_dict['vpp2']) + ".pkl")
 
-    print("test m_vpp3")
-    print(m_vpp3)
-
     # m_vpp2.to_csv(path_save + "_" + "view_vpp2" + ".csv")
     # m_vpp3.to_csv(path_save + "_" + "view_vpp3" + ".csv")
 

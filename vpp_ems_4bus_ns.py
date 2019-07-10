@@ -592,4 +592,4 @@ if __name__ == '__main__':
     time.sleep(small_wait)
 
     save_learning_memory(tocsv)
-    show_results_history(pdf)
+    # show_results_history(pdf)
