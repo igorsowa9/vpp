@@ -13,9 +13,10 @@ import pandas as pd
 import time
 import pickle
 import csv
+import scipy.io as sio
 
 # path_save = '/home/iso/Desktop/vpp_some_results/2019_0710_0820_price_decrease_at_2114/'
-path_save = '/home/iso/Desktop/vpp_some_results/2019_0710_1508_test/'
+path_save = '/home/iso/Desktop/vpp_some_results/2019_0710_1539_test/'
 
 opf1_save_balcost_all = np.load(path_save + "opf1_save_balcost_all.npy")
 opf1_save_genload_all = np.load(path_save + "opf1_save_genload_all.npy")
@@ -136,9 +137,6 @@ p3 = m_vpp3['pcf'].tolist()
 # p3 = [np.array(p3[0]) for element in p3]
 # p3 = np.array(p3).flatten()
 
-print(p2)
-sys.exit()
-
 x = np.array(m_vpp3['t'])
 
 plt.title('vpp3 (excess - learning) vs vpp2 (deficit - dumb)')
@@ -151,7 +149,7 @@ plt.setp(plt.plot(x, p2), color='red', linewidth=1.0)
 plt.setp(plt.plot(x, p3), color='purple', linewidth=2.0)
 
 plt.fill_between(x, p2, p1[:, 0], facecolor='lightgreen', interpolate=True)
-plt.ylim(10, 18)
+plt.ylim(-1, 18)
 
 plt.ylabel('prices')
 plt.axhline(0, color='black')
@@ -207,6 +205,13 @@ for k in np.arange(0, n_upd):
 x_with_init = np.append([min(x)-1], x)
 
 # rgb = [0, 0.2, 0.4, 0.6, 1.0]
+print(mp_factor_m)
+print(x_with_init)
+adict = {}
+adict['mp_factor_m'] = mp_factor_m
+adict['x_with_init'] = x_with_init
+sio.savemat(path_save + 'mp_factor.mat', adict)
+sys.exit()
 
 rgb = 0
 for h in np.arange(len(pcfs_upper_h)):

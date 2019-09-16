@@ -11,7 +11,7 @@ ts_0 = 3861#7*int(60/5*24)  # 3861, 2109
 constant_environment = False
 ts_n = 40#7*int(60/5*24)-1  # number of timestamps of whole simulation
 
-directory_tail = "_test"
+directory_tail = "_test_opfonly"
 # directory_tail = "_test_price_decr_week2"
 # directory_tail = "_week2_decreased_vpp4price"
 # directory_tail = "_history_week1_oneshot_pri3_1_20_loadoffset1"
